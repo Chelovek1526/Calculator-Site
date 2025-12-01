@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Онлайн-калькулятор алгебры</title>
+    <title>Продвинутый Калькулятор</title>
     <style>
         body { 
             font-family: Arial, sans-serif; 
@@ -18,45 +18,152 @@
             justify-content: center;
             align-items: center;
         }
-        .container {
-            max-width: 800px;
-            width: 100%;
-        }
-        h1 {
-            margin-bottom: 20px;
-            color: #ff6b6b;
-        }
-        .calculator-container {
+        .calculator {
             background: rgba(255, 255, 255, 0.1);
             padding: 20px;
             border-radius: 15px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 700px;
+            width: 100%;
+        }
+        input[type="text"] {
+            width: 100%;
+            height: 50px;
+            font-size: 24px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background: #ff6b6b;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover { background: #ff5252; }
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+            min-height: 30px;
+            word-wrap: break-word;
+        }
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .hint {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 10px;
         }
         @media (max-width: 600px) {
-            .container { max-width: 100%; }
+            .calculator { max-width: 100%; }
+            button { font-size: 14px; padding: 8px 12px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🧮 Онлайн-калькулятор алгебры</h1>
-        <p>Реши уравнение, посчитай производную или просто потренируйся. Всё работает в реальном времени!</p>
-        
-        <div class="calculator-container">
-            <div class="calculator-online-widget" calculator-url="algebra-calculator" calculator-height="500">
-                <div class="calculator-online-header">
-                    <img src="https://calculator-online.net/assets/loader.svg" alt="loader" width="200" height="200" style="margin: 0px auto;display: block;">
-                </div>
-                <div class="calculator-online-footer">
-                    <a href="https://calculator-online.net/algebra-calculator/" title="Calculator-Online.net" class="calculator-online-link" target="_blank"><img alt="Calculator Online" class="calculator-online-logo" height="30" width="125" src="https://calculator-online.net/blue-logo.png" /></a>
-                </div>
-            </div>
+    <h1>🧮 Продвинутый Калькулятор (Без зависимостей)</h1>
+    <div class="calculator">
+        <div class="hint">Примеры: 2+2, sin(45*PI/180), log(100)/log(10), sqrt(16). Для градусов умножай на PI/180. Solve не поддерживается — только базовые выражения.</div>
+        <input type="text" id="expression" placeholder="Введите выражение">
+        <div class="buttons">
+            <button onclick="appendToExpression('sin(')">sin</button>
+            <button onclick="appendToExpression('cos(')">cos</button>
+            <button onclick="appendToExpression('tan(')">tan</button>
+            <button onclick="appendToExpression('Math.asin(')">asin</button>
+            <button onclick="appendToExpression('Math.acos(')">acos</button>
+            <button onclick="appendToExpression('Math.atan(')">atan</button>
+            <button onclick="appendToExpression('Math.log(')">ln</button>
+            <button onclick="appendToExpression('Math.log10(')">log10</button>
+            <button onclick="appendToExpression('Math.exp(')">exp</button>
+            <button onclick="appendToExpression('Math.sqrt(')">sqrt</button>
+            <button onclick="appendToExpression('Math.PI')">π</button>
+            <button onclick="appendToExpression('Math.E')">e</button>
+            <button onclick="appendToExpression('**')">^</button>
+            <button onclick="appendToExpression('!')">!</button> <!-- Факториал добавим в функцию -->
+            <button onclick="clearExpression()">C</button>
         </div>
-        
-        <p style="margin-top: 20px; font-size: 0.9em;">Виджет от <a href="https://calculator-online.net/" target="_blank" style="color: #ff6b6b;">Calculator-Online.net</a>. Если не загружается, проверь интернет или обнови страницу.</p>
+        <button onclick="calculate()" style="width: 100%; margin-top: 10px;">Вычислить</button>
+        <div class="result" id="result"></div>
     </div>
 
-    <script src="https://calculator-online.net/widget/sdk.js?v=0.1.5" async defer></script>
+    <script>
+        const expressionInput = document.getElementById('expression');
+        expressionInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculate();
+            }
+        });
+
+        function appendToExpression(value) {
+            expressionInput.value += value;
+            expressionInput.focus();
+        }
+
+        function clearExpression() {
+            expressionInput.value = '';
+            document.getElementById('result').textContent = '';
+        }
+
+        // Функция факториала
+        function factorial(n) {
+            if (n < 0) return NaN;
+            if (n === 0 || n === 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) result *= i;
+            return result;
+        }
+
+        function calculate() {
+            const expr = expressionInput.value.trim();
+            const resultDiv = document.getElementById('result');
+            if (!expr) {
+                resultDiv.textContent = 'Введите выражение!';
+                return;
+            }
+            try {
+                // Заменяем ! на factorial()
+                let safeExpr = expr.replace(/(\d+)!/g, 'factorial($1)');
+                // Добавляем Math. к функциям, если не указано
+                safeExpr = safeExpr.replace(/\bsin\b/g, 'Math.sin')
+                                    .replace(/\bcos\b/g, 'Math.cos')
+                                    .replace(/\btan\b/g, 'Math.tan')
+                                    .replace(/\basin\b/g, 'Math.asin')
+                                    .replace(/\bacos\b/g, 'Math.acos')
+                                    .replace(/\batan\b/g, 'Math.atan')
+                                    .replace(/\bln\b/g, 'Math.log')
+                                    .replace(/\blog\b/g, 'Math.log')
+                                    .replace(/\blog10\b/g, 'Math.log10')
+                                    .replace(/\bexp\b/g, 'Math.exp')
+                                    .replace(/\bsqrt\b/g, 'Math.sqrt')
+                                    .replace(/\bpi\b/g, 'Math.PI')
+                                    .replace(/\be\b/g, 'Math.E')
+                                    .replace(/\^/g, '**'); // Для степени
+
+                // Проверка на безопасные символы (только числа, операторы, функции)
+                if (!/^[\d\s\+\-\*\/\(\)\.\,\!\^\w]+$/.test(safeExpr)) {
+                    throw new Error('Недопустимые символы. Только числа и математические операторы.');
+                }
+
+                // Вычисляем с eval (безопасно, так как проверено)
+                const result = eval(safeExpr);
+                if (isNaN(result) || !isFinite(result)) {
+                    throw new Error('Результат не число или бесконечность.');
+                }
+                resultDiv.textContent = 'Результат: ' + result;
+            } catch (error) {
+                resultDiv.textContent = 'Ошибка: ' + error.message + '. Пример: 2+2 → 4; sin(45*Math.PI/180) → ~0.707';
+            }
+        }
+    </script>
 </body>
-                      </html>
+</html>
