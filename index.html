@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн-калькулятор алгебры</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            padding: 20px;
+            background: linear-gradient(45deg, #000, #333);
+            color: white;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #ff6b6b;
+        }
+        .calculator-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        @media (max-width: 600px) {
+            .container { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 Онлайн-калькулятор алгебры</h1>
+        <p>Реши уравнение, посчитай производную или просто потренируйся. Всё работает в реальном времени!</p>
+        
+        <div class="calculator-container">
+            <div class="calculator-online-widget" calculator-url="algebra-calculator" calculator-height="500">
+                <div class="calculator-online-header">
+                    <img src="https://calculator-online.net/assets/loader.svg" alt="loader" width="200" height="200" style="margin: 0px auto;display: block;">
+                </div>
+                <div class="calculator-online-footer">
+                    <a href="https://calculator-online.net/algebra-calculator/" title="Calculator-Online.net" class="calculator-online-link" target="_blank"><img alt="Calculator Online" class="calculator-online-logo" height="30" width="125" src="https://calculator-online.net/blue-logo.png" /></a>
+                </div>
+            </div>
+        </div>
+        
+        <p style="margin-top: 20px; font-size: 0.9em;">Виджет от <a href="https://calculator-online.net/" target="_blank" style="color: #ff6b6b;">Calculator-Online.net</a>. Если не загружается, проверь интернет или обнови страницу.</p>
+    </div>
+
+    <script src="https://calculator-online.net/widget/sdk.js?v=0.1.5" async defer></script>
+</body>
+                      </html>
