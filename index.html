@@ -97,73 +97,150 @@
     </div>
 
     <script>
-        const expressionInput = document.getElementById('expression');
-        expressionInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                calculate();
+    const expressionInput = document.getElementById('expression');
+    const equationInput = document.getElementById('equation');
+    const resultDiv = document.getElementById('result');
+
+    expressionInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') calculateBasic(); });
+    equationInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') solveSimple(); });
+
+    function appendToExpression(value) {
+        expressionInput.value += value;
+        expressionInput.focus();
+    }
+
+    function clearExpression() {
+        expressionInput.value = '';
+        equationInput.value = '';
+        resultDiv.textContent = '';
+        resultDiv.className = 'result';
+    }
+
+    function factorial(n) {
+        if (n < 0) return NaN;
+        if (n === 0 || n === 1) return 1;
+        let result = 1;
+        for (let i = 2; i <= n; i++) result *= i;
+        return result;
+    }
+
+    function calculateBasic() {
+        const expr = expressionInput.value.trim();
+        if (!expr) {
+            showResult('Введите выражение!', 'error');
+            return;
+        }
+        try {
+            let safeExpr = expr.replace(/(\d+)!/g, 'factorial($1)')
+                                .replace(/\bsin\b/g, 'Math.sin')
+                                .replace(/\bcos\b/g, 'Math.cos')
+                                .replace(/\btangent\b/g, 'Math.tan')  // Старый код имел tan, но я исправил на tan для совместимости
+                                .replace(/\bln\b/g, 'Math.log')
+                                .replace(/\bsqrt\b/g, 'Math.sqrt')
+                                .replace(/\bpi\b/g, 'Math.PI')
+                                .replace(/\^/g, '**');
+
+            if (!/^[\d\s\+\-\*\/\(\)\.\,\!\^\w]+$/.test(safeExpr)) {
+                throw new Error('Недопустимые символы.');
             }
-        });
 
-        function appendToExpression(value) {
-            expressionInput.value += value;
-            expressionInput.focus();
-        }
-
-        function clearExpression() {
-            expressionInput.value = '';
-            document.getElementById('result').textContent = '';
-        }
-
-        // Функция факториала
-        function factorial(n) {
-            if (n < 0) return NaN;
-            if (n === 0 || n === 1) return 1;
-            let result = 1;
-            for (let i = 2; i <= n; i++) result *= i;
-            return result;
-        }
-
-        function calculate() {
-            const expr = expressionInput.value.trim();
-            const resultDiv = document.getElementById('result');
-            if (!expr) {
-                resultDiv.textContent = 'Введите выражение!';
-                return;
+            const result = eval(safeExpr);
+            if (isNaN(result) || !isFinite(result)) {
+                throw new Error('Неверный результат.');
             }
-            try {
-                // Заменяем ! на factorial()
-                let safeExpr = expr.replace(/(\d+)!/g, 'factorial($1)');
-                // Добавляем Math. к функциям, если не указано
-                safeExpr = safeExpr.replace(/\bsin\b/g, 'Math.sin')
-                                    .replace(/\bcos\b/g, 'Math.cos')
-                                    .replace(/\btan\b/g, 'Math.tan')
-                                    .replace(/\basin\b/g, 'Math.asin')
-                                    .replace(/\bacos\b/g, 'Math.acos')
-                                    .replace(/\batan\b/g, 'Math.atan')
-                                    .replace(/\bln\b/g, 'Math.log')
-                                    .replace(/\blog\b/g, 'Math.log')
-                                    .replace(/\blog10\b/g, 'Math.log10')
-                                    .replace(/\bexp\b/g, 'Math.exp')
-                                    .replace(/\bsqrt\b/g, 'Math.sqrt')
-                                    .replace(/\bpi\b/g, 'Math.PI')
-                                    .replace(/\be\b/g, 'Math.E')
-                                    .replace(/\^/g, '**'); // Для степени
+            showResult('Результат: ' + result.toFixed(10));
+        } catch (error) {
+            showResult('Ошибка: ' + error.message, 'error');
+        }
+    }
 
-                // Проверка на безопасные символы (только числа, операторы, функции)
-                if (!/^[\d\s\+\-\*\/\(\)\.\,\!\^\w]+$/.test(safeExpr)) {
-                    throw new Error('Недопустимые символы. Только числа и математические операторы.');
+    function solveSimple() {
+        const input = equationInput.value.trim();
+        if (!input) {
+            showResult('Введите уравнение!', 'error');
+            return;
+        }
+        try {
+            let coeffs;
+            if (input.includes('=')) {
+                // Парсим левую и правую части: 2x - 5x = 1 + 2
+                const parts = input.split('=').map(p => p.trim());
+                if (parts.length !== 2) throw new Error('Неверный формат. Используй "=".');
+                let left = parts[0].replace(/\s/g, '');
+                let right = parts[1].replace(/\s/g, '');
+
+                // Функция для парсинга линейного выражения (ax + b)
+                function parseLinear(expr) {
+                    // Удаляем * перед x, если есть
+                    expr = expr.replace(/\*x/g, 'x').replace(/x/g, '*x');  // Нормализуем: 2x -> 2*x
+                    // Разделяем на термины по + и -
+                    const terms = expr.split(/(?=[-+])/);  // Разделяем, сохраняя знаки
+                    let coeffX = 0, constant = 0;
+                    for (let term of terms) {
+                        term = term.trim();
+                        if (term.includes('x')) {
+                            // Коэффициент при x
+                            let coeff = term.replace('x', '').replace(/\*/g, '');
+                            if (coeff === '' || coeff === '+') coeff = '1';
+                            if (coeff === '-') coeff = '-1';
+                            coeffX += parseFloat(coeff) || 0;
+                        } else {
+                            // Константа
+                            constant += parseFloat(term) || 0;
+                        }
+                    }
+                    return { coeffX, constant };
                 }
 
-                // Вычисляем с eval (безопасно, так как проверено)
-                const result = eval(safeExpr);
-                if (isNaN(result) || !isFinite(result)) {
-                    throw new Error('Результат не число или бесконечность.');
-                }
-                resultDiv.textContent = 'Результат: ' + result;
-            } catch (error) {
-                resultDiv.textContent = 'Ошибка: ' + error.message + '. Пример: 2+2 → 4; sin(45*Math.PI/180) → ~0.707';
+                const leftParsed = parseLinear(left);
+                const rightParsed = parseLinear(right);
+
+                // Приводим к (coeffX_left - coeffX_right)*x + (const_left - const_right) = 0
+                const a = 0; // Линейное, нет x^2
+                const b = leftParsed.coeffX - rightParsed.coeffX;
+                const c = leftParsed.constant - rightParsed.constant;
+                coeffs = [a, b, c, 0]; // d=0
+            } else {
+                // Коэффициенты: a b c d
+                coeffs = input.split(/[\s,]+/).map(Number);
+                if (coeffs.length < 3 || coeffs.length > 4) throw new Error('Введите 3-4 коэффициента: a b c [d]');
+                coeffs[3] = coeffs[3] || 0;
             }
+
+            const [a, b, c, d] = coeffs;
+            const constant = d - c; // ax^2 + bx + constant = 0
+
+            if (a === 0) {
+                // Линейное: bx + constant = 0
+                if (b === 0) {
+                    showResult(constant === 0 ? 'Бесконечно много решений' : 'Нет решений');
+                } else {
+                    const x = -constant / b;
+                    showResult(`x = ${x.toFixed(6)}`);
+                }
+            } else {
+                // Квадратичное: ax^2 + bx + constant = 0
+                const discriminant = b * b - 4 * a * constant;
+                if (discriminant < 0) {
+                    showResult('Нет действительных решений');
+                } else if (discriminant === 0) {
+                    const x = -b / (2 * a);
+                    showResult(`x = ${x.toFixed(6)}`);
+                } else {
+                    const x1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+                    const x2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+                    showResult(`x1 = ${x1.toFixed(6)}, x2 = ${x2.toFixed(6)}`);
+                }
+            }
+        } catch (error) {
+            showResult('Ошибка: ' + error.message + '. Примеры: "2x - 5x = 1 + 2" или "0 -3 -3"', 'error');
         }
-    </script>
+    }
+
+    function showResult(text, className = '') {
+        resultDiv.textContent = text;
+        resultDiv.className = 'result ' + className;
+    }
+        </script>
 </body>
 </html>
