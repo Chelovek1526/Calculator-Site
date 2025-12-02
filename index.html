@@ -136,13 +136,11 @@
     <h1 class="text-3xl font-extrabold text-white mb-6 text-center">🧮 Продвинутый Калькулятор</h1>
     
     <div class="calculator-container">
-        <!-- Основной Калькулятор -->
         <div class="calculator">
             
             <div class="result-box" id="result">Ожидание ввода...</div>
-            <input type="text" id="expression" placeholder="Введите выражение или уравнение >
+            <input type="text" id="expression" placeholder="Введите выражение (2+2) или уравнение (2x^3=4)">
             
-            <!-- Кнопки Памяти -->
             <div class="grid grid-cols-4 gap-2 mb-4">
                 <button class="btn-mem text-sm" onclick="memoryClear()">MC</button>
                 <button class="btn-mem text-sm" onclick="memoryRecall()">MR</button>
@@ -150,7 +148,6 @@
                 <button class="btn-mem text-sm" onclick="memorySubtract()">M-</button>
             </div>
             
-            <!-- Функциональные кнопки -->
             <div class="grid grid-cols-5 gap-2 mb-4">
                 <button class="btn-op text-sm" onclick="appendToExpression('Math.sin(')">sin</button>
                 <button class="btn-op text-sm" onclick="appendToExpression('Math.cos(')">cos</button>
@@ -159,9 +156,7 @@
                 <button class="btn-op text-sm" onclick="appendToExpression('Math.sqrt(')">√</button>
             </div>
             
-            <!-- Основная сетка -->
             <div class="btn-grid">
-                <!-- Кнопка H для истории -->
                 <button class="btn-history" onclick="toggleHistory()">H</button>
                 <button class="btn-clear" onclick="clearExpression()">AC</button>
                 <button class="btn-op" onclick="appendToExpression('(')">(</button>
@@ -185,21 +180,18 @@
                 <button class="btn-num" onclick="appendToExpression('0')">0</button>
                 <button class="btn-num" onclick="appendToExpression('.')">.</button>
                 <button class="btn-num" onclick="appendToExpression('Math.PI')">π</button>
-                <button class="btn-num" onclick="appendToExpression('+')">+</button>
+                <button class="btn-op" onclick="appendToExpression('+')">+</button>
 
-                <!-- Дополнительный ряд для x и степеней -->
                 <button class="btn-op" onclick="appendToExpression('x')">x</button>
-                <button class="btn-op" onclick="appendToExpression('^2')">x²</button>
-                <button class="btn-op" onclick="appendToExpression('^3')">x³</button>
+                <button class="btn-op" onclick="appendToExpression('x^2')">x²</button>
+                <button class="btn-op" onclick="appendToExpression('x^3')">x³</button>
                 <button class="btn-op" onclick="appendToExpression('=')">=</button>
                 
-                <!-- Единая кнопка "Вычислить" -->
                 <button class="btn-main mt-4" onclick="handleInput()">Вычислить</button>
             </div>
             
         </div>
         
-        <!-- Панель Истории (скрыта по умолчанию) -->
         <div class="history-panel hidden" id="history-panel">
             <h3 class="text-xl font-bold mb-4 border-b border-gray-600 pb-2">Журнал Вычислений</h3>
             <div id="history-log" class="flex flex-col-reverse">
@@ -247,7 +239,7 @@
 
                 if (isNaN(currentResult)) {
                     showResult('Не удалось получить число для памяти.', true);
-                    return;
+                    return; // КРИТИЧНОЕ ИСПРАВЛЕНИЕ: Добавлен return
                 }
                 
                 if (operation === '+') memoryValue += currentResult;
@@ -282,6 +274,9 @@
         }
         
         function appendToExpression(value) {
+            // Оптимизация для кнопок степеней
+            if (value === 'x^2') value = 'x^2';
+            if (value === 'x^3') value = 'x^3';
             expressionInput.value += value;
             expressionInput.focus();
         }
@@ -357,18 +352,25 @@
 
         function calculateBasic(expr) {
             try {
-                let safeExpr = expr.replace(/\^/g, '**')
+                let safeExpr = expr.replace(/x²/g, '**2') // x² -> **2
+                                   .replace(/x³/g, '**3') // x³ -> **3
+                                   .replace(/\^/g, '**') // ^ -> **
                                    .replace(/(\d+)!/g, 'factorial($1)')
                                    .replace(/([0-9\.]+)([A-Za-z])/g, '$1*$2')
                                    .replace(/\)([0-9])/g, ')*$1')
-                                   .replace(/M/g, memoryValue.toString()); 
+                                   .replace(/M/g, memoryValue.toString());
+                                   
+                // ИСПРАВЛЕНИЕ 3: Добавлена поддержка числа Эйлера
+                safeExpr = safeExpr.replace(/e/g, 'Math.E'); 
 
+                // Проверка на недопустимый код (white-list)
                 const allowedCode = safeExpr.replace(/Math\.(sin|cos|tan|log|sqrt|PI|E|pow|abs|round|floor|ceil|random)|\d+\.?\d*|[\+\-\*\/\(\)\s\**]|factorial/g, '');
 
                 if (allowedCode.length > 0) {
                     throw new Error('Недопустимые символы или функции: ' + allowedCode.trim().substring(0, 10) + '...');
                 }
 
+                // Использование new Function для безопасного вычисления
                 const func = new Function('factorial', 'return ' + safeExpr);
                 const result = func(factorial);
 
@@ -388,10 +390,20 @@
         // Парсит одну сторону уравнения и возвращает коэффициенты для Ax^3 + Bx^2 + Cx + D
         function parseSide(expr) {
             expr = expr.replace(/\s/g, '');
-            // Обеспечиваем явный коэффициент 1 (например, x^3 -> 1x^3)
-            expr = expr.replace(/([+-]|^)x\^3/g, '$11x^3').replace(/^x\^3/, '1x^3');
-            expr = expr.replace(/([+-]|^)x\^2/g, '$11x^2').replace(/^x\^2/, '1x^2');
-            expr = expr.replace(/([+-]|^)x/g, '$11x').replace(/^x/, '1x');
+            
+            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ 2: Более точный парсинг для явного коэффициента '1'
+            // 1. Сначала обрабатываем 'x' (коэффициент 1)
+            expr = expr.replace(/([+-]|^)(x(?![^()]*\^))/g, '$11$2'); 
+            // 2. Затем 'x^2'
+            expr = expr.replace(/([+-]|^)(x\^2)/g, '$11$2'); 
+            // 3. Затем 'x^3'
+            expr = expr.replace(/([+-]|^)(x\^3)/g, '$11$3'); 
+
+            // Отдельно обрабатываем случай, когда 'x' стоит в начале
+            expr = expr.replace(/^x(?![^()]*\^)/, '1x');
+            expr = expr.replace(/^x\^2/, '1x^2');
+            expr = expr.replace(/^x\^3/, '1x^3');
+
             
             // Regex для захвата всех членов: x^3, x^2, x, константа
             const terms = expr.match(/([+-]?\d*\.?\d*x\^3)|([+-]?\d*\.?\d*x\^2)|([+-]?\d*\.?\d*x)|([+-]?\d+\.?\d*)/g);
@@ -422,6 +434,9 @@
 
         // Алгоритм решения кубического уравнения Ax^3 + Bx^2 + Cx + D = 0 (Метод Кардано)
         function solveCubic(a, b, c, d) {
+            // Условие: a != 0
+            if (Math.abs(a) < Epsilon) return solveCubicAlternative(b, c, d);
+            
             // Переход к депрессивному кубическому уравнению: z^3 + pz + q = 0 (где x = z - b/(3a))
             const p = (3 * a * c - b * b) / (3 * a * a);
             const q = (2 * b * b * b - 9 * a * b * c + 27 * a * a * d) / (27 * a * a * a);
@@ -447,15 +462,9 @@
                     const realPartStr = realPart.toFixed(6).replace(/\.?0+$/, '');
                     const imagPartStr = Math.abs(imagPart).toFixed(6).replace(/\.?0+$/, '');
 
-                    // Проверка на чисто мнимые корни
-                    if (Math.abs(imagPart) < Epsilon && Math.abs(realPart) < Epsilon) {
-                        // Если комплексные части близки к нулю, считаем их действительными
-                        roots.push(realPart.toFixed(6).replace(/\.?0+$/, ''));
-                        roots.push(realPart.toFixed(6).replace(/\.?0+$/, ''));
-                    } else if (Math.abs(imagPart) < Epsilon) {
+                    if (Math.abs(imagPart) < Epsilon) {
                         // Чисто действительные корни, но Кардано может дать небольшой мнимый хвост
-                        roots.push(realPartStr);
-                        roots.push(realPartStr);
+                        roots.push(realPartStr, realPartStr);
                     }
                     else {
                         roots.push(`${realPartStr} + ${imagPartStr}i`);
@@ -496,6 +505,29 @@
             return `Кубические решения: x1 = ${roots[0]}` + 
                    (roots[1] ? `, x2 = ${roots[1]}` : '') +
                    (roots[2] ? `, x3 = ${roots[2]}` : '');
+        }
+
+        // Альтернативное решение (если A_cubic оказалось близко к нулю) - Квадратное
+        function solveCubicAlternative(b, c, d) {
+            const A_quad = b;
+            const B_quad = c;
+            const C_quad = d;
+            
+            // Копирование логики решения квадратного уравнения
+            const discriminant = B_quad * B_quad - 4 * A_quad * C_quad;
+
+            if (discriminant < -Epsilon) {
+                const realPart = (-B_quad / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                const imagPart = (Math.sqrt(-discriminant) / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                return `Квадратичные решения: x1 = ${realPart} + ${imagPart}i, x2 = ${realPart} - ${imagPart}i`;
+            } else if (Math.abs(discriminant) < Epsilon) {
+                const x = (-B_quad / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                return `Квадратичное решение (один корень): x = ${x}`;
+            } else {
+                const x1 = ((-B_quad + Math.sqrt(discriminant)) / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                const x2 = ((-B_quad - Math.sqrt(discriminant)) / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                return `Квадратичные решения: x1 = ${x1}, x2 = ${x2}`;
+            }
         }
 
 
