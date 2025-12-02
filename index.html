@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Продвинутый Калькулятор с конвертацией</title>
+    <title>Продвинутый Калькулятор с конвертером</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
@@ -39,6 +39,26 @@
             border: 1px solid #4b5563;
         }
         
+        /* ОБЛАСТЬ РЕНДЕРИНГА (ВИЗУАЛЬНАЯ ДРОБЬ) */
+        #render-output {
+            background: #1f2937;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 60px;
+            margin-bottom: 10px;
+            text-align: right;
+            font-size: 1.8rem;
+            color: #d1d5db; 
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            overflow-x: auto;
+        }
+
+        #render-output .katex {
+            color: #d1d5db;
+        }
+
         /* --- ДВА ПОЛЯ РЕЗУЛЬТАТА --- */
         #result-container {
             display: grid;
@@ -101,15 +121,72 @@
             margin-top: 5px;
         }
 
-        /* --- Общие стили для кнопок и полей ввода (без изменений) --- */
+        /* --- Общие стили для кнопок и полей ввода --- */
+
+        input[type="text"] {
+            width: 100%;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 8px;
+            padding: 15px;
+            box-sizing: border-box;
+            background: #1f2937; 
+            color: #d1d5db; 
+            text-align: right;
+            transition: all 0.2s;
+        }
 
         .btn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .btn-op { background-color: #f59e0b; color: #1f2937; box-shadow: 0 3px #d97706; }
+        .btn-op:active { background-color: #d97706; transform: translateY(1px); box-shadow: 0 2px #d97706; }
         .btn-num { background-color: #4b5563; color: white; box-shadow: 0 3px #374151; }
+        .btn-num:active { background-color: #374151; transform: translateY(1px); box-shadow: 0 2px #374151; }
         .btn-main { background-color: #10b981; color: white; box-shadow: 0 3px #059669; grid-column: span 4; }
+        .btn-main:active { background-color: #059669; transform: translateY(1px); box-shadow: 0 2px #059669; }
         .btn-clear, .btn-history { background-color: #ef4444; color: white; box-shadow: 0 3px #dc2626; }
+        .btn-clear:active, .btn-history:active { background-color: #dc2626; transform: translateY(1px); box-shadow: 0 2px #dc2626; }
         .btn-mem { background-color: #3b82f6; color: white; box-shadow: 0 3px #2563eb; }
+        .btn-mem:active { background-color: #2563eb; transform: translateY(1px); box-shadow: 0 2px #2563eb; }
         
+        /* Стили для истории */
+        .history-panel {
+            background: #28303d; 
+            width: 100%; 
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #4b5563;
+            max-height: 400px; 
+            overflow-y: auto;
+            color: #d1d5db;
+            margin-top: 20px;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out, visibility 0.3s;
+        }
+
+        .history-panel.hidden {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            visibility: hidden;
+        }
+
+        .history-panel::-webkit-scrollbar { width: 8px; }
+        .history-panel::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        .history-panel::-webkit-scrollbar-track { background: #28303d; }
+
+        .history-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #374151;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.15s;
+            border-left: 4px solid #f59e0b;
+        }
+        .history-item:hover { background: #4b5563; }
+        .history-expression { font-size: 0.9rem; color: #9ca3af; }
+        .history-result { font-size: 1.2rem; font-weight: 600; color: #10b981; }
+
     </style>
 </head>
 <body>
@@ -229,14 +306,14 @@
         const historyPanel = document.getElementById('history-panel'); 
         const historyLogDiv = document.getElementById('history-log');
         const renderOutputDiv = document.getElementById('render-output');
-        const converterPanel = document.getElementById('converter-panel'); // Новый элемент
+        const converterPanel = document.getElementById('converter-panel'); 
         const converterResultOutput = document.getElementById('converter-result-output');
 
         let calculationHistory = [];
         let memoryValue = 0; 
         const Epsilon = 1e-10; 
 
-        // Категории единиц, которые поддерживает math.js.
+        // Категории единиц
         const UNIT_CATEGORIES = {
             'Длина': ['m', 'km', 'cm', 'mm', 'inch', 'ft', 'yd', 'mile'],
             'Масса': ['kg', 'g', 'mg', 'lbm', 'oz', 'tonne'],
@@ -317,7 +394,7 @@
         function toggleConverter() {
             converterPanel.classList.toggle('hidden');
             if (!converterPanel.classList.contains('hidden')) {
-                // Если открываем, убеждаемся, что инициализировано
+                // Если открываем, убеждаемся, что инициализировано и конвертируем
                 initConverter();
             }
         }
@@ -327,7 +404,6 @@
             
             // Если категории уже есть, не делаем ничего
             if (categorySelect.options.length > 0) {
-                // Вызываем рендер, чтобы убедиться, что конвертация сработает
                 performConversion();
                 return;
             }
@@ -340,7 +416,6 @@
                 categorySelect.appendChild(option);
             }
 
-            // Вызываем первый рендер селекторов единиц
             renderUnitSelector();
         }
 
@@ -351,11 +426,9 @@
             const unitFromSelect = document.getElementById('unit-from');
             const unitToSelect = document.getElementById('unit-to');
 
-            // Очистка
             unitFromSelect.innerHTML = '';
             unitToSelect.innerHTML = '';
             
-            // Заполнение
             units.forEach((unit, index) => {
                 const optionFrom = document.createElement('option');
                 optionFrom.value = unit;
@@ -365,7 +438,6 @@
                 const optionTo = document.createElement('option');
                 optionTo.value = unit;
                 optionTo.textContent = unit;
-                // Устанавливаем другой юнит по умолчанию, если возможно
                 if (index === 1 || units.length === 1) { 
                     optionTo.selected = true; 
                 }
@@ -387,32 +459,67 @@
             }
 
             try {
-                // 1. Создаем объект единицы
                 const unit = math.unit(value, unitFrom);
-                
-                // 2. Конвертируем
                 const converted = unit.to(unitTo);
                 
-                // 3. Форматируем и выводим
                 const decimalText = converted.format({ precision: 14 }).replace(/\.?0+$/, '');
                 
                 converterResultOutput.textContent = `Результат: ${decimalText} ${unitTo}`;
                 converterResultOutput.className = 'result-box text-yellow-400 mt-4';
 
-                // Добавляем в историю (для конвертера)
                 const historyExpression = `${value} ${unitFrom} to ${unitTo}`;
                 const historyResult = `Конверсия: ${decimalText} ${unitTo}`;
                 recordHistory(historyExpression, historyResult + '|' + historyResult, 'convert');
 
             } catch (error) {
-                converterResultOutput.textContent = 'Ошибка конвертации. Убедитесь, что единицы соответствуют категории.';
+                converterResultOutput.textContent = 'Ошибка конвертации. Единицы несовместимы.';
                 converterResultOutput.className = 'result-box error mt-4';
             }
         }
-
-
-        // --- Остальные функции (Память, История, Уравнения) ---
         
+        // --- Память ---
+        function memoryUpdate(operation) {
+            try {
+                const input = expressionInput.value.trim();
+                let result = NaN;
+                
+                try {
+                    result = math.evaluate(input, scope);
+                } catch (e) {
+                    const resultText = fractionResultDiv.textContent;
+                    if (resultText.includes(': ')) {
+                        result = parseFloat(resultText.split(': ')[1].replace(/[+-]?[a-z]/g, '').replace(' (Dec)', ''));
+                    }
+                }
+
+                if (isNaN(result) || result === null || typeof result === 'object') {
+                    showResults('Не удалось получить числовое значение для памяти.', '---', 'error', 'error');
+                    return;
+                }
+                
+                let currentResult = parseFloat(result);
+
+                if (operation === '+') memoryValue += currentResult;
+                if (operation === '-') memoryValue -= currentResult;
+                
+                scope.M = memoryValue; 
+
+                showResults(`Память: M ${operation}${currentResult.toFixed(4)}`, `(M=${memoryValue.toFixed(4)})`, 'text-blue-400', 'text-blue-400');
+            } catch (e) {
+                 showResults('Невозможно сохранить результат в памяти.', '---', 'error', 'error');
+            }
+        }
+        function memoryAdd() { memoryUpdate('+'); }
+        function memorySubtract() { memoryUpdate('-'); }
+        function memoryClear() { memoryValue = 0; scope.M = 0; showResults('Память очищена (MC=0).', '---', 'text-blue-400', 'decimal-result'); }
+        function memoryRecall() { 
+            expressionInput.value = memoryValue.toString(); 
+            showResults(`Значение памяти (MR): ${memoryValue.toFixed(6)}`, '---', 'text-blue-400', 'decimal-result');
+        }
+
+
+        // --- История ---
+
         function toggleHistory() {
             historyPanel.classList.toggle('hidden');
         }
@@ -427,12 +534,14 @@
             const item = calculationHistory.find(i => i.id === id);
             if (item) {
                 expressionInput.value = item.expression;
-                // В зависимости от типа записи, отображаем по-разному
-                if (item.type === 'calc' || item.type === 'solve' || item.type === 'convert') {
+                if (item.type === 'calc') {
                      const [fraction, decimal] = item.result.split('|');
-                     showResults(fraction || item.result, decimal || '---', item.type === 'calc' ? 'fraction-result' : 'text-purple-400', item.type === 'calc' ? 'decimal-result' : 'text-purple-400');
+                     showResults(fraction, decimal, 'fraction-result', 'decimal-result');
+                } else if (item.type === 'solve' || item.type === 'convert') {
+                     const [fraction, decimal] = item.result.split('|');
+                     showResults(fraction, decimal, item.type === 'solve' ? 'text-purple-400' : 'text-yellow-400', item.type === 'solve' ? 'text-purple-400' : 'text-yellow-400');
                 } else { // Simplify (CAS)
-                     showResults(`Упрощено (CAS).`, item.result, 'text-purple-400', 'text-purple-400');
+                     showResults(`Точный ответ: Упрощено (CAS).`, `Приближенный ответ: См. рендер (KaTeX)`, 'text-purple-400', 'text-purple-400');
                 }
                 renderExpression(item.expression);
             }
@@ -470,15 +579,185 @@
             });
         }
         
-        // ... (Память, Проверка переменных) - Код опущен для краткости, как в предыдущих ответах.
-        function memoryUpdate(operation) { /* ... */ }
-        function memoryAdd() { memoryUpdate('+'); }
-        function memorySubtract() { memoryUpdate('-'); }
-        function memoryClear() { memoryValue = 0; scope.M = 0; showResults('Память очищена (MC=0).', '---', 'text-blue-400', 'decimal-result'); }
-        function memoryRecall() { expressionInput.value = memoryValue.toString(); showResults(`Значение памяти (MR): ${memoryValue.toFixed(6)}`, '---', 'text-blue-400', 'decimal-result'); }
-        function hasUserVariables(expression) { /* ... */ }
+        // --- Уравнения и CAS вспомогательные функции ---
 
-        // --- Главный обработчик ввода (Упрощен, убрана текстовая конверсия) ---
+        function hasUserVariables(expression) {
+            try {
+                const node = math.parse(expression);
+                const userDefinedSymbols = node.filter(function (n) {
+                    return n.isSymbolNode && !['pi', 'e', 'M'].includes(n.name);
+                });
+                return userDefinedSymbols.length > 0;
+            } catch (e) {
+                return false; 
+            }
+        }
+
+        function parseSide(expr) {
+            expr = expr.replace(/\s/g, '');
+            expr = expr.replace(/([+-]|^)(x(?![^()]*\^))/g, '$11$2'); 
+            expr = expr.replace(/([+-]|^)(x\^2)/g, '$11$2'); 
+            expr = expr.replace(/([+-]|^)(x\^3)/g, '$11$3'); 
+            expr = expr.replace(/^x(?![^()]*\^)/, '1x');
+            expr = expr.replace(/^x\^2/, '1x^2');
+            expr = expr.replace(/^x\^3/, '1x^3');
+            expr = expr.replace(/pi/g, math.pi.toString()).replace(/e/g, math.e.toString());
+            
+            const terms = expr.match(/([+-]?\d*\.?\d*x\^3)|([+-]?\d*\.?\d*x\^2)|([+-]?\d*\.?\d*x)|([+-]?\d+\.?\d*)/g);
+            
+            let coeffA = 0; let coeffB = 0; let coeffC = 0; let coeffD = 0; 
+
+            if (!terms) return { coeffA: 0, coeffB: 0, coeffC: 0, coeffD: 0 };
+
+            for (let term of terms) {
+                if (term.includes('x^3')) {
+                    let coeff = term.replace('x^3', '');
+                    coeffA += parseFloat(coeff) || 0;
+                } else if (term.includes('x^2')) {
+                    let coeff = term.replace('x^2', '');
+                    coeffB += parseFloat(coeff) || 0;
+                } else if (term.includes('x')) {
+                    let coeff = term.replace('x', '');
+                    coeffC += parseFloat(coeff) || 0;
+                } else if (term) {
+                    try { coeffD += math.evaluate(term); } 
+                    catch (e) { coeffD += parseFloat(term) || 0; }
+                }
+            }
+            return { coeffA, coeffB, coeffC, coeffD };
+        }
+
+        function solveCubic(a, b, c, d) {
+            if (Math.abs(a) < Epsilon) return solveCubicAlternative(b, c, d);
+            
+            const p = (3 * a * c - b * b) / (3 * a * a);
+            const q = (2 * b * b * b - 9 * a * b * c + 27 * a * a * d) / (27 * a * a * a);
+            
+            const delta = (q * q / 4) + (p * p * p / 27);
+            
+            const roots = [];
+            const correction = -b / (3 * a);
+            
+            try {
+
+                if (delta > Epsilon) {
+                    const u = Math.cbrt(-q / 2 + Math.sqrt(delta));
+                    const v = Math.cbrt(-q / 2 - Math.sqrt(delta));
+                    const x1 = u + v + correction;
+                    roots.push(x1.toFixed(6).replace(/\.?0+$/, ''));
+        
+                    const realPart = (-(u + v) / 2 + correction);
+                    const imagPart = (Math.sqrt(3) / 2) * (u - v);
+                    
+                    const realPartStr = realPart.toFixed(6).replace(/\.?0+$/, '');
+                    const imagPartStr = Math.abs(imagPart).toFixed(6).replace(/\.?0+$/, '');
+
+                    if (Math.abs(imagPart) > Epsilon) {
+                        roots.push(`${realPartStr} + ${imagPartStr}i`);
+                        roots.push(`${realPartStr} - ${imagPartStr}i`);
+                    }
+        
+                } else if (delta < -Epsilon) {
+                    const phi = Math.acos((-q / 2) / Math.sqrt(-(p * p * p / 27)));
+                    const r = 2 * Math.sqrt(-p / 3);
+                    
+                    const x1 = (r * Math.cos(phi / 3) + correction).toFixed(6).replace(/\.?0+$/, '');
+                    const x2 = (r * Math.cos((phi + 2 * Math.PI) / 3) + correction).toFixed(6).replace(/\.?0+$/, '');
+                    const x3 = (r * Math.cos((phi - 2 * Math.PI) / 3) + correction).toFixed(6).replace(/\.?0+$/, '');
+        
+                    roots.push(x1, x2, x3);
+        
+                } else {
+                    const u = Math.cbrt(-q / 2);
+                    
+                    const x1 = (2 * u + correction).toFixed(6).replace(/\.?0+$/, ''); 
+                    const x2 = (-u + correction).toFixed(6).replace(/\.?0+$/, '');    
+                    
+                    roots.push(x1);
+                    if (!(Math.abs(p) < Epsilon && Math.abs(q) < Epsilon)) {
+                         roots.push(x2, x2); 
+                    }
+                }
+            } catch (e) {
+                return 'Ошибка в алгоритме Кардано.';
+            }
+
+            return `Кубические решения: x1 = ${roots[0]}` + 
+                   (roots[1] ? `, x2 = ${roots[1]}` : '') +
+                   (roots[2] ? `, x3 = ${roots[2]}` : '');
+        }
+
+        function solveCubicAlternative(b, c, d) {
+            const A_quad = b;
+            const B_quad = c;
+            const C_quad = d;
+            
+            const discriminant = B_quad * B_quad - 4 * A_quad * C_quad;
+
+            if (Math.abs(A_quad) < Epsilon) {
+                 if (Math.abs(B_quad) > Epsilon) {
+                    const x = (-C_quad / B_quad).toFixed(6).replace(/\.?0+$/, '');
+                    return `Линейное решение: x = ${x}`;
+                 } else {
+                    return Math.abs(C_quad) < Epsilon ? 'Бесконечно много решений (0 = 0)' : 'Нет решений';
+                 }
+            }
+
+            if (discriminant < -Epsilon) {
+                const realPart = (-B_quad / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                const imagPart = (Math.sqrt(-discriminant) / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                return `Квадратичные решения: x1 = ${realPart} + ${imagPart}i, x2 = ${realPart} - ${imagPart}i`;
+            } else if (Math.abs(discriminant) < Epsilon) {
+                const x = (-B_quad / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                return `Квадратичное решение (один корень): x = ${x}`;
+            } else {
+                const x1 = ((-B_quad + Math.sqrt(discriminant)) / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                const x2 = ((-B_quad - Math.sqrt(discriminant)) / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                return `Квадратичные решения: x1 = ${x1}, x2 = ${x2}`;
+            }
+        }
+
+
+        function solveEquation(input) {
+            try {
+                const parts = input.split('=').map(p => p.trim());
+                if (parts.length !== 2) throw new Error('Неверный формат уравнения. Используйте один знак "=".');
+                
+                const leftParsed = parseSide(parts[0]);
+                const rightParsed = parseSide(parts[1]);
+
+                const A_cubic = leftParsed.coeffA - rightParsed.coeffA; 
+                const B_cubic = leftParsed.coeffB - rightParsed.coeffB; 
+                const C_cubic = leftParsed.coeffC - rightParsed.coeffC; 
+                const D_cubic = leftParsed.coeffD - rightParsed.coeffD; 
+                
+                let solutionText;
+
+                if (Math.abs(A_cubic) > Epsilon) {
+                    solutionText = solveCubic(A_cubic, B_cubic, C_cubic, D_cubic);
+
+                } else if (Math.abs(B_cubic) > Epsilon) {
+                    solutionText = solveCubicAlternative(B_cubic, C_cubic, D_cubic);
+                } else if (Math.abs(C_cubic) > Epsilon) {
+                    const B_linear = C_cubic;
+                    const C_linear = D_cubic;
+                    const x = (-C_linear / B_linear).toFixed(6).replace(/\.?0+$/, '');
+                    solutionText = `Линейное решение: x = ${x}`;
+                } else {
+                    solutionText = Math.abs(D_cubic) < Epsilon ? 'Бесконечно много решений (0 = 0)' : 'Нет решений';
+                }
+                
+                showResults(`Точный ответ: ${solutionText}`, `Приближенный ответ: Уравнение решено.`, 'text-purple-400', 'text-purple-400');
+                recordHistory(input, solutionText + '|' + 'Уравнение решено.', 'solve');
+                renderExpression(solutionText);
+
+            } catch (error) {
+                showResults('Ошибка парсинга уравнения: ' + error.message, 'Проверьте формат (используйте x, x², x³).', 'error', 'error');
+            }
+        }
+
+
+        // --- Главный обработчик ввода ---
 
         function handleInput() {
             const input = expressionInput.value.trim();
@@ -497,8 +776,7 @@
 
             // 2. Уравнения
             if (expression.includes('=')) {
-                // solveEquation(input); // Реализация опущена
-                showResults('Точный ответ: Solve Mode', 'Приближенный ответ: Уравнения не решаются в демо-версии.', 'text-purple-400', 'text-purple-400');
+                solveEquation(input); 
             } 
             // 3. CAS и Вычисления
             else {
@@ -509,7 +787,7 @@
                         const resultKaTeX = simplified.toTex(); 
                         
                         showResults(`Точный ответ: Упрощено (CAS). См. рендер.`, 'Приближенный ответ: Переменные', 'text-purple-400', 'text-purple-400');
-                        recordHistory(input, resultKaTeX, 'simplify');
+                        recordHistory(input, resultKaTeX + '|' + 'Переменные', 'simplify');
                         renderExpression(resultKaTeX);
 
                     } catch (error) {
@@ -558,7 +836,7 @@
         // --- Инициализация ---
         renderHistory();
         renderExpression(expressionInput.value);
-        initConverter(); // Инициализируем конвертер при загрузке
+        initConverter(); 
     </script>
 </body>
-    </html>
+                                                                              </html>
