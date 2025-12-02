@@ -242,7 +242,6 @@
         }
 
         // --- Память (Memory Functions) ---
-        // Использование math.js для более точного обновления памяти
 
         function memoryUpdate(operation) {
             try {
@@ -295,7 +294,7 @@
         }
         
         function appendToExpression(value) {
-            // Замена math.PI на pi для упрощения
+            // Замена Math.PI на pi для упрощения
             if (value === 'Math.PI') value = 'pi'; 
             expressionInput.value += value;
             expressionInput.focus();
@@ -352,7 +351,30 @@
             });
         }
 
-        // --- Главный обработчик ввода (НОВЫЙ БЛОК ЛОГИКИ CAS) ---
+        // --- НОВАЯ ФУНКЦИЯ ДЛЯ ТОЧНОЙ ПРОВЕРКИ ПЕРЕМЕННЫХ ---
+        /**
+         * Проверяет, содержит ли выражение символы, которые не определены в scope (например, x).
+         */
+        function hasUserVariables(expression) {
+            try {
+                // Преобразование в дерево выражений
+                const node = math.parse(expression);
+                
+                // Фильтрация: ищем узлы-символы, чьи имена НЕ являются pi, e или M.
+                const userDefinedSymbols = node.filter(function (n) {
+                    return n.isSymbolNode && !['pi', 'e', 'M'].includes(n.name);
+                });
+
+                return userDefinedSymbols.length > 0;
+            } catch (e) {
+                // Если парсинг не удался (например, неверный синтаксис),
+                // мы обработаем это как ошибку в основной функции.
+                return false; 
+            }
+        }
+
+
+        // --- Главный обработчик ввода (ИСПРАВЛЕННЫЙ БЛОК ЛОГИКИ CAS) ---
 
         function handleInput() {
             const input = expressionInput.value.trim();
@@ -360,51 +382,53 @@
                 showResult('Введите выражение или уравнение!', true);
                 return;
             }
+            
+            // Замена символов для правильной обработки math.js
+            let expression = input.replace(/×/g, '*').replace(/x²/g, 'x^2').replace(/x³/g, 'x^3');
 
-            // 1. Задача: Решение уравнений (сохраняем старый функционал)
-            if (input.includes('=')) {
-                solveEquation(input);
+            // 1. Задача: Решение уравнений
+            if (expression.includes('=')) {
+                solveEquation(expression);
             } 
-            // 2. Задача: Символьное упрощение или числовое вычисление (используем math.js)
+            // 2. Задача: Символьное упрощение или числовое вычисление
             else {
-                try {
-                    // Подготовка: замена умножения на * и степени на ^ (math.js предпочитает ^)
-                    let expression = input.replace(/×/g, '*').replace(/\*\*/g, '^');
-
-                    // Проверка, содержит ли выражение переменные (x, a, b и т.д.)
-                    const hasVariables = expression.match(/[a-wyz]/i); // Ищем любые буквы, кроме 'pi' и 'e'
-
-                    if (hasVariables) {
-                        // А) Символьное упрощение (CAS)
+                // Проверяем, есть ли переменные, которые нужно упрощать
+                if (hasUserVariables(expression)) {
+                    // А) Символьное упрощение (CAS)
+                    try {
                         const simplified = math.simplify(expression);
                         const resultText = simplified.toString();
                         
                         showResult(`Упрощено (CAS): ${resultText}`, false, 'text-purple-400');
                         recordHistory(input, resultText, 'simplify');
 
-                    } else {
-                        // Б) Числовое вычисление (Evaluation)
+                    } catch (error) {
+                        // Ошибка упрощения (обычно неверный синтаксис)
+                        showResult('Ошибка символьного упрощения: ' + error.message, true);
+                    }
+                } else {
+                    // Б) Числовое вычисление (Evaluation)
+                    try {
                         const result = math.evaluate(expression, scope);
                         
-                        if (typeof result === 'object' && result.isBigNumber) {
-                            // Обработка больших чисел
-                            const formattedResult = result.toPrecision(10).replace(/\.?0+$/, '');
-                            showResult(`Результат: ${formattedResult}`);
-                            recordHistory(input, formattedResult, 'calc');
-                        } else if (typeof result === 'number') {
-                             const formattedResult = result.toFixed(10).replace(/\.?0+$/, '');
-                            showResult(`Результат: ${formattedResult}`);
-                            recordHistory(input, formattedResult, 'calc');
-                        }
-                        else {
-                            // Результат, который не является простым числом (например, матрица)
-                            showResult(`Результат: ${result.toString()}`);
-                            recordHistory(input, result.toString(), 'calc');
-                        }
-                    }
+                        let formattedResult;
 
-                } catch (error) {
-                    showResult('Ошибка вычисления/упрощения: ' + error.message, true);
+                        if (typeof result === 'object' && result.isBigNumber) {
+                            formattedResult = result.toPrecision(10).replace(/\.?0+$/, '');
+                        } else if (typeof result === 'number') {
+                             formattedResult = result.toFixed(10).replace(/\.?0+$/, '');
+                        } else {
+                            // Результат, который не является простым числом (например, матрица)
+                            formattedResult = result.toString();
+                        }
+                        
+                        showResult(`Результат: ${formattedResult}`);
+                        recordHistory(input, formattedResult, 'calc');
+
+                    } catch (error) {
+                        // Ошибка вычисления (например, деление на ноль, неверный синтаксис)
+                        showResult('Ошибка вычисления: ' + error.message, true);
+                    }
                 }
             }
         }
@@ -458,7 +482,6 @@
 
         // Алгоритм решения кубического уравнения Ax^3 + Bx^2 + Cx + D = 0 (Метод Кардано)
         function solveCubic(a, b, c, d) {
-            // Оставлен ваш исходный код для кубического решения.
             if (Math.abs(a) < Epsilon) return solveCubicAlternative(b, c, d);
             
             const p = (3 * a * c - b * b) / (3 * a * a);
@@ -531,6 +554,17 @@
             
             const discriminant = B_quad * B_quad - 4 * A_quad * C_quad;
 
+            if (Math.abs(A_quad) < Epsilon) {
+                 if (Math.abs(B_quad) > Epsilon) {
+                     // Линейное: B_quad * x + C_quad = 0
+                    const x = (-C_quad / B_quad).toFixed(6).replace(/\.?0+$/, '');
+                    return `Линейное решение: x = ${x}`;
+                 } else {
+                    return Math.abs(C_quad) < Epsilon ? 'Бесконечно много решений (0 = 0)' : 'Нет решений';
+                 }
+            }
+
+
             if (discriminant < -Epsilon) {
                 const realPart = (-B_quad / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
                 const imagPart = (Math.sqrt(-discriminant) / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
@@ -593,4 +627,4 @@
         renderHistory();
     </script>
 </body>
-                    </html>
+            </html>
