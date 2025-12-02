@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Продвинутый Калькулятор</title>
+    <title>Продвинутый Калькулятор (KaTeX)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-nK/gD87CqjGzN0W12/Y0132l4B3hGgM+5r01zYdE/1v8p+8u7m7yA01j2v2n8n5j" crossorigin="anonymous">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-2j98j15Nl1G8b4xVwQYF2rYl5E4s7tT9F/h2sC0mB5qL2J95N/h6n5Z/j7R3p92m" crossorigin="anonymous"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-qR/WvE4Q10Sj1R5n0W4/v+G4N0G5M4tYv7Q30j9j1t6N7T30Q/8m4Y3E4v/nQ1z" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-2j98j15Nl1G8b4xVwR2L4Y5E4s7tT9F/h2Q30j9j1t6N7T30Q/8m4Y3E4v/nQ1z" crossorigin="anonymous"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
@@ -48,7 +47,7 @@
             min-height: 60px;
             margin-bottom: 10px;
             text-align: right;
-            font-size: 1.8rem; /* Увеличенный размер для формул */
+            font-size: 1.8rem;
             color: #d1d5db; 
             display: flex;
             justify-content: flex-end;
@@ -115,7 +114,45 @@
         }
         .error { color: #f87171; }
         
-        /* Стили для истории и прочего - без изменений */
+        /* Стили для панели истории */
+        .history-panel {
+            background: #28303d; 
+            width: 100%; 
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #4b5563;
+            max-height: 400px; 
+            overflow-y: auto;
+            color: #d1d5db;
+            margin-top: 20px;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out, visibility 0.3s;
+        }
+
+        .history-panel.hidden {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            visibility: hidden;
+        }
+
+        .history-panel::-webkit-scrollbar { width: 8px; }
+        .history-panel::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        .history-panel::-webkit-scrollbar-track { background: #28303d; }
+
+        /* Стили для истории */
+        .history-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #374151;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.15s;
+            border-left: 4px solid #f59e0b;
+        }
+        .history-item:hover { background: #4b5563; }
+        .history-expression { font-size: 0.9rem; color: #9ca3af; }
+        .history-result { font-size: 1.2rem; font-weight: 600; color: #10b981; }
+        .text-purple-400 { color: #c084fc; } /* Для CAS упрощения */
 
     </style>
 </head>
@@ -169,7 +206,8 @@
                 
                 <button class="btn-num" onclick="appendToExpression('0')">0</button>
                 <button class="btn-num" onclick="appendToExpression('.')">.</button>
-                <button class="btn-op" onclick="appendToExpression('\\pi')">π</button> <button class="btn-op" onclick="appendToExpression('+')">+</button>
+                <button class="btn-op" onclick="appendToExpression('\\pi')">π</button> 
+                <button class="btn-op" onclick="appendToExpression('+')">+</button>
 
                 <button class="btn-op text-lg font-extrabold" onclick="insertFractionTemplate()">f/x</button> 
                 <button class="btn-op" onclick="appendToExpression('x')">x</button>
@@ -190,29 +228,39 @@
     </div>
 
     <script>
+        // Инициализация элементов DOM
         const expressionInput = document.getElementById('expression');
         const resultDiv = document.getElementById('result');
-        const renderOutputDiv = document.getElementById('render-output'); // Новый элемент
-        // ... (остальные DOM элементы)
+        const historyPanel = document.getElementById('history-panel'); 
+        const historyLogDiv = document.getElementById('history-log');
+        const renderOutputDiv = document.getElementById('render-output');
 
         let calculationHistory = [];
         let memoryValue = 0; 
         const Epsilon = 1e-10; 
-        const scope = { M: 0, pi: math.pi, e: math.e };
+
+        // Настройка math.js для использования локальной памяти
+        const scope = { 
+            M: 0, 
+            pi: math.pi, 
+            e: math.e
+        };
         
+        // Обновляем scope при изменении memoryValue
         Object.defineProperty(scope, 'M', {
-            get: () => memoryValue, set: (val) => memoryValue = val, enumerable: true, configurable: true
+            get: () => memoryValue,
+            set: (val) => memoryValue = val,
+            enumerable: true,
+            configurable: true
         });
 
         // --- НОВАЯ ФУНКЦИЯ: Рендеринг в KaTeX ---
         function renderExpression(text) {
-            // Заменяем pi и e обратно на текстовые \pi и e для KaTeX
             let kaTeXInput = text
                 .replace(/\*/g, '\\cdot ') // Заменяем * на \cdot для красоты
                 .replace(/pi/g, '\\pi') // Заменяем 'pi' на '\pi' для KaTeX
                 .replace(/\^/g, '^{'); // Заменяем ^ на ^{ для красивых степеней
 
-            // Добавляем закрывающую скобку для степеней, если она отсутствует
             kaTeXInput = kaTeXInput.replace(/^{([^{}]+)(?![}])/g, '^{$1}');
             
             try {
@@ -226,7 +274,7 @@
                 renderOutputDiv.textContent = text;
             }
         }
-        
+
         // --- Обработчик ввода для рендеринга ---
         expressionInput.addEventListener('input', function() {
             renderExpression(expressionInput.value);
@@ -236,13 +284,22 @@
             if (e.key === 'Enter') handleInput(); 
         });
 
+        // --- Вспомогательные функции Калькулятора ---
 
-        // --- Вспомогательные функции ---
+        function toggleHistory() {
+            historyPanel.classList.toggle('hidden');
+        }
 
+        function showResult(text, isError = false, colorClass = 'text-emerald-400') {
+            resultDiv.textContent = text;
+            resultDiv.className = `result-box ${isError ? 'error' : colorClass}`;
+        }
+        
         function appendToExpression(value) {
-            if (value === 'pi') value = '\\pi'; // KaTeX использует \pi
+            // KaTeX использует \pi
+            if (value === 'pi') value = '\\pi'; 
             expressionInput.value += value;
-            renderExpression(expressionInput.value); // Рендерим после добавления
+            renderExpression(expressionInput.value); 
         }
 
         function clearExpression() {
@@ -250,36 +307,111 @@
             showResult('Ожидание ввода...');
             renderOutputDiv.innerHTML = ''; // Очистка рендеринга
         }
-        
-        // --- НОВАЯ ФУНКЦИЯ: Вставка шаблона дроби ---
+
         function insertFractionTemplate() {
             // Вставляем шаблон дроби и сразу рендерим
             expressionInput.value += '\\frac{}{}';
             renderExpression(expressionInput.value);
-            // ПРИМЕЧАНИЕ: На телефонах/ПК, пользователю нужно вручную нажать
-            // на поле ввода, чтобы поместить курсор между первыми {}
+        }
+
+        // --- Функции Памяти ---
+        function memoryUpdate(operation) {
+            try {
+                const input = expressionInput.value.trim();
+                let result = NaN;
+                
+                try {
+                    result = math.evaluate(input, scope);
+                } catch (e) {
+                    const resultText = resultDiv.textContent;
+                    if (resultText.includes(': ')) {
+                        result = parseFloat(resultText.split(': ')[1].replace(/[+-]?[a-z]/g, ''));
+                    }
+                }
+
+                if (isNaN(result) || result === null || typeof result === 'object') {
+                    showResult('Не удалось получить числовое значение для памяти.', true);
+                    return;
+                }
+                
+                let currentResult = parseFloat(result);
+
+                if (operation === '+') memoryValue += currentResult;
+                if (operation === '-') memoryValue -= currentResult;
+                
+                scope.M = memoryValue; 
+
+                showResult(`Память: M ${operation}${currentResult.toFixed(4)} (M=${memoryValue.toFixed(4)})`, false, 'text-blue-400');
+            } catch (e) {
+                 showResult('Невозможно сохранить результат в памяти.', true);
+            }
+        }
+        function memoryAdd() { memoryUpdate('+'); }
+        function memorySubtract() { memoryUpdate('-'); }
+        function memoryClear() { memoryValue = 0; scope.M = 0; showResult('Память очищена (MC=0).', false, 'text-blue-400'); }
+        function memoryRecall() { 
+            expressionInput.value = memoryValue.toString(); 
+            showResult(`Значение памяти (MR): ${memoryValue.toFixed(6)}`, false, 'text-blue-400');
+        }
+
+        // --- Журнал Вычислений (History) ---
+
+        function recordHistory(expression, result, type) {
+            const historyItem = { id: Date.now(), expression, result: result.toString(), type };
+            calculationHistory.push(historyItem);
+            renderHistory();
+        }
+
+        function useHistoryItem(id) {
+            const item = calculationHistory.find(i => i.id === id);
+            if (item) {
+                expressionInput.value = item.expression;
+                showResult(`Загружено из истории: ${item.result}`, false, 'text-gray-400');
+                renderExpression(item.expression);
+            }
+        }
+
+        function renderHistory() {
+            historyLogDiv.innerHTML = '';
+            if (calculationHistory.length === 0) {
+                historyLogDiv.innerHTML = '<p class="text-sm text-gray-500 text-center mt-4">Результаты будут отображаться здесь.</p>';
+                return;
+            }
+
+            [...calculationHistory].reverse().forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.onclick = () => useHistoryItem(item.id);
+                
+                let typeText = 'Вычисление';
+                if (item.type === 'solve') typeText = 'Solve';
+                if (item.type === 'simplify') typeText = 'Упрощение';
+                
+                div.innerHTML = `
+                    <div class="history-expression" title="${typeText}">${item.expression}</div>
+                    <div class="history-result">${item.result}</div>
+                `;
+                historyLogDiv.appendChild(div);
+            });
+        }
+
+        // --- Проверка переменных для CAS ---
+        function hasUserVariables(expression) {
+            try {
+                const node = math.parse(expression);
+                
+                const userDefinedSymbols = node.filter(function (n) {
+                    return n.isSymbolNode && !['pi', 'e', 'M'].includes(n.name);
+                });
+
+                return userDefinedSymbols.length > 0;
+            } catch (e) {
+                return false; 
+            }
         }
 
 
-        // --- Память, История, Решение Уравнений (Логика без изменений, только рефакторинг) ---
-
-        function memoryUpdate(operation) { /* ... */ }
-        function memoryAdd() { memoryUpdate('+'); }
-        function memorySubtract() { memoryUpdate('-'); }
-        function memoryClear() { /* ... */ }
-        function memoryRecall() { /* ... */ }
-        function showResult(text, isError = false, colorClass = 'text-emerald-400') { /* ... */ }
-        function recordHistory(expression, result, type) { /* ... */ }
-        function useHistoryItem(id) { /* ... */ }
-        function renderHistory() { /* ... */ }
-        function hasUserVariables(expression) { /* ... */ }
-        function solveEquation(input) { /* ... */ }
-        function parseSide(expr) { /* ... */ }
-        function solveCubic(a, b, c, d) { /* ... */ }
-        function solveCubicAlternative(b, c, d) { /* ... */ }
-        function toggleHistory() { /* ... */ }
-
-        // --- Главный обработчик ввода (обновлена обработка pi/e) ---
+        // --- Главный обработчик ввода ---
 
         function handleInput() {
             const input = expressionInput.value.trim();
@@ -288,30 +420,29 @@
                 return;
             }
             
-            // Замена символов для правильной обработки math.js:
+            // 1. ПРЕОБРАЗОВАНИЕ KaTeX в math.js
             let expression = input
-                .replace(/\\pi/g, 'pi') // KaTeX \pi обратно в math.js pi
-                .replace(/\\frac{([^{}]+)}{([^{}]+)}/g, '($1)/($2)') // KaTeX \frac{}{} обратно в ( )/( )
+                .replace(/\\pi/g, 'pi')
+                .replace(/\\frac{([^{}]+)}{([^{}]+)}/g, '($1)/($2)')
                 .replace(/×/g, '*')
                 .replace(/x²/g, 'x^2')
                 .replace(/x³/g, 'x^3');
 
-            // 1. Задача: Решение уравнений
+            // 2. Задача: Решение уравнений
             if (expression.includes('=')) {
                 solveEquation(expression);
             } 
-            // 2. Задача: Символьное упрощение или числовое вычисление
+            // 3. Задача: Символьное упрощение или числовое вычисление
             else {
                 if (hasUserVariables(expression)) {
                     // А) Символьное упрощение (CAS)
                     try {
                         const simplified = math.simplify(expression);
-                        // Преобразуем результат обратно в строку KaTeX для записи в историю
                         const resultKaTeX = simplified.toTex(); 
                         
-                        showResult(`Упрощено (CAS). См. результат выше.`, false, 'text-purple-400');
+                        showResult(`Упрощено (CAS). См. рендер.`, false, 'text-purple-400');
                         recordHistory(input, resultKaTeX, 'simplify');
-                        renderExpression(resultKaTeX); // Показываем окончательный результат
+                        renderExpression(resultKaTeX);
 
                     } catch (error) {
                         showResult('Ошибка символьного упрощения: ' + error.message, true);
@@ -322,22 +453,26 @@
                         const result = math.evaluate(expression, scope);
                         
                         let formattedResult;
+                        let kaTeXOutput;
 
                         if (typeof result === 'object' && result.isFraction) {
                             formattedResult = result.toFraction();
+                            kaTeXOutput = `\\frac{${result.n}}{${result.d}}`;
+
                         } else if (typeof result === 'object' && result.isBigNumber) {
                             formattedResult = result.toPrecision(10).replace(/\.?0+$/, '');
+                            kaTeXOutput = formattedResult;
                         } else if (typeof result === 'number') {
                              formattedResult = result.toFixed(10).replace(/\.?0+$/, '');
+                             kaTeXOutput = formattedResult;
                         } else {
                             formattedResult = result.toString();
+                            kaTeXOutput = formattedResult;
                         }
                         
                         showResult(`Результат: ${formattedResult}`);
                         recordHistory(input, formattedResult, 'calc');
-                        
-                        // Рендерим числовой результат в KaTeX
-                        renderExpression(formattedResult);
+                        renderExpression(kaTeXOutput);
 
                     } catch (error) {
                         showResult('Ошибка вычисления: ' + error.message, true);
@@ -345,12 +480,185 @@
                 }
             }
         }
-        
-        // (Остальной код функций solveEquation, parseSide, solveCubic и т.д. остается без изменений, 
-        // но для краткости здесь не приводится). 
 
-        // Инициализация
+
+        // --- Функции для Решения Уравнений (Ax^3 + Bx^2 + Cx + D = 0) ---
+
+        function parseSide(expr) {
+            expr = expr.replace(/\s/g, '');
+            
+            expr = expr.replace(/([+-]|^)(x(?![^()]*\^))/g, '$11$2'); 
+            expr = expr.replace(/([+-]|^)(x\^2)/g, '$11$2'); 
+            expr = expr.replace(/([+-]|^)(x\^3)/g, '$11$3'); 
+
+            expr = expr.replace(/^x(?![^()]*\^)/, '1x');
+            expr = expr.replace(/^x\^2/, '1x^2');
+            expr = expr.replace(/^x\^3/, '1x^3');
+
+            expr = expr.replace(/pi/g, math.pi.toString()).replace(/e/g, math.e.toString());
+            
+            const terms = expr.match(/([+-]?\d*\.?\d*x\^3)|([+-]?\d*\.?\d*x\^2)|([+-]?\d*\.?\d*x)|([+-]?\d+\.?\d*)/g);
+            
+            let coeffA = 0; 
+            let coeffB = 0; 
+            let coeffC = 0; 
+            let coeffD = 0; 
+
+            if (!terms) return { coeffA: 0, coeffB: 0, coeffC: 0, coeffD: 0 };
+
+            for (let term of terms) {
+                if (term.includes('x^3')) {
+                    let coeff = term.replace('x^3', '');
+                    coeffA += parseFloat(coeff) || 0;
+                } else if (term.includes('x^2')) {
+                    let coeff = term.replace('x^2', '');
+                    coeffB += parseFloat(coeff) || 0;
+                } else if (term.includes('x')) {
+                    let coeff = term.replace('x', '');
+                    coeffC += parseFloat(coeff) || 0;
+                } else if (term) {
+                    try {
+                         coeffD += math.evaluate(term);
+                    } catch (e) {
+                         coeffD += parseFloat(term) || 0;
+                    }
+                }
+            }
+            return { coeffA, coeffB, coeffC, coeffD };
+        }
+
+        function solveCubic(a, b, c, d) {
+            if (Math.abs(a) < Epsilon) return solveCubicAlternative(b, c, d);
+            
+            const p = (3 * a * c - b * b) / (3 * a * a);
+            const q = (2 * b * b * b - 9 * a * b * c + 27 * a * a * d) / (27 * a * a * a);
+            
+            const delta = (q * q / 4) + (p * p * p / 27);
+            
+            const roots = [];
+            const correction = -b / (3 * a);
+            
+            try {
+
+                if (delta > Epsilon) {
+                    const u = Math.cbrt(-q / 2 + Math.sqrt(delta));
+                    const v = Math.cbrt(-q / 2 - Math.sqrt(delta));
+                    const x1 = u + v + correction;
+                    roots.push(x1.toFixed(6).replace(/\.?0+$/, ''));
+        
+                    const realPart = (-(u + v) / 2 + correction);
+                    const imagPart = (Math.sqrt(3) / 2) * (u - v);
+                    
+                    const realPartStr = realPart.toFixed(6).replace(/\.?0+$/, '');
+                    const imagPartStr = Math.abs(imagPart).toFixed(6).replace(/\.?0+$/, '');
+
+                    if (Math.abs(imagPart) > Epsilon) {
+                        roots.push(`${realPartStr} + ${imagPartStr}i`);
+                        roots.push(`${realPartStr} - ${imagPartStr}i`);
+                    }
+        
+                } else if (delta < -Epsilon) {
+                    const phi = Math.acos((-q / 2) / Math.sqrt(-(p * p * p / 27)));
+                    const r = 2 * Math.sqrt(-p / 3);
+                    
+                    const x1 = (r * Math.cos(phi / 3) + correction).toFixed(6).replace(/\.?0+$/, '');
+                    const x2 = (r * Math.cos((phi + 2 * Math.PI) / 3) + correction).toFixed(6).replace(/\.?0+$/, '');
+                    const x3 = (r * Math.cos((phi - 2 * Math.PI) / 3) + correction).toFixed(6).replace(/\.?0+$/, '');
+        
+                    roots.push(x1, x2, x3);
+        
+                } else {
+                    const u = Math.cbrt(-q / 2);
+                    
+                    const x1 = (2 * u + correction).toFixed(6).replace(/\.?0+$/, ''); 
+                    const x2 = (-u + correction).toFixed(6).replace(/\.?0+$/, '');    
+                    
+                    roots.push(x1);
+                    if (!(Math.abs(p) < Epsilon && Math.abs(q) < Epsilon)) {
+                         roots.push(x2, x2); 
+                    }
+                }
+            } catch (e) {
+                return 'Ошибка в алгоритме Кардано.';
+            }
+
+            return `Кубические решения: x1 = ${roots[0]}` + 
+                   (roots[1] ? `, x2 = ${roots[1]}` : '') +
+                   (roots[2] ? `, x3 = ${roots[2]}` : '');
+        }
+
+        function solveCubicAlternative(b, c, d) {
+            const A_quad = b;
+            const B_quad = c;
+            const C_quad = d;
+            
+            const discriminant = B_quad * B_quad - 4 * A_quad * C_quad;
+
+            if (Math.abs(A_quad) < Epsilon) {
+                 if (Math.abs(B_quad) > Epsilon) {
+                    const x = (-C_quad / B_quad).toFixed(6).replace(/\.?0+$/, '');
+                    return `Линейное решение: x = ${x}`;
+                 } else {
+                    return Math.abs(C_quad) < Epsilon ? 'Бесконечно много решений (0 = 0)' : 'Нет решений';
+                 }
+            }
+
+            if (discriminant < -Epsilon) {
+                const realPart = (-B_quad / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                const imagPart = (Math.sqrt(-discriminant) / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                return `Квадратичные решения: x1 = ${realPart} + ${imagPart}i, x2 = ${realPart} - ${imagPart}i`;
+            } else if (Math.abs(discriminant) < Epsilon) {
+                const x = (-B_quad / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                return `Квадратичное решение (один корень): x = ${x}`;
+            } else {
+                const x1 = ((-B_quad + Math.sqrt(discriminant)) / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                const x2 = ((-B_quad - Math.sqrt(discriminant)) / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                return `Квадратичные решения: x1 = ${x1}, x2 = ${x2}`;
+            }
+        }
+
+
+        function solveEquation(input) {
+            try {
+                const parts = input.split('=').map(p => p.trim());
+                if (parts.length !== 2) throw new Error('Неверный формат уравнения. Используйте один знак "=".');
+                
+                const leftParsed = parseSide(parts[0]);
+                const rightParsed = parseSide(parts[1]);
+
+                const A_cubic = leftParsed.coeffA - rightParsed.coeffA; 
+                const B_cubic = leftParsed.coeffB - rightParsed.coeffB; 
+                const C_cubic = leftParsed.coeffC - rightParsed.coeffC; 
+                const D_cubic = leftParsed.coeffD - rightParsed.coeffD; 
+                
+                let solutionText;
+
+                if (Math.abs(A_cubic) > Epsilon) {
+                    solutionText = solveCubic(A_cubic, B_cubic, C_cubic, D_cubic);
+
+                } else if (Math.abs(B_cubic) > Epsilon) {
+                    solutionText = solveCubicAlternative(B_cubic, C_cubic, D_cubic);
+                } else if (Math.abs(C_cubic) > Epsilon) {
+                    const B_linear = C_cubic;
+                    const C_linear = D_cubic;
+                    const x = (-C_linear / B_linear).toFixed(6).replace(/\.?0+$/, '');
+                    solutionText = `Линейное решение: x = ${x}`;
+                } else {
+                    solutionText = Math.abs(D_cubic) < Epsilon ? 'Бесконечно много решений (0 = 0)' : 'Нет решений';
+                }
+                
+                showResult(`Solve: ${solutionText}`);
+                recordHistory(input, solutionText, 'solve');
+                renderExpression(solutionText); // Рендерим для истории
+
+            } catch (error) {
+                showResult('Ошибка парсинга уравнения: ' + error.message + '. Проверьте формат (используйте x, x², x³).', true);
+            }
+        }
+        
+        // Инициализация при загрузке
         renderHistory();
+        renderExpression(expressionInput.value);
     </script>
 </body>
-                    </html>
+    </html>
