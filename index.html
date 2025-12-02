@@ -10,7 +10,7 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1f2937, #111827); /* Темный градиент */
+            background: linear-gradient(135deg, #1f2937, #111827); 
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -18,17 +18,48 @@
             padding: 20px;
         }
         
-        .calculator {
-            background: #374151; /* Темный серый */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        .calculator-container {
             max-width: 500px;
-            width: 95%;
+            width: 100%; 
+            margin: 0 auto;
+        }
+
+        .calculator {
+            background: #374151; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%; 
             border-radius: 16px;
             padding: 20px;
             border: 1px solid #4b5563;
         }
+        
+        /* Стили для панели истории */
+        .history-panel {
+            background: #28303d; 
+            width: 100%; 
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #4b5563;
+            max-height: 400px; 
+            overflow-y: auto;
+            color: #d1d5db;
+            margin-top: 20px;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out, visibility 0.3s;
+        }
 
-        /* Общие стили для инпутов */
+        /* Стиль для скрытия/показа истории */
+        .history-panel.hidden {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            visibility: hidden;
+        }
+
+        /* Стили скроллбара для истории */
+        .history-panel::-webkit-scrollbar { width: 8px; }
+        .history-panel::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        .history-panel::-webkit-scrollbar-track { background: #28303d; }
+
         input[type="text"] {
             width: 100%;
             font-size: 1.5rem;
@@ -37,14 +68,10 @@
             border-radius: 8px;
             padding: 15px;
             box-sizing: border-box;
-            background: #1f2937; /* Очень темно-серый */
-            color: #d1d5db; /* Светло-серый текст */
+            background: #1f2937; 
+            color: #d1d5db; 
             text-align: right;
             transition: all 0.2s;
-        }
-        input[type="text"]:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px #10b981; /* Зеленое свечение при фокусе */
         }
         
         .btn-grid {
@@ -54,75 +81,77 @@
         }
         
         button {
-            padding: 15px 0;
-            font-size: 1.1rem;
+            padding: 12px 0;
+            font-size: 1rem;
             font-weight: 600;
             border-radius: 8px;
             transition: all 0.15s ease-in-out;
             box-shadow: 0 3px #4b5563;
             cursor: pointer;
             user-select: none;
+            min-width: 0; 
         }
-
-        /* Операторы и функции */
-        .btn-op {
-            background-color: #f59e0b; /* Оранжевый */
-            color: #1f2937;
-            box-shadow: 0 3px #d97706;
-        }
+        
+        .btn-op { background-color: #f59e0b; color: #1f2937; box-shadow: 0 3px #d97706; }
         .btn-op:active { background-color: #d97706; transform: translateY(1px); box-shadow: 0 2px #d97706; }
-
-        /* Числа */
-        .btn-num {
-            background-color: #4b5563; /* Средний серый */
-            color: white;
-            box-shadow: 0 3px #374151;
-        }
+        .btn-num { background-color: #4b5563; color: white; box-shadow: 0 3px #374151; }
         .btn-num:active { background-color: #374151; transform: translateY(1px); box-shadow: 0 2px #374151; }
-
-        /* Главная кнопка */
-        .btn-equals, .btn-solve {
-            background-color: #10b981; /* Зеленый */
-            color: white;
-            box-shadow: 0 3px #059669;
-        }
-        .btn-equals:active, .btn-solve:active { background-color: #059669; transform: translateY(1px); box-shadow: 0 2px #059669; }
-
-        /* Очистка */
-        .btn-clear {
-            background-color: #ef4444; /* Красный */
-            color: white;
-            box-shadow: 0 3px #dc2626;
-        }
-        .btn-clear:active { background-color: #dc2626; transform: translateY(1px); box-shadow: 0 2px #dc2626; }
+        .btn-main { background-color: #10b981; color: white; box-shadow: 0 3px #059669; grid-column: span 4; }
+        .btn-main:active { background-color: #059669; transform: translateY(1px); box-shadow: 0 2px #059669; }
+        .btn-clear, .btn-history { background-color: #ef4444; color: white; box-shadow: 0 3px #dc2626; }
+        .btn-clear:active, .btn-history:active { background-color: #dc2626; transform: translateY(1px); box-shadow: 0 2px #dc2626; }
+        .btn-mem { background-color: #3b82f6; color: white; box-shadow: 0 3px #2563eb; }
+        .btn-mem:active { background-color: #2563eb; transform: translateY(1px); box-shadow: 0 2px #2563eb; }
         
         .result-box {
-            margin-top: 20px;
+            margin-bottom: 15px;
             min-height: 40px;
             padding: 10px;
             border-radius: 8px;
             font-size: 1.25rem;
-            text-align: left;
+            text-align: right;
             word-break: break-all;
             background-color: #1f2937;
             color: #10b981;
         }
         .error { color: #f87171; }
+        
+        /* Стили для истории */
+        .history-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #374151;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.15s;
+            border-left: 4px solid #f59e0b;
+        }
+        .history-item:hover { background: #4b5563; }
+        .history-expression { font-size: 0.9rem; color: #9ca3af; }
+        .history-result { font-size: 1.2rem; font-weight: 600; color: #10b981; }
+
     </style>
 </head>
 <body>
-    <div class="calculator">
-        <h1 class="text-3xl font-extrabold text-white mb-6 text-center">🧮 Калькулятор</h1>
-
-        <!-- Блок ввода -->
-        <input type="text" id="expression" placeholder="Введите выражение (2+2) или уравнение (2x=4)">
-        
-        <!-- Блок вывода -->
-        <div class="result-box" id="result">Ожидание ввода...</div>
-
-        <!-- Кнопки -->
-        <div class="space-y-4 mt-6">
-            <div class="grid grid-cols-5 gap-2">
+    <h1 class="text-3xl font-extrabold text-white mb-6 text-center">🧮 Продвинутый Калькулятор</h1>
+    
+    <div class="calculator-container">
+        <!-- Основной Калькулятор -->
+        <div class="calculator">
+            
+            <div class="result-box" id="result">Ожидание ввода...</div>
+            <input type="text" id="expression" placeholder="Введите выражение или уравнение >
+            
+            <!-- Кнопки Памяти -->
+            <div class="grid grid-cols-4 gap-2 mb-4">
+                <button class="btn-mem text-sm" onclick="memoryClear()">MC</button>
+                <button class="btn-mem text-sm" onclick="memoryRecall()">MR</button>
+                <button class="btn-mem text-sm" onclick="memoryAdd()">M+</button>
+                <button class="btn-mem text-sm" onclick="memorySubtract()">M-</button>
+            </div>
+            
+            <!-- Функциональные кнопки -->
+            <div class="grid grid-cols-5 gap-2 mb-4">
                 <button class="btn-op text-sm" onclick="appendToExpression('Math.sin(')">sin</button>
                 <button class="btn-op text-sm" onclick="appendToExpression('Math.cos(')">cos</button>
                 <button class="btn-op text-sm" onclick="appendToExpression('Math.tan(')">tan</button>
@@ -130,56 +159,114 @@
                 <button class="btn-op text-sm" onclick="appendToExpression('Math.sqrt(')">√</button>
             </div>
             
+            <!-- Основная сетка -->
             <div class="btn-grid">
-                <button class="btn-clear" onclick="clearExpression()">C</button>
+                <!-- Кнопка H для истории -->
+                <button class="btn-history" onclick="toggleHistory()">H</button>
+                <button class="btn-clear" onclick="clearExpression()">AC</button>
                 <button class="btn-op" onclick="appendToExpression('(')">(</button>
                 <button class="btn-op" onclick="appendToExpression(')')">)</button>
-                <button class="btn-op" onclick="appendToExpression('/')">/</button>
 
                 <button class="btn-num" onclick="appendToExpression('7')">7</button>
                 <button class="btn-num" onclick="appendToExpression('8')">8</button>
                 <button class="btn-num" onclick="appendToExpression('9')">9</button>
-                <button class="btn-op" onclick="appendToExpression('*')">×</button>
+                <button class="btn-op" onclick="appendToExpression('/')">/</button>
 
                 <button class="btn-num" onclick="appendToExpression('4')">4</button>
                 <button class="btn-num" onclick="appendToExpression('5')">5</button>
                 <button class="btn-num" onclick="appendToExpression('6')">6</button>
-                <button class="btn-op" onclick="appendToExpression('-')">-</button>
+                <button class="btn-op" onclick="appendToExpression('*')">×</button>
 
                 <button class="btn-num" onclick="appendToExpression('1')">1</button>
                 <button class="btn-num" onclick="appendToExpression('2')">2</button>
                 <button class="btn-num" onclick="appendToExpression('3')">3</button>
-                <button class="btn-op" onclick="appendToExpression('+')">+</button>
+                <button class="btn-op" onclick="appendToExpression('-')">-</button>
                 
                 <button class="btn-num" onclick="appendToExpression('0')">0</button>
                 <button class="btn-num" onclick="appendToExpression('.')">.</button>
                 <button class="btn-num" onclick="appendToExpression('Math.PI')">π</button>
-                <button class="btn-num" onclick="appendToExpression('^')">^</button>
+                <button class="btn-num" onclick="appendToExpression('+')">+</button>
+
+                <!-- Дополнительный ряд для x и степеней -->
+                <button class="btn-op" onclick="appendToExpression('x')">x</button>
+                <button class="btn-op" onclick="appendToExpression('^2')">x²</button>
+                <button class="btn-op" onclick="appendToExpression('^3')">x³</button>
+                <button class="btn-op" onclick="appendToExpression('=')">=</button>
+                
+                <!-- Единая кнопка "Вычислить" -->
+                <button class="btn-main mt-4" onclick="handleInput()">Вычислить</button>
             </div>
             
-            <div class="grid grid-cols-2 gap-4 mt-4">
-                <button class="btn-equals" onclick="handleInput()">= Вычислить</button>
-                <button class="btn-solve" onclick="handleInput()">Solve</button>
-            </div>
         </div>
         
-        <p class="text-xs text-gray-400 mt-4 text-center">
-            *Для решения уравнений используйте формат: <code>2x + 5 = 15</code> (линейные) или <code>x^2 - 4 = 0</code> (квадратичные).
-        </p>
+        <!-- Панель Истории (скрыта по умолчанию) -->
+        <div class="history-panel hidden" id="history-panel">
+            <h3 class="text-xl font-bold mb-4 border-b border-gray-600 pb-2">Журнал Вычислений</h3>
+            <div id="history-log" class="flex flex-col-reverse">
+                <p class="text-sm text-gray-500 text-center mt-4">Результаты будут отображаться здесь.</p>
+            </div>
+        </div>
     </div>
 
     <script>
+        // Инициализация элементов DOM
         const expressionInput = document.getElementById('expression');
         const resultDiv = document.getElementById('result');
+        const historyPanel = document.getElementById('history-panel'); 
+        const historyLogDiv = document.getElementById('history-log');
 
-        // Добавляем обработчик нажатия Enter
+        let calculationHistory = [];
+        let memoryValue = 0; 
+        const Epsilon = 1e-10; // Допуск для сравнения чисел с плавающей точкой
+
+        // Обработка ввода по нажатию Enter
         expressionInput.addEventListener('keypress', function(e) { 
             if (e.key === 'Enter') handleInput(); 
         });
 
+        // --- Функция переключения истории ---
+        function toggleHistory() {
+            historyPanel.classList.toggle('hidden');
+        }
+
+        // --- Память (Memory Functions) ---
+
+        function memoryUpdate(operation) {
+            try {
+                const resultText = resultDiv.textContent;
+                let currentResult = NaN;
+
+                if (resultText.startsWith('Результат: ')) {
+                    currentResult = parseFloat(resultText.replace('Результат: ', ''));
+                } else if (resultText.startsWith('Solve: ')) {
+                    const match = resultText.match(/x\s?=\s?([-+]?\d+(\.\d+)?)/);
+                    if (match) currentResult = parseFloat(match[1]);
+                } else if (!isNaN(parseFloat(resultText))) {
+                    currentResult = parseFloat(resultText);
+                }
+
+                if (isNaN(currentResult)) {
+                    showResult('Не удалось получить число для памяти.', true);
+                    return;
+                }
+                
+                if (operation === '+') memoryValue += currentResult;
+                if (operation === '-') memoryValue -= currentResult;
+                showResult(`Память: M ${operation}${currentResult.toFixed(4)} (M=${memoryValue.toFixed(4)})`, false, 'text-blue-400');
+            } catch (e) {
+                 showResult('Невозможно сохранить результат в памяти.', true);
+            }
+        }
+        function memoryAdd() { memoryUpdate('+'); }
+        function memorySubtract() { memoryUpdate('-'); }
+        function memoryClear() { memoryValue = 0; showResult('Память очищена (MC=0).', false, 'text-blue-400'); }
+        function memoryRecall() { 
+            expressionInput.value = memoryValue.toString(); 
+            showResult(`Значение памяти (MR): ${memoryValue.toFixed(6)}`, false, 'text-blue-400');
+        }
+
         // --- Вспомогательные функции ---
 
-        // Факториал
         function factorial(n) {
             n = Math.floor(n);
             if (n < 0) throw new Error('Факториал отрицательного числа не определен.');
@@ -189,22 +276,63 @@
             return result;
         }
 
-        // Вывод результата или ошибки
-        function showResult(text, isError = false) {
+        function showResult(text, isError = false, colorClass = 'text-emerald-400') {
             resultDiv.textContent = text;
-            resultDiv.className = 'result-box ' + (isError ? 'error' : 'text-emerald-400');
+            resultDiv.className = `result-box ${isError ? 'error' : colorClass}`;
         }
-
-        // Добавление значения в поле ввода
+        
         function appendToExpression(value) {
             expressionInput.value += value;
             expressionInput.focus();
         }
 
-        // Очистка
         function clearExpression() {
             expressionInput.value = '';
             showResult('Ожидание ввода...');
+        }
+
+        // --- Журнал Вычислений (History) ---
+
+        function recordHistory(expression, result, type) {
+            const historyItem = {
+                id: Date.now(),
+                expression,
+                result: result.toString(),
+                type
+            };
+            calculationHistory.push(historyItem);
+            renderHistory();
+        }
+
+        function useHistoryItem(id) {
+            const item = calculationHistory.find(i => i.id === id);
+            if (item) {
+                expressionInput.value = item.expression;
+                expressionInput.focus();
+                showResult(`Загружено из истории: ${item.result}`, false, 'text-gray-400');
+            }
+        }
+
+        function renderHistory() {
+            historyLogDiv.innerHTML = '';
+            if (calculationHistory.length === 0) {
+                historyLogDiv.innerHTML = '<p class="text-sm text-gray-500 text-center mt-4">Результаты будут отображаться здесь.</p>';
+                return;
+            }
+
+            [...calculationHistory].reverse().forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.onclick = () => useHistoryItem(item.id);
+                
+                const typeText = item.type === 'calc' ? 'Вычисление' : 'Solve';
+                
+                div.innerHTML = `
+                    <div class="history-expression" title="${typeText}">${item.expression}</div>
+                    <div class="history-result">${item.result}</div>
+                `;
+                historyLogDiv.appendChild(div);
+            });
         }
 
         // --- Главный обработчик ввода ---
@@ -216,9 +344,11 @@
                 return;
             }
 
+            // Если во вводе есть знак равенства, считаем это уравнением
             if (input.includes('=')) {
                 solveEquation(input);
             } else {
+                // Иначе - простое вычисление
                 calculateBasic(input);
             }
         }
@@ -227,123 +357,210 @@
 
         function calculateBasic(expr) {
             try {
-                // 1. Подготовка: Замена синтаксиса и добавление факториала
-                let safeExpr = expr.replace(/\^/g, '**') // a^b -> a**b (power)
-                                   .replace(/(\d+)!/g, 'factorial($1)') // 5! -> factorial(5)
-                                   // Поддержка неявного умножения (например, 2pi)
+                let safeExpr = expr.replace(/\^/g, '**')
+                                   .replace(/(\d+)!/g, 'factorial($1)')
                                    .replace(/([0-9\.]+)([A-Za-z])/g, '$1*$2')
-                                   .replace(/\)([0-9])/g, ')*$1');
+                                   .replace(/\)([0-9])/g, ')*$1')
+                                   .replace(/M/g, memoryValue.toString()); 
 
-                // 2. Вайтлист (безопасность): Разрешены только числа, операторы, Math.*, и 'factorial'
                 const allowedCode = safeExpr.replace(/Math\.(sin|cos|tan|log|sqrt|PI|E|pow|abs|round|floor|ceil|random)|\d+\.?\d*|[\+\-\*\/\(\)\s\**]|factorial/g, '');
 
                 if (allowedCode.length > 0) {
                     throw new Error('Недопустимые символы или функции: ' + allowedCode.trim().substring(0, 10) + '...');
                 }
 
-                // 3. Выполнение с помощью Function (безопаснее, чем eval)
-                // Передаем функцию factorial как аргумент
                 const func = new Function('factorial', 'return ' + safeExpr);
                 const result = func(factorial);
 
                 if (isNaN(result) || !isFinite(result)) {
                     throw new Error('Неверный результат.');
                 }
-                showResult(`Результат: ${result.toFixed(10).replace(/\.?0+$/, '')}`);
+                const formattedResult = result.toFixed(10).replace(/\.?0+$/, '');
+                showResult(`Результат: ${formattedResult}`);
+                recordHistory(expr, formattedResult, 'calc'); 
             } catch (error) {
                 showResult('Ошибка вычисления: ' + error.message, true);
             }
         }
 
-        // --- 2. Решение уравнений ---
-
-        // Функция для парсинга выражения (ax + b)
+        // --- 2. Решение уравнений (Линейные, Квадратные, Кубические) ---
+        
+        // Парсит одну сторону уравнения и возвращает коэффициенты для Ax^3 + Bx^2 + Cx + D
         function parseSide(expr) {
-            let coeffX = 0;
-            let constant = 0;
-
-            // Упрощаем пробелы и нормализуем ввод
             expr = expr.replace(/\s/g, '');
+            // Обеспечиваем явный коэффициент 1 (например, x^3 -> 1x^3)
+            expr = expr.replace(/([+-]|^)x\^3/g, '$11x^3').replace(/^x\^3/, '1x^3');
+            expr = expr.replace(/([+-]|^)x\^2/g, '$11x^2').replace(/^x\^2/, '1x^2');
+            expr = expr.replace(/([+-]|^)x/g, '$11x').replace(/^x/, '1x');
             
-            // Замена 'x' на '1x' или '-x' на '-1x' для корректного парсинга
-            expr = expr.replace(/([+-]|^)x/g, '$11x');
-            expr = expr.replace(/^x/, '1x');
+            // Regex для захвата всех членов: x^3, x^2, x, константа
+            const terms = expr.match(/([+-]?\d*\.?\d*x\^3)|([+-]?\d*\.?\d*x\^2)|([+-]?\d*\.?\d*x)|([+-]?\d+\.?\d*)/g);
             
-            // Находим все члены: 2x, -5, +3x, -10, x^2 и т.д.
-            const terms = expr.match(/([+-]?\d*\.?\d*\^2x?)|([+-]?\d*\.?\d*x)|([+-]?\d+\.?\d*)/g);
-            
-            let coeffA = 0; // x^2
-            let coeffB = 0; // x
-            let coeffC = 0; // const
+            let coeffA = 0; // x^3
+            let coeffB = 0; // x^2
+            let coeffC = 0; // x
+            let coeffD = 0; // constant
 
-            if (!terms) return { coeffA: 0, coeffB: 0, coeffC: 0 };
+            if (!terms) return { coeffA: 0, coeffB: 0, coeffC: 0, coeffD: 0 };
 
             for (let term of terms) {
-                if (term.includes('x^2')) {
-                    // Коэффициент при x^2
-                    let coeff = term.replace('x^2', '');
-                    if (coeff === '+' || coeff === '') coeff = '1';
-                    if (coeff === '-') coeff = '-1';
+                if (term.includes('x^3')) {
+                    let coeff = term.replace('x^3', '');
                     coeffA += parseFloat(coeff) || 0;
-                } else if (term.includes('x')) {
-                    // Коэффициент при x
-                    let coeff = term.replace('x', '');
-                    if (coeff === '+' || coeff === '') coeff = '1';
-                    if (coeff === '-') coeff = '-1';
+                } else if (term.includes('x^2')) {
+                    let coeff = term.replace('x^2', '');
                     coeffB += parseFloat(coeff) || 0;
+                } else if (term.includes('x')) {
+                    let coeff = term.replace('x', '');
+                    coeffC += parseFloat(coeff) || 0;
                 } else if (term) {
-                    // Константа
-                    coeffC += parseFloat(term) || 0;
+                    coeffD += parseFloat(term) || 0;
                 }
             }
-            return { coeffA, coeffB, coeffC };
+            return { coeffA, coeffB, coeffC, coeffD };
+        }
+
+        // Алгоритм решения кубического уравнения Ax^3 + Bx^2 + Cx + D = 0 (Метод Кардано)
+        function solveCubic(a, b, c, d) {
+            // Переход к депрессивному кубическому уравнению: z^3 + pz + q = 0 (где x = z - b/(3a))
+            const p = (3 * a * c - b * b) / (3 * a * a);
+            const q = (2 * b * b * b - 9 * a * b * c + 27 * a * a * d) / (27 * a * a * a);
+            
+            const delta = (q * q / 4) + (p * p * p / 27); // Дискриминант
+            
+            const roots = [];
+            const correction = -b / (3 * a);
+            
+            try {
+
+                if (delta > Epsilon) {
+                    // Случай 1: Один действительный корень и два сопряженных комплексных
+                    const u = Math.cbrt(-q / 2 + Math.sqrt(delta));
+                    const v = Math.cbrt(-q / 2 - Math.sqrt(delta));
+                    const x1 = u + v + correction;
+                    roots.push(x1.toFixed(6).replace(/\.?0+$/, ''));
+        
+                    const realPart = (-(u + v) / 2 + correction);
+                    const imagPart = (Math.sqrt(3) / 2) * (u - v);
+                    
+                    // Форматирование комплексных корней
+                    const realPartStr = realPart.toFixed(6).replace(/\.?0+$/, '');
+                    const imagPartStr = Math.abs(imagPart).toFixed(6).replace(/\.?0+$/, '');
+
+                    // Проверка на чисто мнимые корни
+                    if (Math.abs(imagPart) < Epsilon && Math.abs(realPart) < Epsilon) {
+                        // Если комплексные части близки к нулю, считаем их действительными
+                        roots.push(realPart.toFixed(6).replace(/\.?0+$/, ''));
+                        roots.push(realPart.toFixed(6).replace(/\.?0+$/, ''));
+                    } else if (Math.abs(imagPart) < Epsilon) {
+                        // Чисто действительные корни, но Кардано может дать небольшой мнимый хвост
+                        roots.push(realPartStr);
+                        roots.push(realPartStr);
+                    }
+                    else {
+                        roots.push(`${realPartStr} + ${imagPartStr}i`);
+                        roots.push(`${realPartStr} - ${imagPartStr}i`);
+                    }
+        
+                } else if (delta < -Epsilon) {
+                    // Случай 2: Три различных действительных корня (Casus Irreducibilis)
+                    const phi = Math.acos((-q / 2) / Math.sqrt(-(p * p * p / 27)));
+                    const r = 2 * Math.sqrt(-p / 3);
+                    
+                    const x1 = (r * Math.cos(phi / 3) + correction).toFixed(6).replace(/\.?0+$/, '');
+                    const x2 = (r * Math.cos((phi + 2 * Math.PI) / 3) + correction).toFixed(6).replace(/\.?0+$/, '');
+                    const x3 = (r * Math.cos((phi - 2 * Math.PI) / 3) + correction).toFixed(6).replace(/\.?0+$/, '');
+        
+                    roots.push(x1, x2, x3);
+        
+                } else {
+                    // Случай 3: По крайней мере, два корня равны (Delta ≈ 0)
+                    const u = Math.cbrt(-q / 2);
+                    
+                    const x1 = (2 * u + correction).toFixed(6).replace(/\.?0+$/, ''); 
+                    const x2 = (-u + correction).toFixed(6).replace(/\.?0+$/, '');    
+                    
+                    roots.push(x1);
+                    // Проверка на тройной корень
+                    if (Math.abs(p) < Epsilon && Math.abs(q) < Epsilon) {
+                         roots.push(x1, x1); 
+                    } else {
+                         roots.push(x2, x2); 
+                    }
+                }
+            } catch (e) {
+                return 'Ошибка в алгоритме Кардано.';
+            }
+
+            // Форматирование результата
+            return `Кубические решения: x1 = ${roots[0]}` + 
+                   (roots[1] ? `, x2 = ${roots[1]}` : '') +
+                   (roots[2] ? `, x3 = ${roots[2]}` : '');
         }
 
 
         function solveEquation(input) {
             try {
+                // Замена символов степени для парсинга
+                input = input.replace(/x²/g, 'x^2').replace(/x³/g, 'x^3');
+
                 const parts = input.split('=').map(p => p.trim());
                 if (parts.length !== 2) throw new Error('Неверный формат уравнения. Используйте один знак "=".');
                 
                 const leftParsed = parseSide(parts[0]);
                 const rightParsed = parseSide(parts[1]);
 
-                // Приводим к общему виду: A x^2 + B x + C = 0
-                const A = leftParsed.coeffA - rightParsed.coeffA;
-                const B = leftParsed.coeffB - rightParsed.coeffB;
-                const C = leftParsed.coeffC - rightParsed.coeffC;
+                // Общие коэффициенты для Ax^3 + Bx^2 + Cx + D = 0
+                const A_cubic = leftParsed.coeffA - rightParsed.coeffA; // x^3
+                const B_cubic = leftParsed.coeffB - rightParsed.coeffB; // x^2
+                const C_cubic = leftParsed.coeffC - rightParsed.coeffC; // x
+                const D_cubic = leftParsed.coeffD - rightParsed.coeffD; // constant
                 
-                if (A === 0) {
-                    // --- Линейное уравнение: Bx + C = 0 ---
-                    if (B === 0) {
-                        showResult(C === 0 ? 'Бесконечно много решений (0 = 0)' : 'Нет решений', C !== 0);
+                let solutionText;
+
+                if (Math.abs(A_cubic) > Epsilon) {
+                    // Уравнение 3-й степени (Кубическое)
+                    solutionText = solveCubic(A_cubic, B_cubic, C_cubic, D_cubic);
+
+                } else if (Math.abs(B_cubic) > Epsilon) {
+                    // Уравнение 2-й степени (Квадратное)
+                    const A_quad = B_cubic;
+                    const B_quad = C_cubic;
+                    const C_quad = D_cubic;
+                    
+                    const discriminant = B_quad * B_quad - 4 * A_quad * C_quad;
+
+                    if (discriminant < -Epsilon) {
+                        const realPart = (-B_quad / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                        const imagPart = (Math.sqrt(-discriminant) / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                        solutionText = `Квадратичные решения: x1 = ${realPart} + ${imagPart}i, x2 = ${realPart} - ${imagPart}i`;
+                    } else if (Math.abs(discriminant) < Epsilon) {
+                        const x = (-B_quad / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                        solutionText = `Квадратичное решение (один корень): x = ${x}`;
                     } else {
-                        const x = -C / B;
-                        showResult(`Линейное решение: x = ${x.toFixed(6)}`);
+                        const x1 = ((-B_quad + Math.sqrt(discriminant)) / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                        const x2 = ((-B_quad - Math.sqrt(discriminant)) / (2 * A_quad)).toFixed(6).replace(/\.?0+$/, '');
+                        solutionText = `Квадратичные решения: x1 = ${x1}, x2 = ${x2}`;
                     }
+                } else if (Math.abs(C_cubic) > Epsilon) {
+                    // Уравнение 1-й степени (Линейное)
+                    const B_linear = C_cubic;
+                    const C_linear = D_cubic;
+                    const x = (-C_linear / B_linear).toFixed(6).replace(/\.?0+$/, '');
+                    solutionText = `Линейное решение: x = ${x}`;
                 } else {
-                    // --- Квадратичное уравнение: Ax^2 + Bx + C = 0 ---
-                    const discriminant = B * B - 4 * A * C;
-
-                    if (discriminant < 0) {
-                        // Для большей пользы показываем комплексные корни
-                        const realPart = (-B / (2 * A)).toFixed(6);
-                        const imagPart = (Math.sqrt(-discriminant) / (2 * A)).toFixed(6);
-                        showResult(`Комплексные решения: x1 = ${realPart} + ${imagPart}i, x2 = ${realPart} - ${imagPart}i`);
-                    } else if (discriminant === 0) {
-                        const x = -B / (2 * A);
-                        showResult(`Квадратичное решение (один корень): x = ${x.toFixed(6)}`);
-                    } else {
-                        const x1 = (-B + Math.sqrt(discriminant)) / (2 * A);
-                        const x2 = (-B - Math.sqrt(discriminant)) / (2 * A);
-                        showResult(`Квадратичные решения: x1 = ${x1.toFixed(6)}, x2 = ${x2.toFixed(6)}`);
-                    }
+                    // 0 = 0 или N = 0
+                    solutionText = Math.abs(D_cubic) < Epsilon ? 'Бесконечно много решений (0 = 0)' : 'Нет решений';
                 }
-
+                
+                showResult(`Solve: ${solutionText}`);
+                recordHistory(input, solutionText, 'solve');
             } catch (error) {
-                showResult('Ошибка парсинга уравнения: ' + error.message + '. Проверьте формат.', true);
+                showResult('Ошибка парсинга уравнения: ' + error.message + '. Проверьте формат (используйте x, x², x³).', true);
             }
         }
+        
+        renderHistory();
     </script>
 </body>
-    </html>
+                    </html>
