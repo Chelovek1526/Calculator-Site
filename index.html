@@ -446,22 +446,7 @@
     </div>
     <!-- Заголовок и настройки -->
     <div class="header-controls">
-        <div class="flex items-center gap-2">
-            <h1 class="text-3xl font-extrabold text-white">🧮 Продвинутый Калькулятор</h1>
-            <!-- Кнопка Шаблоны (📋) перемещена сюда -->
-            <div class="templates-dropdown">
-                <button class="px-3 py-1 bg-purple-700 text-white rounded hover:bg-purple-600">
-                    📋
-                </button>
-                <div class="templates-content">
-                    <button onclick="insertTemplate('quadratic')">Квадратное уравнение</button>
-                    <button onclick="insertTemplate('trigonometric')">Тригонометрическое выражение</button>
-                    <button onclick="insertTemplate('complex')">Комплексное число</button>
-                    <button onclick="insertTemplate('logarithm')">Логарифмическое выражение</button>
-                    <button onclick="insertTemplate('system')">Система уравнений</button>
-                </div>
-            </div>
-        </div>
+        <h1 class="text-3xl font-extrabold text-white">🧮 Продвинутый Калькулятор</h1>
         <div class="settings-group">
             <!-- Переключатель языка -->
             <select id="language-select" class="language-select" onchange="changeLanguage()">
@@ -480,6 +465,19 @@
             <button onclick="openModal('helpModal')" class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
                 ?
             </button>
+            <!-- Шаблоны -->
+            <div class="templates-dropdown">
+                <button class="px-3 py-1 bg-purple-700 text-white rounded hover:bg-purple-600">
+                    📋
+                </button>
+                <div class="templates-content">
+                    <button onclick="insertTemplate('quadratic')">Квадратное уравнение</button>
+                    <button onclick="insertTemplate('trigonometric')">Тригонометрическое выражение</button>
+                    <button onclick="insertTemplate('complex')">Комплексное число</button>
+                    <button onclick="insertTemplate('logarithm')">Логарифмическое выражение</button>
+                    <button onclick="insertTemplate('system')">Система уравнений</button>
+                </div>
+            </div>
         </div>
     </div>
     <div class="calculator-container">
@@ -865,7 +863,8 @@
             expressionInput.value += value;
             renderExpression(expressionInput.value);
             checkSyntax();
-            expressionInput.focus();
+            expressionInput.focus(); // Попробуем фокусировать после добавления
+            //expressionInput.blur(); // Попробуйте раскомментировать, если фокус не нужен
         }
         function clearExpression() {
             expressionInput.value = '';
@@ -878,11 +877,13 @@
             renderOutputDiv.innerHTML = '';
             expressionInput.classList.remove('error');
             historyIndex = -1;
+            expressionInput.blur(); // Скрыть клавиатуру
         }
         function insertFractionTemplate() {
             expressionInput.value += '\\frac{}{}';
             renderExpression(expressionInput.value);
             checkSyntax();
+            expressionInput.blur(); // Скрыть клавиатуру
         }
         function showResults(fractionText, decimalText, fractionClass, decimalClass) {
             fractionResultDiv.textContent = fractionText;
@@ -896,6 +897,7 @@
             if (!converterPanel.classList.contains('hidden')) {
                 initConverter();
             }
+            expressionInput.blur(); // Скрыть клавиатуру
         }
         function initConverter() {
             const categorySelect = document.getElementById('unit-category');
@@ -973,6 +975,7 @@
             if (!historyPanel.classList.contains('hidden')) {
                 updateHistoryDisplay();
             }
+            expressionInput.blur(); // Скрыть клавиатуру
         }
         function recordHistory(expression, result, type = 'calc') {
             const historyItem = {
@@ -1027,11 +1030,13 @@
                 renderExpression(item.expression);
                 expressionInput.focus();
             }
+            expressionInput.blur(); // Скрыть клавиатуру после редактирования
         }
         function deleteHistoryItem(id) {
             calculationHistory = calculationHistory.filter(h => h.id !== id);
             updateHistoryDisplay();
             saveToLocalStorage();
+            expressionInput.blur(); // Скрыть клавиатуру после удаления
         }
         function clearAllHistory() {
             if (confirm(translations[currentLanguage].confirm_clear_history)) {
@@ -1040,6 +1045,7 @@
                 saveToLocalStorage();
                 alert(translations[currentLanguage].history_cleared);
             }
+            expressionInput.blur(); // Скрыть клавиатуру
         }
         function exportHistory() {
             if (calculationHistory.length === 0) {
@@ -1054,6 +1060,7 @@
             linkElement.setAttribute('download', exportFileDefaultName);
             linkElement.click();
             alert(translations[currentLanguage].history_exported);
+            expressionInput.blur(); // Скрыть клавиатуру
         }
         // Основная функция вычислений
         async function handleInput() {
@@ -1063,6 +1070,7 @@
                 showResults('Ошибка синтаксиса:', 'Проверьте выражение', 'error', 'error');
                 return;
             }
+            expressionInput.blur(); // Скрыть клавиатуру перед вычислением
             showSpinner(true);
             try {
                 // Проверяем, является ли выражение уравнением
@@ -1162,15 +1170,18 @@
         function toggleScientificNotation() {
             scientificNotation = !scientificNotation;
             saveToLocalStorage();
+            expressionInput.blur(); // Скрыть клавиатуру
         }
         // Функции памяти
         function memoryClear() {
             memoryValue = 0;
             alert(translations[currentLanguage].memory_cleared);
+            expressionInput.blur(); // Скрыть клавиатуру
         }
         function memoryRecall() {
             expressionInput.value += 'M';
             renderExpression(expressionInput.value);
+            expressionInput.blur(); // Скрыть клавиатуру
         }
         function memoryAdd() {
             try {
@@ -1180,6 +1191,7 @@
             } catch (e) {
                 alert(translations[currentLanguage].memory_add_error + e.message);
             }
+            expressionInput.blur(); // Скрыть клавиатуру
         }
         function memorySubtract() {
             try {
@@ -1189,6 +1201,7 @@
             } catch (e) {
                 alert(translations[currentLanguage].memory_sub_error + e.message);
             }
+            expressionInput.blur(); // Скрыть клавиатуру
         }
         // Шаблоны выражений
         function insertTemplate(type) {
@@ -1203,15 +1216,17 @@
                 expressionInput.value = templates[type];
                 renderExpression(expressionInput.value);
                 checkSyntax();
-                expressionInput.focus(); // Фокусируемся на поле ввода после вставки шаблона
+                expressionInput.blur(); // Скрыть клавиатуру
             }
         }
         // Графики
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
+            expressionInput.blur(); // Скрыть клавиатуру
         }
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
+            //expressionInput.focus(); // Опционально: вернуть фокус после закрытия модального окна
         }
         function plotGraph() {
             const funcStr = document.getElementById('graph-function').value;
@@ -1230,6 +1245,7 @@
                 alert('Шаг должен быть положительным числом');
                 return;
             }
+            expressionInput.blur(); // Скрыть клавиатуру перед построением графика
             showSpinner(true);
             try {
                 const func = math.parse(funcStr);
@@ -1253,11 +1269,11 @@
                 }
                 window.currentChart = new Chart(ctx, {
                     type: 'line',
-                    data: {
+                     {
                         labels: xValues,
                         datasets: [{
                             label: `f(x) = ${funcStr}`,
-                            data: yValues,
+                             yValues,
                             borderColor: 'rgb(59, 130, 246)',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             borderWidth: 2,
