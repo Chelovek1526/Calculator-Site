@@ -8,31 +8,47 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
     <!-- Chart.js для графиков -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-nK/gD87CqjGzN0W12/Y0132l4B3hGgM+5r01zYdE/1v8p+8u7m7yA01j2v2n8n5j" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-nK/gD87CqjGzN0W12/Y01j2v2n8p+8u7m7yA01j2v2n5j1t6N7T30Q/8m4Y3E4v/nQ1z" crossorigin="anonymous">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-2j98j15Nl1G8b4xVwR2L4Y5E4s7tT9F/h2Q30j9j1t6N7T30Q/8m4Y3E4v/nQ1z" crossorigin="anonymous"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Предотвращает прокрутку всего документа */
+        }
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1f2937, #111827); 
-            min-height: 100vh;
+            background: linear-gradient(135deg, #1f2937, #111827);
             display: flex;
             flex-direction: column;
-            align-items: center;
+            /* padding убран, так как теперь калькулятор растягивается */
+        }
+        .main-content-wrapper {
+            flex: 1; /* Занимает оставшееся место после header-controls */
+            overflow-y: auto; /* Добавляет прокрутку внутри wrapper, если контент больше */
             padding: 20px;
+            box-sizing: border-box;
         }
         .calculator-container {
             max-width: 500px;
-            width: 100%; 
+            width: 100%;
             margin: 0 auto;
+            height: 100%; /* Пытается занять всю высоту wrapper */
+            display: flex;
+            flex-direction: column;
         }
         .calculator {
-            background: #374151; 
+            background: #374151;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            width: 100%; 
+            width: 100%;
             border-radius: 16px;
             padding: 20px;
             border: 1px solid #4b5563;
+            display: flex; /* Используем flex для внутреннего расположения */
+            flex-direction: column;
+            flex: 1; /* Растягивается на доступное место в container */
         }
         #render-output {
             background: #1f2937;
@@ -42,7 +58,7 @@
             margin-bottom: 10px;
             text-align: right;
             font-size: 1.8rem;
-            color: #d1d5db; 
+            color: #d1d5db;
             display: flex;
             justify-content: flex-end;
             align-items: center;
@@ -72,15 +88,15 @@
         .text-purple-400 { color: #c084fc; border-color: #c084fc; }
         .text-yellow-400 { color: #facc15; border-color: #facc15; }
         .converter-panel {
-            background: #28303d; 
-            width: 100%; 
+            background: #28303d;
+            width: 100%;
             border-radius: 16px;
             padding: 20px;
             border: 1px solid #4b5563;
             margin-top: 20px;
             color: #d1d5db;
             transition: max-height 0.3s ease-out, padding 0.3s ease-out, opacity 0.3s;
-            max-height: 450px; 
+            max-height: 450px;
             overflow-y: auto;
         }
         .converter-panel.hidden {
@@ -112,10 +128,11 @@
             border-radius: 8px;
             padding: 15px;
             box-sizing: border-box;
-            background: #1f2937; 
-            color: #d1d5db; 
+            background: #1f2937;
+            color: #d1d5db;
             text-align: right;
             transition: all 0.2s;
+            flex: 0 0 auto; /* Не растягивается, занимает только нужное место */
         }
         input[type="text"].error {
             border: 2px solid #f87171;
@@ -133,12 +150,12 @@
         .btn-mem { background-color: #3b82f6; color: white; box-shadow: 0 3px #2563eb; }
         .btn-mem:active { background-color: #2563eb; transform: translateY(1px); box-shadow: 0 2px #2563eb; }
         .history-panel {
-            background: #28303d; 
-            width: 100%; 
+            background: #28303d;
+            width: 100%;
             border-radius: 16px;
             padding: 20px;
             border: 1px solid #4b5563;
-            max-height: 400px; 
+            max-height: 400px;
             overflow-y: auto;
             color: #d1d5db;
             margin-top: 20px;
@@ -239,14 +256,16 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        /* Заголовок с настройками */
+        /* Заголовок с настройками - перемещён вниз */
         .header-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            padding: 10px 20px; /* Уменьшен отступ сверху/снизу */
             width: 100%;
             max-width: 500px;
+            margin: 0 auto; /* Центрируем */
+            background: rgba(0, 0, 0, 0.2); /* Легкий фон для отделения */
         }
         .settings-group {
             display: flex;
@@ -347,6 +366,42 @@
             cursor: pointer;
             border-radius: 50%;
         }
+         /* Стили для кнопок под калькулятором */
+        .bottom-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px; /* Отступ сверху от кнопок калькулятора */
+        }
+        .btn-bottom-control {
+             /* Наследуем стили от btn-mem или создаем новые */
+            /* background-color: #3b82f6; color: white; box-shadow: 0 3px #2563eb; */
+            /* Пример стиля для контрольных кнопок */
+            background-color: #6b7280; /* gray-500 */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 3px #4b5563;
+        }
+        .btn-bottom-control:active {
+             background-color: #4b5563; transform: translateY(1px); box-shadow: 0 2px #4b5563;
+        }
+        .btn-bottom-control.help {
+            background-color: #8b5cf6; /* purple-500 */
+            box-shadow: 0 3px #7c3aed; /* purple-600 */
+        }
+        .btn-bottom-control.help:active {
+            background-color: #7c3aed; /* purple-600 */
+            box-shadow: 0 2px #7c3aed;
+        }
+
+        /* Убедимся, что кнопки калькулятора не растягиваются слишком сильно */
+        .btn-grid, .grid.grid-cols-4.gap-2.mb-4, .grid.grid-cols-5.gap-2.mb-4 {
+            flex: 0 0 auto; /* Эти блоки занимают только нужное им место */
+        }
     </style>
 </head>
 <body>
@@ -444,9 +499,114 @@
             </button>
         </div>
     </div>
-    <!-- Заголовок и настройки -->
+    <!-- Основной контент калькулятора -->
+    <div class="main-content-wrapper">
+        <div class="calculator-container">
+            <div class="calculator">
+                 <h1 class="text-3xl font-extrabold text-white mb-4">🧮 Продвинутый Калькулятор</h1> <!-- Заголовок перемещен внутрь калькулятора -->
+                <div id="result-container">
+                    <div class="result-box fraction-result" id="fraction-result" data-i18n="exact_answer">Точный ответ: Ожидание ввода...</div>
+                    <div class="result-box decimal-result" id="decimal-result" data-i18n="approx_answer">Приближенный ответ: ---</div>
+                </div>
+                <div id="render-output"></div>
+                <input type="text" id="expression" placeholder="Введите: 2+2, x+y=5, \frac{1}{3}+1" autocomplete="off">
+                <div class="grid grid-cols-4 gap-2 mb-4">
+                    <button class="btn-mem text-sm" onclick="memoryClear()">MC</button>
+                    <button class="btn-mem text-sm" onclick="memoryRecall()">MR</button>
+                    <button class="btn-mem text-sm" onclick="memoryAdd()">M+</button>
+                    <button class="btn-mem text-sm" onclick="memorySubtract()">M-</button>
+                </div>
+                <div class="grid grid-cols-5 gap-2 mb-4">
+                    <button class="btn-op text-sm" onclick="appendToExpression('sin(')">sin</button>
+                    <button class="btn-op text-sm" onclick="appendToExpression('cos(')">cos</button>
+                    <button class="btn-op text-sm" onclick="appendToExpression('tan(')">tan</button>
+                    <button class="btn-op text-sm" onclick="appendToExpression('log(')">log</button>
+                    <button class="btn-op text-sm" onclick="appendToExpression('sqrt(')">√</button>
+                </div>
+                <div class="btn-grid">
+                    <button class="btn-history" onclick="toggleConverter()">🌐</button>
+                    <button class="btn-history" onclick="toggleHistory()">H</button>
+                    <button class="btn-clear" onclick="clearExpression()">AC</button>
+                    <button class="btn-op" onclick="appendToExpression('(')">(</button>
+                    <button class="btn-op" onclick="appendToExpression(')')">)</button>
+                    <button class="btn-num" onclick="appendToExpression('7')">7</button>
+                    <button class="btn-num" onclick="appendToExpression('8')">8</button>
+                    <button class="btn-num" onclick="appendToExpression('9')">9</button>
+                    <button class="btn-op" onclick="appendToExpression('/')">/</button>
+                    <button class="btn-num" onclick="appendToExpression('4')">4</button>
+                    <button class="btn-num" onclick="appendToExpression('5')">5</button>
+                    <button class="btn-num" onclick="appendToExpression('6')">6</button>
+                    <button class="btn-op" onclick="appendToExpression('*')">×</button>
+                    <button class="btn-num" onclick="appendToExpression('1')">1</button>
+                    <button class="btn-num" onclick="appendToExpression('2')">2</button>
+                    <button class="btn-num" onclick="appendToExpression('3')">3</button>
+                    <button class="btn-op" onclick="appendToExpression('-')">-</button>
+                    <button class="btn-num" onclick="appendToExpression('0')">0</button>
+                    <button class="btn-num" onclick="appendToExpression('.')">.</button>
+                    <button class="btn-op" onclick="appendToExpression('\\pi')">π</button>
+                    <button class="btn-op" onclick="appendToExpression('+')">+</button>
+                    <button class="btn-op" onclick="appendToExpression('i')">i</button>
+                    <button class="btn-op" onclick="openModal('graphModal')">📈</button>
+                    <button class="btn-op" onclick="appendToExpression('^')">^</button>
+                    <button class="btn-op" onclick="appendToExpression('=')">=</button>
+                    <button class="btn-main mt-4" onclick="handleInput()" id="calculate-btn" data-i18n="calculate">Вычислить</button>
+                </div>
+            </div>
+            <div class="converter-panel hidden" id="converter-panel">
+                <h3 class="text-xl font-bold mb-4 border-b border-gray-600 pb-2" data-i18n="unit_converter">🌐 Конвертер Единиц</h3>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium" data-i18n="select_category">Выберите Категорию:</label>
+                    <select id="unit-category" class="converter-select" onchange="renderUnitSelector()"></select>
+                </div>
+                <div class="converter-section">
+                    <label class="block mb-2 text-sm font-medium" data-i18n="value">Значение:</label>
+                    <input type="number" id="converter-input" class="converter-input" placeholder="Введите число" value="1" oninput="performConversion()">
+                    <div class="grid grid-cols-3 gap-2 mt-4 items-center">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400" data-i18n="from">ИЗ:</label>
+                            <select id="unit-from" class="converter-select" onchange="performConversion()"></select>
+                        </div>
+                        <div class="text-center text-lg text-yellow-400 font-bold">→</div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400" data-i18n="to">В:</label>
+                            <select id="unit-to" class="converter-select" onchange="performConversion()"></select>
+                        </div>
+                    </div>
+                </div>
+                <!-- Ползунок точности -->
+                <div class="converter-section mt-4">
+                    <label class="block mb-2 text-sm font-medium" data-i18n="precision">Точность (знаков после запятой):</label>
+                    <input type="range" min="1" max="15" value="6" class="precision-slider" id="precision-slider" oninput="updatePrecision()">
+                    <div class="flex justify-between text-xs text-gray-400">
+                        <span>1</span>
+                        <span id="precision-value">6</span>
+                        <span>15</span>
+                    </div>
+                </div>
+                <div id="converter-result-output" class="result-box decimal-result mt-4" data-i18n="result">
+                    Результат:
+                </div>
+            </div>
+            <div class="history-panel hidden" id="history-panel">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold border-b border-gray-600 pb-2" data-i18n="calculation_history">Журнал Вычислений</h3>
+                    <div class="flex gap-2">
+                        <button onclick="exportHistory()" class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700" data-i18n="export">
+                            Экспорт
+                        </button>
+                        <button onclick="clearAllHistory()" class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700" data-i18n="clear_all">
+                            Удалить всё
+                        </button>
+                    </div>
+                </div>
+                <div id="history-log" class="flex flex-col-reverse">
+                    <p class="text-sm text-gray-500 text-center mt-4" data-i18n="history_empty">Результаты будут отображаться здесь.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Заголовок и настройки перемещены вниз -->
     <div class="header-controls">
-        <h1 class="text-3xl font-extrabold text-white">🧮 Продвинутый Калькулятор</h1>
         <div class="settings-group">
             <!-- Переключатель языка -->
             <select id="language-select" class="language-select" onchange="changeLanguage()">
@@ -461,10 +621,6 @@
                     <span class="slider"></span>
                 </label>
             </label>
-            <!-- Кнопка справки -->
-            <button onclick="openModal('helpModal')" class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">
-                ?
-            </button>
             <!-- Шаблоны -->
             <div class="templates-dropdown">
                 <button class="px-3 py-1 bg-purple-700 text-white rounded hover:bg-purple-600">
@@ -479,118 +635,20 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="calculator-container">
-        <div class="calculator">
-            <div id="result-container">
-                <div class="result-box fraction-result" id="fraction-result" data-i18n="exact_answer">Точный ответ: Ожидание ввода...</div>
-                <div class="result-box decimal-result" id="decimal-result" data-i18n="approx_answer">Приближенный ответ: ---</div>
-            </div>
-            <div id="render-output"></div>
-            <input type="text" id="expression" placeholder="Введите: 2+2, x+y=5, \frac{1}{3}+1" autocomplete="off">
-            <div class="grid grid-cols-4 gap-2 mb-4">
-                <button class="btn-mem text-sm" onclick="memoryClear()">MC</button>
-                <button class="btn-mem text-sm" onclick="memoryRecall()">MR</button>
-                <button class="btn-mem text-sm" onclick="memoryAdd()">M+</button>
-                <button class="btn-mem text-sm" onclick="memorySubtract()">M-</button>
-            </div>
-            <div class="grid grid-cols-5 gap-2 mb-4">
-                <button class="btn-op text-sm" onclick="appendToExpression('sin(')">sin</button>
-                <button class="btn-op text-sm" onclick="appendToExpression('cos(')">cos</button>
-                <button class="btn-op text-sm" onclick="appendToExpression('tan(')">tan</button>
-                <button class="btn-op text-sm" onclick="appendToExpression('log(')">log</button>
-                <button class="btn-op text-sm" onclick="appendToExpression('sqrt(')">√</button>
-            </div>
-            <div class="btn-grid">
-                <button class="btn-history" onclick="toggleConverter()">🌐</button>
-                <button class="btn-history" onclick="toggleHistory()">H</button>
-                <button class="btn-clear" onclick="clearExpression()">AC</button>
-                <button class="btn-op" onclick="appendToExpression('(')">(</button>
-                <button class="btn-op" onclick="appendToExpression(')')">)</button>
-                <button class="btn-num" onclick="appendToExpression('7')">7</button>
-                <button class="btn-num" onclick="appendToExpression('8')">8</button>
-                <button class="btn-num" onclick="appendToExpression('9')">9</button>
-                <button class="btn-op" onclick="appendToExpression('/')">/</button>
-                <button class="btn-num" onclick="appendToExpression('4')">4</button>
-                <button class="btn-num" onclick="appendToExpression('5')">5</button>
-                <button class="btn-num" onclick="appendToExpression('6')">6</button>
-                <button class="btn-op" onclick="appendToExpression('*')">×</button>
-                <button class="btn-num" onclick="appendToExpression('1')">1</button>
-                <button class="btn-num" onclick="appendToExpression('2')">2</button>
-                <button class="btn-num" onclick="appendToExpression('3')">3</button>
-                <button class="btn-op" onclick="appendToExpression('-')">-</button>
-                <button class="btn-num" onclick="appendToExpression('0')">0</button>
-                <button class="btn-num" onclick="appendToExpression('.')">.</button>
-                <button class="btn-op" onclick="appendToExpression('\\pi')">π</button>
-                <button class="btn-op" onclick="appendToExpression('+')">+</button>
-                <button class="btn-op" onclick="appendToExpression('i')">i</button>
-                <button class="btn-op" onclick="openModal('graphModal')">📈</button>
-                <button class="btn-op" onclick="appendToExpression('^')">^</button>
-                <button class="btn-op" onclick="appendToExpression('=')">=</button>
-                <button class="btn-main mt-4" onclick="handleInput()" id="calculate-btn" data-i18n="calculate">Вычислить</button>
-            </div>
-        </div>
-        <div class="converter-panel hidden" id="converter-panel">
-            <h3 class="text-xl font-bold mb-4 border-b border-gray-600 pb-2" data-i18n="unit_converter">🌐 Конвертер Единиц</h3>
-            <div class="mb-4">
-                <label class="block mb-2 text-sm font-medium" data-i18n="select_category">Выберите Категорию:</label>
-                <select id="unit-category" class="converter-select" onchange="renderUnitSelector()"></select>
-            </div>
-            <div class="converter-section">
-                <label class="block mb-2 text-sm font-medium" data-i18n="value">Значение:</label>
-                <input type="number" id="converter-input" class="converter-input" placeholder="Введите число" value="1" oninput="performConversion()">
-                <div class="grid grid-cols-3 gap-2 mt-4 items-center">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-400" data-i18n="from">ИЗ:</label>
-                        <select id="unit-from" class="converter-select" onchange="performConversion()"></select>
-                    </div>
-                    <div class="text-center text-lg text-yellow-400 font-bold">→</div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-400" data-i18n="to">В:</label>
-                        <select id="unit-to" class="converter-select" onchange="performConversion()"></select>
-                    </div>
-                </div>
-            </div>
-            <!-- Ползунок точности -->
-            <div class="converter-section mt-4">
-                <label class="block mb-2 text-sm font-medium" data-i18n="precision">Точность (знаков после запятой):</label>
-                <input type="range" min="1" max="15" value="6" class="precision-slider" id="precision-slider" oninput="updatePrecision()">
-                <div class="flex justify-between text-xs text-gray-400">
-                    <span>1</span>
-                    <span id="precision-value">6</span>
-                    <span>15</span>
-                </div>
-            </div>
-            <div id="converter-result-output" class="result-box decimal-result mt-4" data-i18n="result">
-                Результат: 
-            </div>
-        </div>
-        <div class="history-panel hidden" id="history-panel">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold border-b border-gray-600 pb-2" data-i18n="calculation_history">Журнал Вычислений</h3>
-                <div class="flex gap-2">
-                    <button onclick="exportHistory()" class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700" data-i18n="export">
-                        Экспорт
-                    </button>
-                    <button onclick="clearAllHistory()" class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700" data-i18n="clear_all">
-                        Удалить всё
-                    </button>
-                </div>
-            </div>
-            <div id="history-log" class="flex flex-col-reverse">
-                <p class="text-sm text-gray-500 text-center mt-4" data-i18n="history_empty">Результаты будут отображаться здесь.</p>
-            </div>
-        </div>
+        <!-- Кнопка справки перемещена в правую часть нижней панели -->
+        <button onclick="openModal('helpModal')" class="btn-bottom-control help">
+            ?
+        </button>
     </div>
     <script>
         // Инициализация элементов DOM
         const expressionInput = document.getElementById('expression');
         const fractionResultDiv = document.getElementById('fraction-result');
         const decimalResultDiv = document.getElementById('decimal-result');
-        const historyPanel = document.getElementById('history-panel'); 
+        const historyPanel = document.getElementById('history-panel');
         const historyLogDiv = document.getElementById('history-log');
         const renderOutputDiv = document.getElementById('render-output');
-        const converterPanel = document.getElementById('converter-panel'); 
+        const converterPanel = document.getElementById('converter-panel');
         const converterResultOutput = document.getElementById('converter-result-output');
         const spinner = document.getElementById('spinner');
         const precisionSlider = document.getElementById('precision-slider');
@@ -598,7 +656,7 @@
         const languageSelect = document.getElementById('language-select');
         // Глобальные переменные
         let calculationHistory = [];
-        let memoryValue = 0; 
+        let memoryValue = 0;
         let precision = 6;
         let scientificNotation = false;
         let historyIndex = -1;
@@ -798,7 +856,7 @@
             }
             checkSyntax();
         });
-        expressionInput.addEventListener('keypress', function(e) { 
+        expressionInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 if (e.ctrlKey) {
                     handleInput();
@@ -863,8 +921,7 @@
             expressionInput.value += value;
             renderExpression(expressionInput.value);
             checkSyntax();
-            expressionInput.focus(); // Попробуем фокусировать после добавления
-            //expressionInput.blur(); // Попробуйте раскомментировать, если фокус не нужен
+            expressionInput.focus();
         }
         function clearExpression() {
             expressionInput.value = '';
@@ -877,13 +934,11 @@
             renderOutputDiv.innerHTML = '';
             expressionInput.classList.remove('error');
             historyIndex = -1;
-            expressionInput.blur(); // Скрыть клавиатуру
         }
         function insertFractionTemplate() {
             expressionInput.value += '\\frac{}{}';
             renderExpression(expressionInput.value);
             checkSyntax();
-            expressionInput.blur(); // Скрыть клавиатуру
         }
         function showResults(fractionText, decimalText, fractionClass, decimalClass) {
             fractionResultDiv.textContent = fractionText;
@@ -897,7 +952,6 @@
             if (!converterPanel.classList.contains('hidden')) {
                 initConverter();
             }
-            expressionInput.blur(); // Скрыть клавиатуру
         }
         function initConverter() {
             const categorySelect = document.getElementById('unit-category');
@@ -975,7 +1029,6 @@
             if (!historyPanel.classList.contains('hidden')) {
                 updateHistoryDisplay();
             }
-            expressionInput.blur(); // Скрыть клавиатуру
         }
         function recordHistory(expression, result, type = 'calc') {
             const historyItem = {
@@ -1030,13 +1083,11 @@
                 renderExpression(item.expression);
                 expressionInput.focus();
             }
-            expressionInput.blur(); // Скрыть клавиатуру после редактирования
         }
         function deleteHistoryItem(id) {
             calculationHistory = calculationHistory.filter(h => h.id !== id);
             updateHistoryDisplay();
             saveToLocalStorage();
-            expressionInput.blur(); // Скрыть клавиатуру после удаления
         }
         function clearAllHistory() {
             if (confirm(translations[currentLanguage].confirm_clear_history)) {
@@ -1045,7 +1096,6 @@
                 saveToLocalStorage();
                 alert(translations[currentLanguage].history_cleared);
             }
-            expressionInput.blur(); // Скрыть клавиатуру
         }
         function exportHistory() {
             if (calculationHistory.length === 0) {
@@ -1053,14 +1103,13 @@
                 return;
             }
             const dataStr = JSON.stringify(calculationHistory, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const dataUri = 'application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
             const exportFileDefaultName = `calculator-history-${new Date().toISOString().split('T')[0]}.json`;
             const linkElement = document.createElement('a');
             linkElement.setAttribute('href', dataUri);
             linkElement.setAttribute('download', exportFileDefaultName);
             linkElement.click();
             alert(translations[currentLanguage].history_exported);
-            expressionInput.blur(); // Скрыть клавиатуру
         }
         // Основная функция вычислений
         async function handleInput() {
@@ -1070,7 +1119,6 @@
                 showResults('Ошибка синтаксиса:', 'Проверьте выражение', 'error', 'error');
                 return;
             }
-            expressionInput.blur(); // Скрыть клавиатуру перед вычислением
             showSpinner(true);
             try {
                 // Проверяем, является ли выражение уравнением
@@ -1170,18 +1218,15 @@
         function toggleScientificNotation() {
             scientificNotation = !scientificNotation;
             saveToLocalStorage();
-            expressionInput.blur(); // Скрыть клавиатуру
         }
         // Функции памяти
         function memoryClear() {
             memoryValue = 0;
             alert(translations[currentLanguage].memory_cleared);
-            expressionInput.blur(); // Скрыть клавиатуру
         }
         function memoryRecall() {
             expressionInput.value += 'M';
             renderExpression(expressionInput.value);
-            expressionInput.blur(); // Скрыть клавиатуру
         }
         function memoryAdd() {
             try {
@@ -1191,7 +1236,6 @@
             } catch (e) {
                 alert(translations[currentLanguage].memory_add_error + e.message);
             }
-            expressionInput.blur(); // Скрыть клавиатуру
         }
         function memorySubtract() {
             try {
@@ -1201,7 +1245,6 @@
             } catch (e) {
                 alert(translations[currentLanguage].memory_sub_error + e.message);
             }
-            expressionInput.blur(); // Скрыть клавиатуру
         }
         // Шаблоны выражений
         function insertTemplate(type) {
@@ -1216,17 +1259,14 @@
                 expressionInput.value = templates[type];
                 renderExpression(expressionInput.value);
                 checkSyntax();
-                expressionInput.blur(); // Скрыть клавиатуру
             }
         }
         // Графики
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
-            expressionInput.blur(); // Скрыть клавиатуру
         }
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
-            //expressionInput.focus(); // Опционально: вернуть фокус после закрытия модального окна
         }
         function plotGraph() {
             const funcStr = document.getElementById('graph-function').value;
@@ -1245,7 +1285,6 @@
                 alert('Шаг должен быть положительным числом');
                 return;
             }
-            expressionInput.blur(); // Скрыть клавиатуру перед построением графика
             showSpinner(true);
             try {
                 const func = math.parse(funcStr);
@@ -1269,11 +1308,11 @@
                 }
                 window.currentChart = new Chart(ctx, {
                     type: 'line',
-                     {
+                    data: {
                         labels: xValues,
                         datasets: [{
                             label: `f(x) = ${funcStr}`,
-                             yValues,
+                            data: yValues,
                             borderColor: 'rgb(59, 130, 246)',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             borderWidth: 2,
