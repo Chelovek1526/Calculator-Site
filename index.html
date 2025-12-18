@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Многофункциональный калькулятор с преобразователем</title>
+    <title>Продвинутый Калькулятор с конвертером</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
     <!-- Chart.js для графиков -->
@@ -16,17 +16,18 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden;
+            overflow: hidden; /* Предотвращает прокрутку всего документа */
         }
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #1f2937, #111827);
             display: flex;
             flex-direction: column;
+            /* padding убран, так как теперь калькулятор растягивается */
         }
         .main-content-wrapper {
-            flex: 1;
-            overflow-y: auto;
+            flex: 1; /* Занимает оставшееся место после header-controls */
+            overflow-y: auto; /* Добавляет прокрутку внутри wrapper, если контент больше */
             padding: 20px;
             box-sizing: border-box;
         }
@@ -34,7 +35,7 @@
             max-width: 500px;
             width: 100%;
             margin: 0 auto;
-            height: 100%;
+            height: 100%; /* Пытается занять всю высоту wrapper */
             display: flex;
             flex-direction: column;
         }
@@ -45,9 +46,9 @@
             border-radius: 16px;
             padding: 20px;
             border: 1px solid #4b5563;
-            display: flex;
+            display: flex; /* Используем flex для внутреннего расположения */
             flex-direction: column;
-            flex: 1;
+            flex: 1; /* Растягивается на доступное место в container */
         }
         #render-output {
             background: #1f2937;
@@ -131,7 +132,7 @@
             color: #d1d5db;
             text-align: right;
             transition: all 0.2s;
-            flex: 0 0 auto;
+            flex: 0 0 auto; /* Не растягивается, занимает только нужное место */
         }
         input[type="text"].error {
             border: 2px solid #f87171;
@@ -207,8 +208,6 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            overflow-y: auto;
-            padding: 20px;
         }
         .modal-content {
             background: #374151;
@@ -219,8 +218,6 @@
             max-height: 80vh;
             overflow-y: auto;
             color: #d1d5db;
-            position: relative;
-            margin: auto;
         }
         .modal-header {
             display: flex;
@@ -259,16 +256,16 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        /* Верхнее меню управления */
+        /* Заголовок с настройками - перемещён вниз */
         .header-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
+            padding: 10px 20px; /* Уменьшен отступ сверху/снизу */
             width: 100%;
             max-width: 500px;
-            margin: 0 auto;
-            background: rgba(0, 0, 0, 0.2);
+            margin: 0 auto; /* Центрируем */
+            background: rgba(0, 0, 0, 0.2); /* Легкий фон для отделения */
         }
         .settings-group {
             display: flex;
@@ -321,7 +318,7 @@
             border-radius: 6px;
             padding: 5px 10px;
         }
-        /* Выпадающее меню шаблонов */
+        /* Шаблоны */
         .templates-dropdown {
             position: relative;
             display: inline-block;
@@ -353,7 +350,7 @@
         .templates-dropdown:hover .templates-content {
             display: block;
         }
-        /* Ползунок точности */
+        /* Точность */
         .precision-slider {
             width: 100%;
             height: 6px;
@@ -369,15 +366,18 @@
             cursor: pointer;
             border-radius: 50%;
         }
-         /* Кнопки внизу для мобильных устройств */
+         /* Стили для кнопок под калькулятором */
         .bottom-controls {
             display: flex;
             gap: 10px;
             justify-content: center;
-            margin-top: 10px;
+            margin-top: 10px; /* Отступ сверху от кнопок калькулятора */
         }
         .btn-bottom-control {
-            background-color: #6b7280;
+             /* Наследуем стили от btn-mem или создаем новые */
+            /* background-color: #3b82f6; color: white; box-shadow: 0 3px #2563eb; */
+            /* Пример стиля для контрольных кнопок */
+            background-color: #6b7280; /* gray-500 */
             color: white;
             border: none;
             border-radius: 6px;
@@ -387,18 +387,20 @@
             box-shadow: 0 3px #4b5563;
         }
         .btn-bottom-control:active {
-            background-color: #4b5563; transform: translateY(1px); box-shadow: 0 2px #4b5563;
+             background-color: #4b5563; transform: translateY(1px); box-shadow: 0 2px #4b5563;
         }
         .btn-bottom-control.help {
-            background-color: #8b5cf6;
-            box-shadow: 0 3px #7c3aed;
+            background-color: #8b5cf6; /* purple-500 */
+            box-shadow: 0 3px #7c3aed; /* purple-600 */
         }
         .btn-bottom-control.help:active {
-            background-color: #7c3aed;
+            background-color: #7c3aed; /* purple-600 */
             box-shadow: 0 2px #7c3aed;
         }
+
+        /* Убедимся, что кнопки калькулятора не растягиваются слишком сильно */
         .btn-grid, .grid.grid-cols-4.gap-2.mb-4, .grid.grid-cols-5.gap-2.mb-4 {
-            flex: 0 0 auto;
+            flex: 0 0 auto; /* Эти блоки занимают только нужное им место */
         }
     </style>
 </head>
@@ -411,7 +413,7 @@
     <div class="modal" id="helpModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="text-2xl font-bold">Инструкция по использованию калькулятора</h2>
+                <h2 class="text-2xl font-bold">📚 Справка по калькулятору</h2>
                 <button class="close-btn" onclick="closeModal('helpModal')">×</button>
             </div>
             <div class="space-y-4">
@@ -426,7 +428,7 @@
                     </ul>
                 </div>
                 <div>
-                    <h3 class="text-lg font-bold text-green-300 mb-2">Тригонометрические функции</h3>
+                    <h3 class="text-lg font-bold text-green-300 mb-2">Тригонометрия</h3>
                     <ul class="list-disc pl-5 space-y-1">
                         <li><code>sin(x)</code> - синус</li>
                         <li><code>cos(x)</code> - косинус</li>
@@ -443,7 +445,7 @@
                         <li><code>ln(x)</code> - натуральный логарифм</li>
                         <li><code>sqrt(x)</code> или <code>√</code> - квадратный корень</li>
                         <li><code>cbrt(x)</code> - кубический корень</li>
-                        <li><code>nthRoot(x, n)</code> - корень n-ой степени</li>
+                        <li><code>nthRoot(x, n)</code> - корень n-й степени</li>
                     </ul>
                 </div>
                 <div>
@@ -457,10 +459,10 @@
                 <div>
                     <h3 class="text-lg font-bold text-red-300 mb-2">Горячие клавиши</h3>
                     <ul class="list-disc pl-5 space-y-1">
-                        <li><kbd>Ctrl</kbd> + <kbd>Enter</kbd> - вычисление</li>
-                        <li><kbd>Esc</kbd> - очистка поля ввода</li>
-                        <li><kbd>?</kbd> / <kbd>/</kbd> - вызов помощи</li>
-                        <li><kbd>F1</kbd> - открытие справки</li>
+                        <li><kbd>Ctrl</kbd> + <kbd>Enter</kbd> - вычислить</li>
+                        <li><kbd>Esc</kbd> - очистить поле</li>
+                        <li><kbd>↑</kbd> / <kbd>↓</kbd> - навигация по истории</li>
+                        <li><kbd>F1</kbd> - открыть справку</li>
                     </ul>
                 </div>
             </div>
@@ -470,7 +472,7 @@
     <div class="modal" id="graphModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="text-2xl font-bold">Построение графика функции</h2>
+                <h2 class="text-2xl font-bold">📈 Построение графика</h2>
                 <button class="close-btn" onclick="closeModal('graphModal')">×</button>
             </div>
             <div class="mb-4">
@@ -497,17 +499,17 @@
             </button>
         </div>
     </div>
-    <!-- Основной контент -->
+    <!-- Основной контент калькулятора -->
     <div class="main-content-wrapper">
         <div class="calculator-container">
             <div class="calculator">
-                <h1 class="text-3xl font-extrabold text-white mb-4">Многофункциональный калькулятор</h1>
+                 <h1 class="text-3xl font-extrabold text-white mb-4">🧮 Продвинутый Калькулятор</h1> <!-- Заголовок перемещен внутрь калькулятора -->
                 <div id="result-container">
-                    <div class="result-box fraction-result" id="fraction-result" data-i18n="exact_answer">Точный ответ: ожидание выражения...</div>
-                    <div class="result-box decimal-result" id="decimal-result" data-i18n="approx_answer">Приблизительный ответ: ---</div>
+                    <div class="result-box fraction-result" id="fraction-result" data-i18n="exact_answer">Точный ответ: Ожидание ввода...</div>
+                    <div class="result-box decimal-result" id="decimal-result" data-i18n="approx_answer">Приближенный ответ: ---</div>
                 </div>
                 <div id="render-output"></div>
-                <input type="text" id="expression" placeholder="Пример: 2+2, x+y=5, \frac{1}{3}+1" autocomplete="off">
+                <input type="text" id="expression" placeholder="Введите: 2+2, x+y=5, \frac{1}{3}+1" autocomplete="off">
                 <div class="grid grid-cols-4 gap-2 mb-4">
                     <button class="btn-mem text-sm" onclick="memoryClear()">MC</button>
                     <button class="btn-mem text-sm" onclick="memoryRecall()">MR</button>
@@ -522,7 +524,7 @@
                     <button class="btn-op text-sm" onclick="appendToExpression('sqrt(')">√</button>
                 </div>
                 <div class="btn-grid">
-                    <button class="btn-history" onclick="toggleConverter()">Конв</button>
+                    <button class="btn-history" onclick="toggleConverter()">🌐</button>
                     <button class="btn-history" onclick="toggleHistory()">H</button>
                     <button class="btn-clear" onclick="clearExpression()">AC</button>
                     <button class="btn-op" onclick="appendToExpression('(')">(</button>
@@ -544,16 +546,16 @@
                     <button class="btn-op" onclick="appendToExpression('\\pi')">π</button>
                     <button class="btn-op" onclick="appendToExpression('+')">+</button>
                     <button class="btn-op" onclick="appendToExpression('i')">i</button>
-                    <button class="btn-op" onclick="openModal('graphModal')">Гр</button>
+                    <button class="btn-op" onclick="openModal('graphModal')">📈</button>
                     <button class="btn-op" onclick="appendToExpression('^')">^</button>
                     <button class="btn-op" onclick="appendToExpression('=')">=</button>
                     <button class="btn-main mt-4" onclick="handleInput()" id="calculate-btn" data-i18n="calculate">Вычислить</button>
                 </div>
             </div>
             <div class="converter-panel hidden" id="converter-panel">
-                <h3 class="text-xl font-bold mb-4 border-b border-gray-600 pb-2" data-i18n="unit_converter">Конвертер единиц измерения</h3>
+                <h3 class="text-xl font-bold mb-4 border-b border-gray-600 pb-2" data-i18n="unit_converter">🌐 Конвертер Единиц</h3>
                 <div class="mb-4">
-                    <label class="block mb-2 text-sm font-medium" data-i18n="select_category">Выберите категорию:</label>
+                    <label class="block mb-2 text-sm font-medium" data-i18n="select_category">Выберите Категорию:</label>
                     <select id="unit-category" class="converter-select" onchange="renderUnitSelector()"></select>
                 </div>
                 <div class="converter-section">
@@ -561,19 +563,19 @@
                     <input type="number" id="converter-input" class="converter-input" placeholder="Введите число" value="1" oninput="performConversion()">
                     <div class="grid grid-cols-3 gap-2 mt-4 items-center">
                         <div>
-                            <label class="block text-xs font-medium text-gray-400" data-i18n="from">От:</label>
+                            <label class="block text-xs font-medium text-gray-400" data-i18n="from">ИЗ:</label>
                             <select id="unit-from" class="converter-select" onchange="performConversion()"></select>
                         </div>
                         <div class="text-center text-lg text-yellow-400 font-bold">→</div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-400" data-i18n="to">К:</label>
+                            <label class="block text-xs font-medium text-gray-400" data-i18n="to">В:</label>
                             <select id="unit-to" class="converter-select" onchange="performConversion()"></select>
                         </div>
                     </div>
                 </div>
-                <!-- Точность конвертации -->
+                <!-- Ползунок точности -->
                 <div class="converter-section mt-4">
-                    <label class="block mb-2 text-sm font-medium" data-i18n="precision">Точность (количество знаков после запятой):</label>
+                    <label class="block mb-2 text-sm font-medium" data-i18n="precision">Точность (знаков после запятой):</label>
                     <input type="range" min="1" max="15" value="6" class="precision-slider" id="precision-slider" oninput="updatePrecision()">
                     <div class="flex justify-between text-xs text-gray-400">
                         <span>1</span>
@@ -587,31 +589,31 @@
             </div>
             <div class="history-panel hidden" id="history-panel">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-bold border-b border-gray-600 pb-2" data-i18n="calculation_history">История вычислений</h3>
+                    <h3 class="text-xl font-bold border-b border-gray-600 pb-2" data-i18n="calculation_history">Журнал Вычислений</h3>
                     <div class="flex gap-2">
                         <button onclick="exportHistory()" class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700" data-i18n="export">
                             Экспорт
                         </button>
                         <button onclick="clearAllHistory()" class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700" data-i18n="clear_all">
-                            Очистить все
+                            Удалить всё
                         </button>
                     </div>
                 </div>
                 <div id="history-log" class="flex flex-col-reverse">
-                    <p class="text-sm text-gray-500 text-center mt-4" data-i18n="history_empty">Результаты будут появляться здесь.</p>
+                    <p class="text-sm text-gray-500 text-center mt-4" data-i18n="history_empty">Результаты будут отображаться здесь.</p>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Верхнее меню управления -->
+    <!-- Заголовок и настройки перемещены вниз -->
     <div class="header-controls">
         <div class="settings-group">
             <!-- Переключатель языка -->
             <select id="language-select" class="language-select" onchange="changeLanguage()">
-                <option value="ru">Русский язык</option>
-                <option value="en">English language</option>
+                <option value="ru">🇷🇺 Русский</option>
+                <option value="en">🇺🇸 English</option>
             </select>
-            <!-- Переключатель научной нотации -->
+            <!-- Научная нотация -->
             <label class="flex items-center gap-2 text-white">
                 <span id="scientific-label">Научная</span>
                 <label class="switch">
@@ -622,24 +624,24 @@
             <!-- Шаблоны -->
             <div class="templates-dropdown">
                 <button class="px-3 py-1 bg-purple-700 text-white rounded hover:bg-purple-600">
-                    Шаб
+                    📋
                 </button>
                 <div class="templates-content">
                     <button onclick="insertTemplate('quadratic')">Квадратное уравнение</button>
                     <button onclick="insertTemplate('trigonometric')">Тригонометрическое выражение</button>
-                    <button onclick="insertTemplate('complex')">Комплексные числа</button>
+                    <button onclick="insertTemplate('complex')">Комплексное число</button>
                     <button onclick="insertTemplate('logarithm')">Логарифмическое выражение</button>
                     <button onclick="insertTemplate('system')">Система уравнений</button>
                 </div>
             </div>
         </div>
-        <!-- Кнопка помощи -->
+        <!-- Кнопка справки перемещена в правую часть нижней панели -->
         <button onclick="openModal('helpModal')" class="btn-bottom-control help">
             ?
         </button>
     </div>
     <script>
-        // Получение DOM элементов
+        // Инициализация элементов DOM
         const expressionInput = document.getElementById('expression');
         const fractionResultDiv = document.getElementById('fraction-result');
         const decimalResultDiv = document.getElementById('decimal-result');
@@ -659,33 +661,33 @@
         let scientificNotation = false;
         let historyIndex = -1;
         let originalExpression = '';
-        const EPSILON = 1e-10;
+        const Epsilon = 1e-10;
         let currentLanguage = 'ru';
-        // Объекты переводов
+        // Многоязычные переводы
         const translations = {
             ru: {
                 exact_answer: "Точный ответ: ",
-                approx_answer: "Приблизительный ответ: ",
+                approx_answer: "Приближенный ответ: ",
                 calculate: "Вычислить",
-                unit_converter: "Конвертер единиц измерения",
-                select_category: "Выберите категорию:",
+                unit_converter: "🌐 Конвертер Единиц",
+                select_category: "Выберите Категорию:",
                 value: "Значение:",
-                from: "От:",
-                to: "К:",
-                precision: "Точность (количество знаков после запятой):",
+                from: "ИЗ:",
+                to: "В:",
+                precision: "Точность (знаков после запятой):",
                 result: "Результат: ",
-                calculation_history: "История вычислений",
+                calculation_history: "Журнал Вычислений",
                 export: "Экспорт",
-                clear_all: "Очистить все",
-                history_empty: "Результаты будут появляться здесь.",
+                clear_all: "Удалить всё",
+                history_empty: "Результаты будут отображаться здесь.",
                 scientific_label: "Научная",
-                expression_placeholder: "Пример: 2+2, x+y=5, \\frac{1}{3}+1",
-                conversion: "Конвертация",
+                expression_placeholder: "Введите: 2+2, x+y=5, \\frac{1}{3}+1",
+                conversion: "Конверсия",
                 memory_cleared: "Память очищена",
-                memory_value: "Текущее значение памяти: ",
+                memory_value: "Значение памяти: ",
                 memory_add_error: "Ошибка при добавлении в память: ",
                 memory_sub_error: "Ошибка при вычитании из памяти: ",
-                confirm_clear_history: "Вы уверены, что хотите очистить всю историю?",
+                confirm_clear_history: "Вы уверены, что хотите удалить всю историю?",
                 history_cleared: "История очищена",
                 history_exported: "История экспортирована",
                 no_history: "Нет истории для экспорта",
@@ -699,7 +701,7 @@
                 exact_answer: "Exact answer: ",
                 approx_answer: "Approximate answer: ",
                 calculate: "Calculate",
-                unit_converter: "Unit Converter",
+                unit_converter: "🌐 Unit Converter",
                 select_category: "Select Category:",
                 value: "Value:",
                 from: "FROM:",
@@ -728,7 +730,7 @@
                 plot_graph: "Plot Graph"
             }
         };
-        // Категории единиц измерения
+        // Категории единиц
         const UNIT_CATEGORIES = {
             'Длина': ['m', 'km', 'cm', 'mm', 'inch', 'ft', 'yd', 'mile'],
             'Масса': ['kg', 'g', 'mg', 'lbm', 'oz', 'tonne'],
@@ -737,17 +739,14 @@
             'Время': ['s', 'min', 'hr', 'day', 'week', 'year'],
             'Температура': ['degC', 'degF', 'K'],
             'Скорость': ['m/s', 'km/h', 'mph', 'knot'],
-            'Энергия': ['J', 'kJ', 'cal', 'kcal', 'kWh', 'BTU'],
+            'Энергия/Работа': ['J', 'kJ', 'cal', 'kcal', 'kWh', 'BTU'],
             'Давление': ['Pa', 'kPa', 'bar', 'atm', 'psi'],
             'Сила': ['N', 'kN', 'lbf'],
         };
-        // Настройка math.js для символьных вычислений
+        // Настройка math.js для использования локальной памяти
         const scope = { M: 0, pi: math.pi, e: math.e, i: math.i };
         Object.defineProperty(scope, 'M', {
-            get: () => memoryValue, 
-            set: (val) => memoryValue = val, 
-            enumerable: true, 
-            configurable: true
+            get: () => memoryValue, set: (val) => memoryValue = val, enumerable: true, configurable: true
         });
         // Инициализация
         function init() {
@@ -758,12 +757,12 @@
             updatePrecision();
             updateLanguage();
             checkSyntax();
-            // При загрузке проверяем историю
+            // Загрузка истории при инициализации
             if (calculationHistory.length > 0) {
                 updateHistoryDisplay();
             }
         }
-        // Изменение языка
+        // Функции многоязычности
         function changeLanguage() {
             currentLanguage = languageSelect.value;
             updateLanguage();
@@ -779,12 +778,12 @@
                     } else {
                         const currentText = element.textContent;
                         const baseText = translations[currentLanguage][key];
-                        // Для специальных элементов обрабатываем содержимое особым образом
+                        // Для результатов, сохраняем вычисленные значения
                         if (element.id === 'fraction-result' && currentText.includes('Точный ответ: ')) {
                             const value = currentText.replace('Точный ответ: ', '');
                             element.textContent = translations[currentLanguage].exact_answer + value;
-                        } else if (element.id === 'decimal-result' && currentText.includes('Приблизительный ответ: ')) {
-                            const value = currentText.replace('Приблизительный ответ: ', '');
+                        } else if (element.id === 'decimal-result' && currentText.includes('Приближенный ответ: ')) {
+                            const value = currentText.replace('Приближенный ответ: ', '');
                             element.textContent = translations[currentLanguage].approx_answer + value;
                         } else if (element.id === 'scientific-label') {
                             element.textContent = translations[currentLanguage].scientific_label;
@@ -795,7 +794,7 @@
                 }
             });
         }
-        // Отображение выражения с форматированием
+        // Функции рендеринга
         function renderExpression(text) {
             let kaTeXInput = text
                 .replace(/\*/g, '\\cdot ')
@@ -816,7 +815,7 @@
             const expr = expressionInput.value;
             let hasError = false;
             if (expr) {
-                // Проверка баланса скобок
+                // Проверка несбалансированных скобок
                 let stack = [];
                 for (let char of expr) {
                     if (char === '(') stack.push('(');
@@ -829,7 +828,7 @@
                     }
                 }
                 if (stack.length > 0) hasError = true;
-                // Проверка допустимых символов
+                // Проверка неизвестных функций/символов
                 const validPattern = /^[0-9+\-*/.^()\s\\frac{}\[\]\sincostanlogsqrtcbrtpiexyzM,=<>!&|]+$/i;
                 if (!validPattern.test(expr.replace(/\s+/g, ''))) {
                     hasError = true;
@@ -842,10 +841,10 @@
             }
             return !hasError;
         }
-        // Слушатели событий для поля ввода
+        // Автодополнение скобок
         expressionInput.addEventListener('input', function(e) {
             renderExpression(expressionInput.value);
-            // Автоматическое добавление закрывающей скобки
+            // Автодополнение скобок
             if (e.inputType === 'insertText' && e.data === '(') {
                 setTimeout(() => {
                     const pos = expressionInput.selectionStart;
@@ -864,7 +863,7 @@
                 }
             }
         });
-        // Слушатели клавиатуры
+        // Горячие клавиши
         document.addEventListener('keydown', function(e) {
             // F1 - помощь
             if (e.key === 'F1') {
@@ -875,7 +874,7 @@
             if (e.key === 'Escape') {
                 clearExpression();
             }
-            // Навигация по истории
+            // Стрелки для навигации по истории
             if (e.key === 'ArrowUp') {
                 e.preventDefault();
                 navigateHistory(-1);
@@ -910,14 +909,14 @@
                     renderExpression(historyItem.expression);
                 }
             }
-            // Если дошли до конца истории, возвращаем исходное выражение
+            // Если вышли за пределы истории, восстанавливаем оригинальное выражение
             if (historyIndex >= calculationHistory.length - 1 && direction === 1) {
                 historyIndex = -1;
                 expressionInput.value = originalExpression;
                 renderExpression(originalExpression);
             }
         }
-        // Управление выражениями
+        // Вспомогательные функции
         function appendToExpression(value) {
             expressionInput.value += value;
             renderExpression(expressionInput.value);
@@ -927,7 +926,7 @@
         function clearExpression() {
             expressionInput.value = '';
             showResults(
-                translations[currentLanguage].exact_answer + 'ожидание выражения...',
+                translations[currentLanguage].exact_answer + 'Ожидание ввода...',
                 translations[currentLanguage].approx_answer + '---',
                 'fraction-result',
                 'decimal-result'
@@ -1001,7 +1000,7 @@
             const unitFrom = document.getElementById('unit-from').value;
             const unitTo = document.getElementById('unit-to').value;
             if (isNaN(value) || !unitFrom || !unitTo) {
-                converterResultOutput.textContent = translations[currentLanguage].result + 'Введите корректное число и единицы измерения.';
+                converterResultOutput.textContent = translations[currentLanguage].result + 'Введите число и выберите единицы.';
                 converterResultOutput.className = 'result-box error mt-4';
                 return;
             }
@@ -1112,28 +1111,28 @@
             linkElement.click();
             alert(translations[currentLanguage].history_exported);
         }
-        // Обработка ввода
+        // Основная функция вычислений
         async function handleInput() {
             const expr = expressionInput.value.trim();
             if (!expr) return;
             if (!checkSyntax()) {
-                showResults('Ошибка синтаксиса:', 'Проверьте правильность выражения', 'error', 'error');
+                showResults('Ошибка синтаксиса:', 'Проверьте выражение', 'error', 'error');
                 return;
             }
             showSpinner(true);
             try {
-                // Обработка уравнений
+                // Проверяем, является ли выражение уравнением
                 if (expr.includes('=')) {
                     const parts = expr.split('=');
                     if (parts.length !== 2) {
-                        throw new Error('Уравнение должно содержать только один знак "="');
+                        throw new Error('Уравнение должно содержать один знак "="');
                     }
                     const left = math.parse(parts[0]);
                     const right = math.parse(parts[1]);
                     const equation = math.simplify(math.subtract(left, right));
                     const solutions = math.solve(equation, 'x');
                     if (solutions === null || solutions.length === 0) {
-                        throw new Error('Нет решений для уравнения');
+                        throw new Error('Нет решения для уравнения');
                     }
                     let fractionText, decimalText;
                     if (Array.isArray(solutions)) {
@@ -1151,15 +1150,15 @@
                     );
                     recordHistory(expr, fractionText);
                 } else {
-                    // Обработка обычных выражений
+                    // Обычное вычисление выражения
                     const simplified = math.simplify(expr, scope);
                     const numericResult = math.evaluate(expr, scope);
-                    // Обработка комплексных чисел
+                    // Проверка на комплексное число
                     if (math.typeOf(numericResult) === 'Complex') {
                         const real = numericResult.re;
                         const imag = numericResult.im;
                         let fractionText, decimalText;
-                        if (Math.abs(imag) < EPSILON) {
+                        if (Math.abs(imag) < Epsilon) {
                             fractionText = simplified.toString();
                             decimalText = formatNumber(real);
                         } else {
@@ -1174,14 +1173,14 @@
                         );
                         recordHistory(expr, fractionText + ' (≈ ' + decimalText + ')');
                     } else {
-                        // Обработка обычных чисел
+                        // Вещественные числа
                         let fractionText;
                         if (math.typeOf(simplified) === 'Fraction') {
                             fractionText = simplified.toString();
                         } else {
                             try {
                                 const frac = math.fraction(numericResult);
-                                if (math.abs(math.number(frac) - numericResult) < EPSILON) {
+                                if (math.abs(math.number(frac) - numericResult) < Epsilon) {
                                     fractionText = frac.toString();
                                 } else {
                                     fractionText = simplified.toString();
@@ -1215,12 +1214,12 @@
                 return formatted.replace(/\.?0+$/, '');
             }
         }
-        // Переключение научной нотации
+        // Научная нотация
         function toggleScientificNotation() {
             scientificNotation = !scientificNotation;
             saveToLocalStorage();
         }
-        // Управление памятью
+        // Функции памяти
         function memoryClear() {
             memoryValue = 0;
             alert(translations[currentLanguage].memory_cleared);
@@ -1262,55 +1261,13 @@
                 checkSyntax();
             }
         }
-        // Модальные окна - ИСПРАВЛЕННЫЙ КОД
+        // Графики
         function openModal(modalId) {
-            // Блокируем скроллинг основного контента при открытии модального окна
-            document.body.style.overflow = 'hidden';
-            
-            const modal = document.getElementById(modalId);
-            modal.style.display = 'flex';
-            
-            // Автоматически фокусируемся на поле ввода в зависимости от модального окна
-            setTimeout(() => {
-                if (modalId === 'graphModal') {
-                    document.getElementById('graph-function').focus();
-                } else if (modalId === 'helpModal') {
-                    // Для helpModal фокус не нужен, но можно фокусироваться на первой кнопке
-                    modal.querySelector('.close-btn').focus();
-                }
-            }, 100);
+            document.getElementById(modalId).style.display = 'flex';
         }
-
         function closeModal(modalId) {
-            // Восстанавливаем скроллинг основного контента
-            document.body.style.overflow = '';
-            
             document.getElementById(modalId).style.display = 'none';
         }
-
-        // Обработка нажатия клавиши Escape для закрытия модальных окон
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                const modals = document.querySelectorAll('.modal');
-                modals.forEach(modal => {
-                    if (modal.style.display === 'flex') {
-                        const modalId = modal.id;
-                        closeModal(modalId);
-                    }
-                });
-            }
-        });
-
-        // Закрытие модального окна при клике вне его содержимого
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeModal(this.id);
-                }
-            });
-        });
-        
-        // Построение графика
         function plotGraph() {
             const funcStr = document.getElementById('graph-function').value;
             const from = parseFloat(document.getElementById('graph-from').value);
@@ -1321,7 +1278,7 @@
                 return;
             }
             if (from >= to) {
-                alert('"От" должно быть меньше чем "До"');
+                alert('"От" должно быть меньше "До"');
                 return;
             }
             if (step <= 0) {
@@ -1341,11 +1298,11 @@
                         yValues.push(y);
                     } catch (e) {
                         // Пропускаем точки, где функция не определена
-                        console.log(`Ошибка при вычислении для x = ${x}`);
+                        console.log(`Функция не определена при x = ${x}`);
                     }
                 }
                 const ctx = document.getElementById('graphCanvas').getContext('2d');
-                // Удаляем предыдущий график, если он существует
+                // Уничтожаем предыдущий график, если он существует
                 if (window.currentChart) {
                     window.currentChart.destroy();
                 }
@@ -1355,7 +1312,7 @@
                         labels: xValues,
                         datasets: [{
                             label: `f(x) = ${funcStr}`,
-                             yValues,
+                            data: yValues,
                             borderColor: 'rgb(59, 130, 246)',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             borderWidth: 2,
@@ -1401,11 +1358,11 @@
                 showSpinner(false);
             }
         }
-        // Показ/скрытие спиннера
+        // Спиннер
         function showSpinner(show) {
             spinner.style.display = show ? 'block' : 'none';
         }
-        // Работа с localStorage
+        // LocalStorage
         function saveToLocalStorage() {
             const data = {
                 history: calculationHistory,
@@ -1430,12 +1387,12 @@
                     document.getElementById('scientific-toggle').checked = scientificNotation;
                     languageSelect.value = currentLanguage;
                 } catch (e) {
-                    console.error('Ошибка при загрузке данных:', e);
+                    console.error('Ошибка загрузки данных:', e);
                 }
             }
         }
-        // Инициализация при загрузке страницы
+        // Инициализация при загрузке
         window.onload = init;
     </script>
 </body>
-    </html>
+                                </html>
