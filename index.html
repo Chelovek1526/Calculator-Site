@@ -576,57 +576,142 @@
             get: () => memoryValue, set: (val) => memoryValue = val, enumerable: true, configurable: true
         });
         
-        // ===== НОВАЯ ФУНКЦИЯ ДЛЯ ФОРМАТИРОВАНИЯ ДРОБЕЙ =====
+        // ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ ДЛЯ ПРЕОБРАЗОВАНИЯ В ДРОБЬ =====
         function formatFractionResult(num) {
-            // Обработка особых значений
-            if (num === Infinity) return '∞';
-            if (num === -Infinity) return '-∞';
-            if (isNaN(num)) return 'Не число';
-            
-            // Если это целое число
-            if (Math.abs(num - Math.round(num)) < 1e-12) {
-                return Math.round(num).toString();
+            // Проверка особых значений
+            if (!isFinite(num)) {
+                if (num === Infinity) return '∞';
+                if (num === -Infinity) return '-∞';
+                return 'NaN';
             }
             
-            try {
-                // Преобразуем в дробь
-                const fraction = math.fraction(num);
-                const [numerator, denominator] = fraction.toFraction();
+            // Если очень маленькое число
+            if (Math.abs(num) < 1e-15) return '0';
+            
+            // Проверка на целое число
+            const rounded = Math.round(num);
+            if (Math.abs(num - rounded) < 1e-10) {
+                return rounded.toString();
+            }
+            
+            // УПРОЩЕННЫЙ И ЭФФЕКТИВНЫЙ АЛГОРИТМ
+            // Сначала проверим популярные дроби напрямую
+            const commonFractions = [
+                {value: 0.5, text: '1/2'},
+                {value: 0.3333333333, text: '1/3'},
+                {value: 0.6666666667, text: '2/3'},
+                {value: 0.25, text: '1/4'},
+                {value: 0.75, text: '3/4'},
+                {value: 0.2, text: '1/5'},
+                {value: 0.4, text: '2/5'},
+                {value: 0.6, text: '3/5'},
+                {value: 0.8, text: '4/5'},
+                {value: 0.125, text: '1/8'},
+                {value: 0.375, text: '3/8'},
+                {value: 0.625, text: '5/8'},
+                {value: 0.875, text: '7/8'},
+                {value: 0.1666666667, text: '1/6'},
+                {value: 0.8333333333, text: '5/6'},
+            ];
+            
+            // Проверяем, не является ли число одной из популярных дробей
+            for (const frac of commonFractions) {
+                if (Math.abs(num - frac.value) < 1e-8) {
+                    return frac.text;
+                }
+            }
+            
+            // Попробуем простой алгоритм поиска дроби
+            const tolerance = 1e-7; // Увеличиваем допуск
+            const maxDenominator = 100;
+            
+            for (let denominator = 1; denominator <= maxDenominator; denominator++) {
+                const numerator = Math.round(num * denominator);
+                const fractionValue = numerator / denominator;
                 
-                // Проверяем, что дробь точная
-                const fractionValue = math.number(fraction);
-                const tolerance = 1e-12;
-                const isExact = Math.abs(fractionValue - num) < tolerance;
-                
-                if (isExact) {
-                    if (denominator === 1) {
-                        return numerator.toString();
-                    } else if (denominator <= 1000) {
-                        // Сокращаем дробь, если нужно
+                if (Math.abs(fractionValue - num) < tolerance) {
+                    // Нашли подходящую дробь, теперь сокращаем её
+                    try {
                         const gcd = math.gcd(numerator, denominator);
-                        if (gcd > 1) {
-                            return (numerator / gcd) + '/' + (denominator / gcd);
+                        const simpNum = numerator / gcd;
+                        const simpDen = denominator / gcd;
+                        
+                        if (simpDen === 1) {
+                            return simpNum.toString();
+                        } else if (simpDen <= 100) {
+                            return `${simpNum}/${simpDen}`;
                         }
-                        return numerator + '/' + denominator;
+                    } catch (e) {
+                        return `${numerator}/${denominator}`;
                     }
                 }
-            } catch (e) {
-                console.log('Ошибка при форматировании дроби:', e);
             }
             
-            // Если не получилось дробь, показываем число с разумной точностью
-            // Определяем оптимальное количество знаков
+            // Если число вида n.5, n.25, n.75 и т.д.
+            if (Math.abs(num * 2 - Math.round(num * 2)) < 1e-8) {
+                // Умножаем на 2, чтобы избавиться от .5
+                const numerator = Math.round(num * 2);
+                const gcd = math.gcd(numerator, 2);
+                const simpNum = numerator / gcd;
+                const simpDen = 2 / gcd;
+                
+                if (simpDen === 1) {
+                    return simpNum.toString();
+                } else {
+                    return `${simpNum}/${simpDen}`;
+                }
+            }
+            
+            if (Math.abs(num * 4 - Math.round(num * 4)) < 1e-8) {
+                const numerator = Math.round(num * 4);
+                const gcd = math.gcd(numerator, 4);
+                const simpNum = numerator / gcd;
+                const simpDen = 4 / gcd;
+                
+                if (simpDen === 1) {
+                    return simpNum.toString();
+                } else {
+                    return `${simpNum}/${simpDen}`;
+                }
+            }
+            
+            if (Math.abs(num * 8 - Math.round(num * 8)) < 1e-8) {
+                const numerator = Math.round(num * 8);
+                const gcd = math.gcd(numerator, 8);
+                const simpNum = numerator / gcd;
+                const simpDen = 8 / gcd;
+                
+                if (simpDen === 1) {
+                    return simpNum.toString();
+                } else {
+                    return `${simpNum}/${simpDen}`;
+                }
+            }
+            
+            // Если ничего не подошло, показываем как десятичное число
             const absNum = Math.abs(num);
-            let precision;
-            if (absNum < 1) {
-                precision = 10;
-            } else if (absNum < 1000) {
-                precision = 6;
-            } else {
-                precision = 4;
+            let displayPrecision = 6;
+            
+            if (absNum < 0.0001 || absNum > 10000) {
+                return num.toExponential(4);
+            } else if (absNum < 1) {
+                displayPrecision = Math.max(6, Math.ceil(-Math.log10(absNum)) + 2);
             }
             
-            return num.toFixed(precision).replace(/\.?0+$/, '');
+            const formatted = num.toFixed(Math.min(displayPrecision, 10));
+            return formatted.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+        }
+        
+        function formatNumber(num) {
+            if (typeof num !== 'number' || isNaN(num) || !isFinite(num)) {
+                return String(num);
+            }
+            if (scientificNotation) {
+                return num.toExponential(precision);
+            } else {
+                const formatted = num.toFixed(precision);
+                return formatted.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+            }
         }
         
         function init() {
@@ -1055,7 +1140,7 @@
                     if (Array.isArray(solutions)) {
                         fractionText = `x = ${solutions.map(s => {
                             try {
-                                return math.simplify(s).toString();
+                                return formatFractionResult(s);
                             } catch {
                                 return s.toString();
                             }
@@ -1063,7 +1148,7 @@
                         decimalText = `x ≈ ${solutions.map(s => formatNumber(s)).join(', ')}`;
                     } else {
                         try {
-                            fractionText = `x = ${math.simplify(solutions).toString()}`;
+                            fractionText = `x = ${formatFractionResult(solutions)}`;
                         } catch {
                             fractionText = `x = ${solutions.toString()}`;
                         }
@@ -1081,17 +1166,21 @@
                         const imag = numericResult.im;
                         let fractionText, decimalText;
                         if (Math.abs(imag) < Epsilon) {
-                            // ИСПРАВЛЕННАЯ СТРОКА: используем новую функцию
+                            // Для действительных чисел
                             fractionText = formatFractionResult(real);
                             decimalText = formatNumber(real);
                         } else {
-                            fractionText = simplified.toString();
-                            decimalText = formatNumber(real) + (imag >= 0 ? ' + ' : ' - ') + formatNumber(Math.abs(imag)) + 'i';
+                            // Для комплексных чисел
+                            const realPart = formatFractionResult(real);
+                            const imagPart = formatFractionResult(Math.abs(imag));
+                            const sign = imag >= 0 ? ' + ' : ' - ';
+                            fractionText = realPart + sign + imagPart + 'i';
+                            decimalText = formatNumber(real) + sign + formatNumber(Math.abs(imag)) + 'i';
                         }
                         showResults(fractionText, decimalText, 'text-purple-400', 'decimal-result');
                         recordHistory(expr, fractionText + ' (≈ ' + decimalText + ')');
                     } else {
-                        // ИСПРАВЛЕННАЯ СТРОКА: используем новую функцию
+                        // Для обычных чисел - ИСПОЛЬЗУЕМ ИСПРАВЛЕННУЮ ФУНКЦИЮ
                         let fractionText = formatFractionResult(numericResult);
                         const decimalText = formatNumber(numericResult);
                         
@@ -1103,18 +1192,6 @@
                 showResults('Ошибка:', error.message, 'error', 'error');
             } finally {
                 showSpinner(false);
-            }
-        }
-        
-        function formatNumber(num) {
-            if (typeof num !== 'number' || isNaN(num) || !isFinite(num)) {
-                return String(num);
-            }
-            if (scientificNotation) {
-                return num.toExponential(precision);
-            } else {
-                const formatted = num.toFixed(precision);
-                return formatted.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
             }
         }
         
@@ -1244,4 +1321,4 @@
         window.onload = init;
     </script>
 </body>
-                                                                              </html>
+        </html>
