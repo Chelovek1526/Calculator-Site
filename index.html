@@ -576,6 +576,59 @@
             get: () => memoryValue, set: (val) => memoryValue = val, enumerable: true, configurable: true
         });
         
+        // ===== НОВАЯ ФУНКЦИЯ ДЛЯ ФОРМАТИРОВАНИЯ ДРОБЕЙ =====
+        function formatFractionResult(num) {
+            // Обработка особых значений
+            if (num === Infinity) return '∞';
+            if (num === -Infinity) return '-∞';
+            if (isNaN(num)) return 'Не число';
+            
+            // Если это целое число
+            if (Math.abs(num - Math.round(num)) < 1e-12) {
+                return Math.round(num).toString();
+            }
+            
+            try {
+                // Преобразуем в дробь
+                const fraction = math.fraction(num);
+                const [numerator, denominator] = fraction.toFraction();
+                
+                // Проверяем, что дробь точная
+                const fractionValue = math.number(fraction);
+                const tolerance = 1e-12;
+                const isExact = Math.abs(fractionValue - num) < tolerance;
+                
+                if (isExact) {
+                    if (denominator === 1) {
+                        return numerator.toString();
+                    } else if (denominator <= 1000) {
+                        // Сокращаем дробь, если нужно
+                        const gcd = math.gcd(numerator, denominator);
+                        if (gcd > 1) {
+                            return (numerator / gcd) + '/' + (denominator / gcd);
+                        }
+                        return numerator + '/' + denominator;
+                    }
+                }
+            } catch (e) {
+                console.log('Ошибка при форматировании дроби:', e);
+            }
+            
+            // Если не получилось дробь, показываем число с разумной точностью
+            // Определяем оптимальное количество знаков
+            const absNum = Math.abs(num);
+            let precision;
+            if (absNum < 1) {
+                precision = 10;
+            } else if (absNum < 1000) {
+                precision = 6;
+            } else {
+                precision = 4;
+            }
+            
+            return num.toFixed(precision).replace(/\.?0+$/, '');
+        }
+        
         function init() {
             calculationHistory = [];
             memoryValue = 0;
@@ -756,101 +809,6 @@
             decimalResultDiv.textContent = translations[currentLanguage].approx_answer + decimalText;
             fractionResultDiv.className = `result-box ${fractionClass}`;
             decimalResultDiv.className = `result-box ${decimalClass}`;
-        }
-        
-        function getFractionRepresentation(numericValue, simplifiedExpr) {
-            // Если это целое число
-            if (Math.abs(Math.round(numericValue) - numericValue) < Epsilon) {
-                return Math.round(numericValue).toString();
-            }
-            
-            // Пытаемся получить точную дробь
-            try {
-                const fraction = math.fraction(numericValue);
-                const fractionValue = math.number(fraction);
-                const error = Math.abs(fractionValue - numericValue);
-                
-                // Если дробь дает точное представление
-                if (error < Epsilon) {
-                    const [numerator, denominator] = fraction.toFraction();
-                    
-                    // Проверяем, что denominator существует и не равен 1
-                    if (denominator && denominator !== 1 && denominator !== 0) {
-                        return `${numerator}/${denominator}`;
-                    } else if (denominator === 1) {
-                        return numerator.toString();
-                    }
-                }
-            } catch (e) {
-                console.log("Ошибка при создании дроби:", e);
-            }
-            
-            // Если есть упрощенное выражение, проверяем его
-            if (simplifiedExpr) {
-                const simplifiedStr = simplifiedExpr.toString();
-                
-                // Проверяем, есть ли в выражении деление (дробь)
-                if (simplifiedStr.includes('/')) {
-                    // Пытаемся извлечь числитель и знаменатель
-                    const parts = simplifiedStr.split('/');
-                    if (parts.length === 2) {
-                        let numerator = parts[0].trim();
-                        let denominator = parts[1].trim();
-                        
-                        // Убираем лишние скобки
-                        numerator = numerator.replace(/^\(|\)$/g, '');
-                        denominator = denominator.replace(/^\(|\)$/g, '');
-                        
-                        // Пытаемся вычислить числитель и знаменатель
-                        try {
-                            const numVal = math.evaluate(numerator);
-                            const denVal = math.evaluate(denominator);
-                            
-                            // Упрощаем дробь
-                            const gcd = math.gcd(numVal, denVal);
-                            const simpNum = numVal / gcd;
-                            const simpDen = denVal / gcd;
-                            
-                            if (simpDen === 1) {
-                                return simpNum.toString();
-                            } else if (simpDen !== 0) {
-                                return `${simpNum}/${simpDen}`;
-                            }
-                        } catch (e) {
-                            // Если не удалось вычислить, возвращаем как есть
-                            return `${numerator}/${denominator}`;
-                        }
-                    }
-                    return simplifiedStr;
-                }
-                
-                // Если это просто число, пытаемся представить как дробь
-                const numMatch = simplifiedStr.match(/^-?\d+(\.\d+)?$/);
-                if (numMatch) {
-                    // Преобразуем в дробь
-                    const decimalStr = simplifiedStr;
-                    // Находим количество знаков после запятой
-                    const decimalPlaces = decimalStr.includes('.') ? decimalStr.split('.')[1].length : 0;
-                    const denominator = Math.pow(10, decimalPlaces);
-                    const numerator = parseFloat(decimalStr) * denominator;
-                    
-                    // Упрощаем дробь
-                    const gcd = math.gcd(numerator, denominator);
-                    const simpNum = numerator / gcd;
-                    const simpDen = denominator / gcd;
-                    
-                    if (simpDen === 1) {
-                        return simpNum.toString();
-                    } else if (simpDen !== 0 && simpDen < 10000) { // Не показываем слишком большие знаменатели
-                        return `${simpNum}/${simpDen}`;
-                    }
-                }
-                
-                return simplifiedStr;
-            }
-            
-            // Если ничего не подошло, возвращаем числовое значение с 10 знаками точности
-            return numericValue.toFixed(10).replace(/\.?0+$/, '');
         }
         
         function toggleConverter() {
@@ -1123,7 +1081,8 @@
                         const imag = numericResult.im;
                         let fractionText, decimalText;
                         if (Math.abs(imag) < Epsilon) {
-                            fractionText = getFractionRepresentation(real, simplified);
+                            // ИСПРАВЛЕННАЯ СТРОКА: используем новую функцию
+                            fractionText = formatFractionResult(real);
                             decimalText = formatNumber(real);
                         } else {
                             fractionText = simplified.toString();
@@ -1132,7 +1091,8 @@
                         showResults(fractionText, decimalText, 'text-purple-400', 'decimal-result');
                         recordHistory(expr, fractionText + ' (≈ ' + decimalText + ')');
                     } else {
-                        let fractionText = getFractionRepresentation(numericResult, simplified);
+                        // ИСПРАВЛЕННАЯ СТРОКА: используем новую функцию
+                        let fractionText = formatFractionResult(numericResult);
                         const decimalText = formatNumber(numericResult);
                         
                         showResults(fractionText, decimalText, 'fraction-result', 'decimal-result');
@@ -1284,4 +1244,4 @@
         window.onload = init;
     </script>
 </body>
-                    </html>
+                                                                              </html>
