@@ -759,63 +759,98 @@
         }
         
         function getFractionRepresentation(numericValue, simplifiedExpr) {
+            // Если это целое число
+            if (Math.abs(Math.round(numericValue) - numericValue) < Epsilon) {
+                return Math.round(numericValue).toString();
+            }
+            
+            // Пытаемся получить точную дробь
             try {
                 const fraction = math.fraction(numericValue);
                 const fractionValue = math.number(fraction);
                 const error = Math.abs(fractionValue - numericValue);
                 
+                // Если дробь дает точное представление
                 if (error < Epsilon) {
                     const [numerator, denominator] = fraction.toFraction();
-                    if (denominator === 1) {
-                        return numerator.toString();
-                    } else {
+                    
+                    // Проверяем, что denominator существует и не равен 1
+                    if (denominator && denominator !== 1 && denominator !== 0) {
                         return `${numerator}/${denominator}`;
+                    } else if (denominator === 1) {
+                        return numerator.toString();
                     }
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.log("Ошибка при создании дроби:", e);
+            }
             
+            // Если есть упрощенное выражение, проверяем его
             if (simplifiedExpr) {
                 const simplifiedStr = simplifiedExpr.toString();
                 
+                // Проверяем, есть ли в выражении деление (дробь)
                 if (simplifiedStr.includes('/')) {
-                    const fractionMatch = simplifiedStr.match(/^\(?(\d+(\.\d+)?)\)?\s*\/\s*\(?(\d+(\.\d+)?)\)?$/);
-                    if (fractionMatch) {
-                        const numerator = fractionMatch[1];
-                        const denominator = fractionMatch[3];
+                    // Пытаемся извлечь числитель и знаменатель
+                    const parts = simplifiedStr.split('/');
+                    if (parts.length === 2) {
+                        let numerator = parts[0].trim();
+                        let denominator = parts[1].trim();
+                        
+                        // Убираем лишние скобки
+                        numerator = numerator.replace(/^\(|\)$/g, '');
+                        denominator = denominator.replace(/^\(|\)$/g, '');
+                        
+                        // Пытаемся вычислить числитель и знаменатель
                         try {
-                            const num = math.fraction(numerator);
-                            const den = math.fraction(denominator);
-                            const result = math.divide(num, den);
-                            const [numResult, denResult] = result.toFraction();
-                            if (denResult === 1) {
-                                return numResult.toString();
-                            } else {
-                                return `${numResult}/${denResult}`;
+                            const numVal = math.evaluate(numerator);
+                            const denVal = math.evaluate(denominator);
+                            
+                            // Упрощаем дробь
+                            const gcd = math.gcd(numVal, denVal);
+                            const simpNum = numVal / gcd;
+                            const simpDen = denVal / gcd;
+                            
+                            if (simpDen === 1) {
+                                return simpNum.toString();
+                            } else if (simpDen !== 0) {
+                                return `${simpNum}/${simpDen}`;
                             }
                         } catch (e) {
+                            // Если не удалось вычислить, возвращаем как есть
                             return `${numerator}/${denominator}`;
                         }
                     }
                     return simplifiedStr;
                 }
                 
-                const decimalMatch = simplifiedStr.match(/^-?\d*\.?\d+$/);
-                if (decimalMatch) {
-                    try {
-                        const fraction = math.fraction(simplifiedStr);
-                        const [numerator, denominator] = fraction.toFraction();
-                        if (denominator === 1) {
-                            return numerator.toString();
-                        } else if (denominator < 1000) {
-                            return `${numerator}/${denominator}`;
-                        }
-                    } catch (e) {}
+                // Если это просто число, пытаемся представить как дробь
+                const numMatch = simplifiedStr.match(/^-?\d+(\.\d+)?$/);
+                if (numMatch) {
+                    // Преобразуем в дробь
+                    const decimalStr = simplifiedStr;
+                    // Находим количество знаков после запятой
+                    const decimalPlaces = decimalStr.includes('.') ? decimalStr.split('.')[1].length : 0;
+                    const denominator = Math.pow(10, decimalPlaces);
+                    const numerator = parseFloat(decimalStr) * denominator;
+                    
+                    // Упрощаем дробь
+                    const gcd = math.gcd(numerator, denominator);
+                    const simpNum = numerator / gcd;
+                    const simpDen = denominator / gcd;
+                    
+                    if (simpDen === 1) {
+                        return simpNum.toString();
+                    } else if (simpDen !== 0 && simpDen < 10000) { // Не показываем слишком большие знаменатели
+                        return `${simpNum}/${simpDen}`;
+                    }
                 }
                 
                 return simplifiedStr;
             }
             
-            return numericValue.toString();
+            // Если ничего не подошло, возвращаем числовое значение с 10 знаками точности
+            return numericValue.toFixed(10).replace(/\.?0+$/, '');
         }
         
         function toggleConverter() {
@@ -1249,4 +1284,4 @@
         window.onload = init;
     </script>
 </body>
-    </html>
+                    </html>
