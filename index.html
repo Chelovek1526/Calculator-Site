@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Продвинутый Калькулятор с конвертером</title>
+    <title>Продвинутый Калькулятор</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -315,42 +315,26 @@
                 <button class="close-btn" onclick="closeModal('helpModal')">×</button>
             </div>
             <div class="space-y-4">
-                <div><h3 class="text-lg font-bold text-blue-300 mb-2">Основные операции</h3>
+                <div><h3 class="text-lg font-bold text-blue-300 mb-2">Дроби и операции</h3>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li><code>\frac{3}{4}</code> или <code>3/4</code> - обыкновенная дробь</li>
+                        <li><code>\frac{1}{2} + \frac{1}{3}</code> - сложение дробей</li>
+                        <li><code>(1/2) * (2/3)</code> - умножение дробей</li>
+                        <li>Результат всегда показывается как обыкновенная дробь</li>
+                    </ul>
+                </div>
+                <div><h3 class="text-lg font-bold text-green-300 mb-2">Основные операции</h3>
                     <ul class="list-disc pl-5 space-y-1">
                         <li><code>+</code> - сложение</li><li><code>-</code> - вычитание</li>
                         <li><code>*</code> или <code>×</code> - умножение</li>
                         <li><code>/</code> - деление</li>
-                        <li><code>^</code> или <code>**</code> - возведение в степень</li>
+                        <li><code>^</code> - возведение в степень</li>
                     </ul>
                 </div>
-                <div><h3 class="text-lg font-bold text-green-300 mb-2">Тригонометрия</h3>
+                <div><h3 class="text-lg font-bold text-purple-300 mb-2">Тригонометрия</h3>
                     <ul class="list-disc pl-5 space-y-1">
                         <li><code>sin(x)</code> - синус</li><li><code>cos(x)</code> - косинус</li>
                         <li><code>tan(x)</code> - тангенс</li><li><code>asin(x)</code> - арксинус</li>
-                        <li><code>acos(x)</code> - арккосинус</li><li><code>atan(x)</code> - арктангенс</li>
-                    </ul>
-                </div>
-                <div><h3 class="text-lg font-bold text-purple-300 mb-2">Логарифмы и корни</h3>
-                    <ul class="list-disc pl-5 space-y-1">
-                        <li><code>log(x)</code> - логарифм по основанию 10</li>
-                        <li><code>ln(x)</code> - натуральный логарифм</li>
-                        <li><code>sqrt(x)</code> или <code>√</code> - квадратный корень</li>
-                        <li><code>cbrt(x)</code> - кубический корень</li>
-                        <li><code>nthRoot(x, n)</code> - корень n-й степени</li>
-                    </ul>
-                </div>
-                <div><h3 class="text-lg font-bold text-yellow-300 mb-2">Константы</h3>
-                    <ul class="list-disc pl-5 space-y-1">
-                        <li><code>pi</code> или <code>π</code> - число π (3.14159...)</li>
-                        <li><code>e</code> - число Эйлера (2.71828...)</li>
-                        <li><code>i</code> - мнимая единица</li>
-                    </ul>
-                </div>
-                <div><h3 class="text-lg font-bold text-red-300 mb-2">Дроби</h3>
-                    <ul class="list-disc pl-5 space-y-1">
-                        <li><code>\frac{числитель}{знаменатель}</code> - обыкновенная дробь</li>
-                        <li><code>3/4</code> - тоже дробь</li>
-                        <li><code>(1/2) + (1/3)</code> - сложение дробей</li>
                     </ul>
                 </div>
                 <div><h3 class="text-lg font-bold text-red-300 mb-2">Горячие клавиши</h3>
@@ -394,7 +378,7 @@
                 <div class="result-box decimal-result" id="decimal-result" data-i18n="approx_answer">Приближенный ответ: ---</div>
             </div>
             <div id="render-output"></div>
-            <input type="text" id="expression" placeholder="Введите: 2+2, x+y=5, \frac{1}{3}+1" autocomplete="off">
+            <input type="text" id="expression" placeholder="Введите: \frac{1}{2}+1, 3/4*2, sin(π/2)" autocomplete="off">
             <div class="grid grid-cols-4 gap-2 mb-4">
                 <button class="btn-mem text-sm" onclick="memoryClear()">MC</button>
                 <button class="btn-mem text-sm" onclick="memoryRecall()">MR</button>
@@ -524,7 +508,7 @@
                 clear_all: "Удалить всё",
                 history_empty: "Результаты будут отображаться здесь.",
                 scientific_label: "Научная",
-                expression_placeholder: "Введите: 2+2, x+y=5, \\frac{1}{3}+1",
+                expression_placeholder: "Введите: \\frac{1}{2}+1, 3/4*2, sin(π/2)",
                 conversion: "Конверсия",
                 memory_cleared: "Память очищена",
                 memory_value: "Значение памяти: ",
@@ -556,7 +540,7 @@
                 clear_all: "Clear All",
                 history_empty: "Results will appear here.",
                 scientific_label: "Scientific",
-                expression_placeholder: "Enter: 2+2, x+y=5, \\frac{1}{3}+1",
+                expression_placeholder: "Enter: \\frac{1}{2}+1, 3/4*2, sin(π/2)",
                 conversion: "Conversion",
                 memory_cleared: "Memory cleared",
                 memory_value: "Memory value: ",
@@ -757,8 +741,8 @@
         function clearExpression() {
             expressionInput.value = '';
             showResults(
-                translations[currentLanguage].exact_answer + 'Ожидание ввода...',
-                translations[currentLanguage].approx_answer + '---',
+                'Ожидание ввода...',
+                '---',
                 'fraction-result',
                 'decimal-result'
             );
@@ -768,10 +752,70 @@
         }
         
         function showResults(fractionText, decimalText, fractionClass, decimalClass) {
-            fractionResultDiv.textContent = fractionText;
-            decimalResultDiv.textContent = decimalText;
+            fractionResultDiv.textContent = translations[currentLanguage].exact_answer + fractionText;
+            decimalResultDiv.textContent = translations[currentLanguage].approx_answer + decimalText;
             fractionResultDiv.className = `result-box ${fractionClass}`;
             decimalResultDiv.className = `result-box ${decimalClass}`;
+        }
+        
+        function getFractionRepresentation(numericValue, simplifiedExpr) {
+            try {
+                const fraction = math.fraction(numericValue);
+                const fractionValue = math.number(fraction);
+                const error = Math.abs(fractionValue - numericValue);
+                
+                if (error < Epsilon) {
+                    const [numerator, denominator] = fraction.toFraction();
+                    if (denominator === 1) {
+                        return numerator.toString();
+                    } else {
+                        return `${numerator}/${denominator}`;
+                    }
+                }
+            } catch (e) {}
+            
+            if (simplifiedExpr) {
+                const simplifiedStr = simplifiedExpr.toString();
+                
+                if (simplifiedStr.includes('/')) {
+                    const fractionMatch = simplifiedStr.match(/^\(?(\d+(\.\d+)?)\)?\s*\/\s*\(?(\d+(\.\d+)?)\)?$/);
+                    if (fractionMatch) {
+                        const numerator = fractionMatch[1];
+                        const denominator = fractionMatch[3];
+                        try {
+                            const num = math.fraction(numerator);
+                            const den = math.fraction(denominator);
+                            const result = math.divide(num, den);
+                            const [numResult, denResult] = result.toFraction();
+                            if (denResult === 1) {
+                                return numResult.toString();
+                            } else {
+                                return `${numResult}/${denResult}`;
+                            }
+                        } catch (e) {
+                            return `${numerator}/${denominator}`;
+                        }
+                    }
+                    return simplifiedStr;
+                }
+                
+                const decimalMatch = simplifiedStr.match(/^-?\d*\.?\d+$/);
+                if (decimalMatch) {
+                    try {
+                        const fraction = math.fraction(simplifiedStr);
+                        const [numerator, denominator] = fraction.toFraction();
+                        if (denominator === 1) {
+                            return numerator.toString();
+                        } else if (denominator < 1000) {
+                            return `${numerator}/${denominator}`;
+                        }
+                    } catch (e) {}
+                }
+                
+                return simplifiedStr;
+            }
+            
+            return numericValue.toString();
         }
         
         function toggleConverter() {
@@ -976,7 +1020,6 @@
             const expr = expressionInput.value.trim();
             if (!expr) return;
             
-            // Преобразуем LaTeX-нотацию в формат math.js
             let mathExpr = expr
                 .replace(/\\frac{([^}]+)}{([^}]+)}/g, '($1)/($2)')
                 .replace(/\\pi/g, 'pi')
@@ -1033,12 +1076,7 @@
                         }
                         decimalText = `x ≈ ${formatNumber(solutions)}`;
                     }
-                    showResults(
-                        translations[currentLanguage].exact_answer + fractionText,
-                        translations[currentLanguage].approx_answer + decimalText,
-                        'text-purple-400',
-                        'decimal-result'
-                    );
+                    showResults(fractionText, decimalText, 'text-purple-400', 'decimal-result');
                     recordHistory(expr, fractionText);
                 } else {
                     const parsed = math.parse(mathExpr, scope);
@@ -1050,38 +1088,19 @@
                         const imag = numericResult.im;
                         let fractionText, decimalText;
                         if (Math.abs(imag) < Epsilon) {
-                            fractionText = simplified.toString();
+                            fractionText = getFractionRepresentation(real, simplified);
                             decimalText = formatNumber(real);
                         } else {
                             fractionText = simplified.toString();
                             decimalText = formatNumber(real) + (imag >= 0 ? ' + ' : ' - ') + formatNumber(Math.abs(imag)) + 'i';
                         }
-                        showResults(
-                            translations[currentLanguage].exact_answer + fractionText,
-                            translations[currentLanguage].approx_answer + decimalText,
-                            'text-purple-400',
-                            'decimal-result'
-                        );
+                        showResults(fractionText, decimalText, 'text-purple-400', 'decimal-result');
                         recordHistory(expr, fractionText + ' (≈ ' + decimalText + ')');
                     } else {
-                        let fractionText = simplified.toString();
+                        let fractionText = getFractionRepresentation(numericResult, simplified);
                         const decimalText = formatNumber(numericResult);
                         
-                        try {
-                            const fraction = math.fraction(numericResult);
-                            const fractionStr = fraction.toString();
-                            if (fractionStr.length < 50) {
-                                fractionText = fractionStr;
-                            }
-                        } catch (e) {
-                        }
-                        
-                        showResults(
-                            translations[currentLanguage].exact_answer + fractionText,
-                            translations[currentLanguage].approx_answer + decimalText,
-                            'fraction-result',
-                            'decimal-result'
-                        );
+                        showResults(fractionText, decimalText, 'fraction-result', 'decimal-result');
                         recordHistory(expr, `${fractionText} (≈ ${decimalText})`);
                     }
                 }
