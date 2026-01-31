@@ -3,297 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Калькулятор с "AI"<title>
+    <title>Продвинутый Калькулятор</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1f2937, #111827);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             padding: 20px;
-            color: #f1f5f9;
+            margin: 0;
         }
-        
-        .container {
-            max-width: 600px;
+        .calculator-container {
+            max-width: 500px;
+            width: 100%;
             margin: 0 auto;
         }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-        
-        h1 {
-            font-size: 2.2rem;
-            background: linear-gradient(90deg, #f59e0b, #fbbf24);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 900;
-        }
-        
-        .ai-btn {
-            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-        }
-        
-        .ai-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
-        }
-        
         .calculator {
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
-        }
-        
-        .display-container {
-            background: #0f172a;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid #334155;
-        }
-        
-        .expression-display {
-            font-size: 1.5rem;
-            min-height: 35px;
-            color: #cbd5e1;
-            word-break: break-all;
-            margin-bottom: 10px;
-        }
-        
-        .result-display {
-            font-size: 2.8rem;
-            font-weight: 700;
-            text-align: right;
-            color: #10b981;
-            min-height: 50px;
-            word-break: break-all;
-        }
-        
-        .input-field {
+            background: #374151;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             width: 100%;
-            padding: 18px;
-            font-size: 1.4rem;
-            background: #1e293b;
-            border: 2px solid #334155;
-            border-radius: 12px;
-            color: white;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-        
-        .input-field:focus {
-            outline: none;
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-        }
-        
-        .buttons-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
-        
-        .btn {
-            padding: 18px 10px;
-            border-radius: 12px;
-            border: none;
-            font-size: 1.3rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #4b5563;
             display: flex;
+            flex-direction: column;
+        }
+        #render-output {
+            background: #1f2937;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 60px;
+            margin-bottom: 10px;
+            text-align: right;
+            font-size: 1.8rem;
+            color: #d1d5db;
+            display: flex;
+            justify-content: flex-end;
             align-items: center;
-            justify-content: center;
+            overflow-x: auto;
         }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            filter: brightness(110%);
-        }
-        
-        .btn:active {
-            transform: translateY(1px);
-        }
-        
-        .btn-number {
-            background: #334155;
-            color: white;
-        }
-        
-        .btn-operator {
-            background: #f59e0b;
-            color: #1e293b;
-        }
-        
-        .btn-function {
-            background: #3b82f6;
-            color: white;
-        }
-        
-        .btn-clear {
-            background: #ef4444;
-            color: white;
-        }
-        
-        .btn-equals {
-            background: #10b981;
-            color: white;
-            grid-column: span 2;
-        }
-        
-        .btn-memory {
-            background: #8b5cf6;
-            color: white;
-        }
-        
-        .btn-scientific {
-            background: #ec4899;
-            color: white;
-        }
-        
-        .memory-buttons {
+        #result-container {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            grid-template-columns: 1fr;
+            gap: 5px;
             margin-bottom: 15px;
         }
-        
-        .scientific-buttons {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
+        .result-box {
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            text-align: right;
+            word-break: break-all;
+            background-color: #1f2937;
+            border-left: 4px solid;
         }
-        
-        .converter-section {
-            background: rgba(30, 41, 59, 0.8);
-            border-radius: 20px;
-            padding: 25px;
+        .result-box.fraction-result { color: #10b981; border-color: #10b981; }
+        .result-box.decimal-result { color: #3b82f6; border-color: #3b82f6; }
+        .error { color: #f87171; border-color: #f87171; }
+        .text-purple-400 { color: #c084fc; border-color: #c084fc; }
+        .text-yellow-400 { color: #facc15; border-color: #facc15; }
+        .text-orange-400 { color: #fb923c; border-color: #fb923c; }
+        .converter-panel {
+            background: #28303d;
+            width: 100%;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #4b5563;
             margin-top: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: none;
-        }
-        
-        .history-section {
-            background: rgba(30, 41, 59, 0.8);
-            border-radius: 20px;
-            padding: 25px;
-            margin-top: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: none;
-            max-height: 400px;
+            color: #d1d5db;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out, opacity 0.3s;
+            max-height: 450px;
             overflow-y: auto;
         }
-        
-        .section-header {
+        .converter-panel.hidden {
+            max-height: 0;
+            padding: 0;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .converter-section {
+            padding: 10px;
+            border: 1px solid #4b5563;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .converter-input, .converter-select {
+            background: #1f2937;
+            color: #d1d5db;
+            border: 1px solid #4b5563;
+            border-radius: 6px;
+            padding: 8px;
+            width: 100%;
+            margin-top: 5px;
+        }
+        input[type="text"] {
+            width: 100%;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 8px;
+            padding: 15px;
+            box-sizing: border-box;
+            background: #1f2937;
+            color: #d1d5db;
+            text-align: right;
+            transition: all 0.2s;
+        }
+        input[type="text"].error {
+            border: 2px solid #f87171;
+            box-shadow: 0 0 0 1px #f87171;
+        }
+        .btn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .btn-op { background-color: #f59e0b; color: #1f2937; box-shadow: 0 3px #d97706; }
+        .btn-op:active { background-color: #d97706; transform: translateY(1px); box-shadow: 0 2px #d97706; }
+        .btn-num { background-color: #4b5563; color: white; box-shadow: 0 3px #374151; }
+        .btn-num:active { background-color: #374151; transform: translateY(1px); box-shadow: 0 2px #374151; }
+        .btn-main { background-color: #10b981; color: white; box-shadow: 0 3px #059669; grid-column: span 4; }
+        .btn-main:active { background-color: #059669; transform: translateY(1px); box-shadow: 0 2px #059669; }
+        .btn-clear, .btn-history { background-color: #ef4444; color: white; box-shadow: 0 3px #dc2626; }
+        .btn-clear:active, .btn-history:active { background-color: #dc2626; transform: translateY(1px); box-shadow: 0 2px #dc2626; }
+        .btn-mem { background-color: #3b82f6; color: white; box-shadow: 0 3px #2563eb; }
+        .btn-mem:active { background-color: #2563eb; transform: translateY(1px); box-shadow: 0 2px #2563eb; }
+        .btn-percent { background-color: #8b5cf6; color: white; box-shadow: 0 3px #7c3aed; }
+        .btn-percent:active { background-color: #7c3aed; transform: translateY(1px); box-shadow: 0 2px #7c3aed; }
+        .history-panel {
+            background: #28303d;
+            width: 100%;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #4b5563;
+            max-height: 400px;
+            overflow-y: auto;
+            color: #d1d5db;
+            margin-top: 20px;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out, visibility 0.3s;
+        }
+        .history-panel.hidden {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            visibility: hidden;
+        }
+        .history-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #374151;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.15s;
+            border-left: 4px solid #f59e0b;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #334155;
         }
-        
-        .history-item {
-            background: #1e293b;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            border-left: 4px solid #f59e0b;
+        .history-item:hover { background: #4b5563; }
+        .history-content { flex: 1; }
+        .history-expression { font-size: 0.9rem; color: #9ca3af; }
+        .history-result { font-size: 1.2rem; font-weight: 600; color: #10b981; }
+        .history-actions { display: flex; gap: 5px; }
+        .history-action-btn {
+            background: transparent;
+            border: none;
+            color: #9ca3af;
             cursor: pointer;
-            transition: all 0.2s;
+            padding: 2px 5px;
+            border-radius: 4px;
         }
-        
-        .history-item:hover {
-            background: #334155;
-            transform: translateX(5px);
-        }
-        
-        .history-expr {
-            color: #cbd5e1;
-            font-size: 1rem;
-            margin-bottom: 5px;
-        }
-        
-        .history-result {
-            color: #10b981;
-            font-size: 1.3rem;
-            font-weight: bold;
-        }
-        
-        .converter-row {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 15px;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .converter-input {
-            width: 100%;
-            padding: 15px;
-            background: #1e293b;
-            border: 2px solid #334155;
-            border-radius: 10px;
-            color: white;
-            font-size: 1.2rem;
-        }
-        
-        .converter-select {
-            width: 100%;
-            padding: 15px;
-            background: #1e293b;
-            border: 2px solid #334155;
-            border-radius: 10px;
-            color: white;
-            font-size: 1rem;
-        }
-        
-        .converter-result {
-            background: #0f172a;
-            padding: 20px;
-            border-radius: 12px;
-            font-size: 1.8rem;
-            color: #3b82f6;
-            text-align: center;
-            font-weight: bold;
-            margin-top: 15px;
-            border: 2px solid #334155;
-        }
-        
-        .converter-arrow {
-            font-size: 2rem;
-            color: #f59e0b;
-            text-align: center;
-        }
-        
+        .history-action-btn:hover { background: rgba(255,255,255,0.1); }
         .modal {
             display: none;
             position: fixed;
@@ -301,1160 +185,1479 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 1000;
-            align-items: center;
             justify-content: center;
-            padding: 20px;
+            align-items: center;
         }
-        
         .modal-content {
-            background: #1e293b;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 700px;
-            width: 100%;
-            max-height: 90vh;
+            background: #374151;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
             overflow-y: auto;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #d1d5db;
         }
-        
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
-        }
-        
-        .honest-badge {
-            background: linear-gradient(135deg, #f59e0b, #fbbf24);
-            color: #1e293b;
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        
-        .truth-box {
-            background: rgba(245, 158, 11, 0.15);
-            border: 1px solid #f59e0b;
-            border-radius: 12px;
-            padding: 15px;
             margin-bottom: 20px;
+            border-bottom: 1px solid #4b5563;
+            padding-bottom: 10px;
         }
-        
-        .ai-prompt {
-            width: 100%;
-            height: 120px;
-            padding: 15px;
-            background: #0f172a;
-            border: 2px solid #334155;
-            border-radius: 12px;
-            color: white;
-            font-size: 1.1rem;
-            resize: vertical;
-            margin-bottom: 20px;
-        }
-        
-        .ai-response {
-            background: #0f172a;
-            border-radius: 12px;
-            padding: 20px;
-            min-height: 200px;
-            max-height: 300px;
-            overflow-y: auto;
-            margin-bottom: 20px;
-            border-left: 4px solid #8b5cf6;
-        }
-        
-        .ai-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .ai-action-btn {
-            padding: 12px 20px;
-            border-radius: 10px;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            flex: 1;
-        }
-        
-        .copy-btn {
-            background: #334155;
-            color: white;
-        }
-        
-        .insert-btn {
-            background: #10b981;
-            color: white;
-        }
-        
-        .clear-btn {
-            background: #ef4444;
-            color: white;
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #10b981;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            z-index: 2000;
-            display: none;
-            animation: slideIn 0.3s ease;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        .tabs {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 20px;
-            background: #1e293b;
-            padding: 5px;
-            border-radius: 12px;
-        }
-        
-        .tab {
-            flex: 1;
-            padding: 12px;
-            text-align: center;
-            background: transparent;
-            border: none;
-            color: #cbd5e1;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .tab.active {
-            background: #8b5cf6;
-            color: white;
-        }
-        
         .close-btn {
             background: none;
             border: none;
-            color: #cbd5e1;
-            font-size: 1.8rem;
+            color: #9ca3af;
+            font-size: 24px;
             cursor: pointer;
-            padding: 5px;
         }
-        
-        @media (max-width: 600px) {
-            .buttons-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            
-            .btn {
-                padding: 16px 8px;
-                font-size: 1.1rem;
-            }
-            
-            .scientific-buttons {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            .converter-row {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            
-            .converter-arrow {
-                transform: rotate(90deg);
-            }
+        .close-btn:hover { color: #fff; }
+        .spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1001;
+        }
+        .spinner-circle {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #4b5563;
+            border-top: 5px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #4b5563;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #10b981;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .language-select {
+            background: #374151;
+            color: #d1d5db;
+            border: 1px solid #4b5563;
+            border-radius: 6px;
+            padding: 5px 10px;
+        }
+        .precision-slider {
+            width: 100%;
+            height: 6px;
+            background: #4b5563;
+            outline: none;
+            border-radius: 3px;
+        }
+        .precision-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #3b82f6;
+            cursor: pointer;
+            border-radius: 50%;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🧮 Калькулятор "Честный"</h1>
-            <button class="ai-btn" onclick="openModal('aiModal')">
-                <i class="fas fa-robot"></i> "AI" Помощник
-            </button>
-        </div>
-        
-        <div class="calculator">
-            <div class="display-container">
-                <div class="expression-display" id="expressionDisplay"></div>
-                <div class="result-display" id="resultDisplay">0</div>
-            </div>
-            
-            <input type="text" class="input-field" id="expressionInput" 
-                   placeholder="Введите выражение: 100%50, x+5=10, 3/4*2" 
-                   autocomplete="off" onkeydown="handleKeyDown(event)">
-            
-            <div class="memory-buttons">
-                <button class="btn btn-memory" onclick="memoryClear()">MC</button>
-                <button class="btn btn-memory" onclick="memoryRecall()">MR</button>
-                <button class="btn btn-memory" onclick="memoryAdd()">M+</button>
-                <button class="btn btn-memory" onclick="memorySubtract()">M-</button>
-            </div>
-            
-            <div class="scientific-buttons">
-                <button class="btn btn-scientific" onclick="appendToExpression('sin(')">sin</button>
-                <button class="btn btn-scientific" onclick="appendToExpression('cos(')">cos</button>
-                <button class="btn btn-scientific" onclick="appendToExpression('tan(')">tan</button>
-                <button class="btn btn-scientific" onclick="appendToExpression('log(')">log</button>
-                <button class="btn btn-scientific" onclick="appendToExpression('sqrt(')">√</button>
-                <button class="btn btn-scientific" onclick="appendToExpression('pi')">π</button>
-                <button class="btn btn-scientific" onclick="appendToExpression('e')">e</button>
-                <button class="btn btn-scientific" onclick="appendToExpression('^')">^</button>
-                <button class="btn btn-scientific" onclick="appendToExpression('!')">!</button>
-                <button class="btn btn-scientific" onclick="appendToExpression('(')">(</button>
-                <button class="btn btn-scientific" onclick="appendToExpression(')')">)</button>
-            </div>
-            
-            <div class="buttons-grid">
-                <button class="btn btn-clear" onclick="clearExpression()">AC</button>
-                <button class="btn btn-function" onclick="toggleHistory()">
-                    <i class="fas fa-history"></i>
-                </button>
-                <button class="btn btn-function" onclick="toggleConverter()">
-                    <i class="fas fa-exchange-alt"></i>
-                </button>
-                <button class="btn btn-operator" onclick="appendToExpression('/')">÷</button>
-                
-                <button class="btn btn-number" onclick="appendToExpression('7')">7</button>
-                <button class="btn btn-number" onclick="appendToExpression('8')">8</button>
-                <button class="btn btn-number" onclick="appendToExpression('9')">9</button>
-                <button class="btn btn-operator" onclick="appendToExpression('*')">×</button>
-                
-                <button class="btn btn-number" onclick="appendToExpression('4')">4</button>
-                <button class="btn btn-number" onclick="appendToExpression('5')">5</button>
-                <button class="btn btn-number" onclick="appendToExpression('6')">6</button>
-                <button class="btn btn-operator" onclick="appendToExpression('-')">-</button>
-                
-                <button class="btn btn-number" onclick="appendToExpression('1')">1</button>
-                <button class="btn btn-number" onclick="appendToExpression('2')">2</button>
-                <button class="btn btn-number" onclick="appendToExpression('3')">3</button>
-                <button class="btn btn-operator" onclick="appendToExpression('+')">+</button>
-                
-                <button class="btn btn-number" onclick="appendToExpression('0')">0</button>
-                <button class="btn btn-number" onclick="appendToExpression('.')">.</button>
-                <button class="btn btn-function" onclick="appendToExpression('%')">%</button>
-                <button class="btn btn-equals" onclick="calculate()">=</button>
-            </div>
-        </div>
-        
-        <div class="tabs">
-            <button class="tab" onclick="showTab('history')">📜 История</button>
-            <button class="tab" onclick="showTab('converter')">🌐 Конвертер</button>
-        </div>
-        
-        <div class="history-section" id="historySection">
-            <div class="section-header">
-                <h2>История вычислений</h2>
-                <button onclick="clearAllHistory()" class="btn btn-clear" style="padding: 8px 15px;">
-                    Очистить всё
-                </button>
-            </div>
-            <div id="historyList"></div>
-        </div>
-        
-        <div class="converter-section" id="converterSection">
-            <div class="section-header">
-                <h2>Конвертер единиц</h2>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-                <select id="converterCategory" class="converter-select" onchange="updateConverterUnits()">
-                    <option value="length">Длина</option>
-                    <option value="mass">Масса</option>
-                    <option value="temperature">Температура</option>
-                    <option value="area">Площадь</option>
-                    <option value="volume">Объём</option>
-                    <option value="time">Время</option>
-                </select>
-            </div>
-            
-            <div class="converter-row">
-                <input type="number" id="converterValue" class="converter-input" value="1" oninput="convertUnits()">
-                <select id="converterFrom" class="converter-select" onchange="convertUnits()"></select>
-                <div class="converter-arrow">→</div>
-                <select id="converterTo" class="converter-select" onchange="convertUnits()"></select>
-            </div>
-            
-            <div class="converter-result" id="converterResult">Результат</div>
-        </div>
+    <div class="spinner" id="spinner">
+        <div class="spinner-circle"></div>
     </div>
-    
-    <!-- AI Модалка -->
-    <div class="modal" id="aiModal">
+    <div class="modal" id="helpModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 style="font-size: 1.8rem;">🧠 "AI" Помощник <span class="honest-badge">НАЁБ 9000</span></h2>
-                <button class="close-btn" onclick="closeModal('aiModal')">×</button>
+                <h2 class="text-2xl font-bold" id="help-title">📚 Справка по калькулятору</h2>
+                <button class="close-btn" onclick="closeModal('helpModal')">×</button>
             </div>
-            
-            <div class="truth-box">
-                <p>🎭 <strong>Честно говоря:</strong> Это не настоящий ИИ, а база готовых решений.</p>
-                <p style="margin-top: 5px; font-size: 0.9rem;">✅ Работает мгновенно • 🔒 Без интернета • 💰 Бесплатно</p>
-            </div>
-            
-            <textarea class="ai-prompt" id="aiPrompt" 
-                      placeholder="Спросите что-нибудь математическое:
-• 2+2
-• x+5=10  
-• 15% от 200
-• площадь круга радиусом 5
-• теорема Пифагора"></textarea>
-            
-            <button onclick="askAI()" class="ai-btn" style="width: 100%; justify-content: center;">
-                <i class="fas fa-brain"></i> Получить "AI" ответ
-            </button>
-            
-            <div class="ai-response" id="aiResponse">
-                <div style="text-align: center; padding: 40px;">
-                    <div style="font-size: 3rem; margin-bottom: 15px;">🤔</div>
-                    <p>"AI" помощник в режиме "Честный наёб"</p>
-                    <p style="margin-top: 10px; color: #94a3b8;">Задайте вопрос - получите мгновенный ответ из базы знаний!</p>
+            <div class="space-y-4">
+                <div><h3 class="text-lg font-bold text-blue-300 mb-2">Проценты (как в Samsung)</h3>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li><code>100%50</code> → 50 (50% от 100)</li>
+                        <li><code>200+10%</code> → 220 (200 + 10% от 200)</li>
+                        <li><code>500-20%</code> → 400 (500 - 20% от 500)</li>
+                        <li><code>1000*15%</code> → 150 (15% от 1000)</li>
+                        <li><code>80/20%</code> → 400 (80 ÷ 20%)</li>
+                    </ul>
                 </div>
-            </div>
-            
-            <div class="ai-actions">
-                <button class="ai-action-btn copy-btn" onclick="copyAIResponse()">
-                    <i class="fas fa-copy"></i> Копировать
-                </button>
-                <button class="ai-action-btn insert-btn" onclick="insertAIResult()">
-                    <i class="fas fa-calculator"></i> В калькулятор
-                </button>
-                <button class="ai-action-btn clear-btn" onclick="clearAIResponse()">
-                    <i class="fas fa-trash"></i> Очистить
-                </button>
-            </div>
-            
-            <div style="margin-top: 20px; color: #94a3b8; font-size: 0.9rem;">
-                <p>💡 <strong>Секрет:</strong> База содержит 150+ готовых решений. Новые задачи решайте через калькулятор!</p>
+                <div><h3 class="text-lg font-bold text-green-300 mb-2">Дроби и операции</h3>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li><code>\frac{3}{4}</code> или <code>3/4</code> - обыкновенная дробь</li>
+                        <li><code>\frac{1}{2} + \frac{1}{3}</code> - сложение дробей</li>
+                        <li><code>(1/2) * (2/3)</code> - умножение дробей</li>
+                        <li>Результат всегда показывается как обыкновенная дробь</li>
+                    </ul>
+                </div>
+                <div><h3 class="text-lg font-bold text-purple-300 mb-2">Решение уравнений</h3>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li><code>x + 5 = 10</code> - линейное уравнение</li>
+                        <li><code>2*x = 8</code> - уравнение с коэффициентом</li>
+                        <li><code>x^2 = 9</code> - квадратное уравнение</li>
+                        <li><code>x/2 = 3</code> - уравнение с делением</li>
+                    </ul>
+                </div>
+                <div><h3 class="text-lg font-bold text-red-300 mb-2">Горячие клавиши</h3>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li><kbd>Ctrl</kbd> + <kbd>Enter</kbd> - вычислить</li>
+                        <li><kbd>Esc</kbd> - очистить поле</li>
+                        <li><kbd>↑</kbd> / <kbd>↓</kbd> - навигация по истории</li>
+                        <li><kbd>F1</kbd> - открыть справку</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
-    
-    <div class="notification" id="notification"></div>
-    
+    <div class="modal" id="graphModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl font-bold" id="graph-title">📈 Построение графика</h2>
+                <button class="close-btn" onclick="closeModal('graphModal')">×</button>
+            </div>
+            <div class="mb-4">
+                <label class="block mb-2" id="graph-function-label">Функция (используйте x как переменную):</label>
+                <input type="text" id="graph-function" class="w-full p-2 rounded bg-gray-800 text-white" value="x^2" placeholder="sin(x), x^2, log(x)">
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div><label class="block mb-2" id="graph-from-label">От:</label><input type="number" id="graph-from" class="w-full p-2 rounded bg-gray-800 text-white" value="-10" step="1"></div>
+                <div><label class="block mb-2" id="graph-to-label">До:</label><input type="number" id="graph-to" class="w-full p-2 rounded bg-gray-800 text-white" value="10" step="1"></div>
+            </div>
+            <div class="mb-4"><label class="block mb-2" id="graph-step-label">Шаг:</label><input type="number" id="graph-step" class="w-full p-2 rounded bg-gray-800 text-white" value="0.1" step="0.1" min="0.01"></div>
+            <canvas id="graphCanvas" class="w-full h-64 bg-gray-900 rounded"></canvas>
+            <button onclick="plotGraph()" class="mt-4 w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700" id="plot-graph-btn">Построить график</button>
+        </div>
+    </div>
+    <div class="header-controls">
+        <h1 class="text-3xl font-extrabold text-white">🧮 Продвинутый Калькулятор</h1>
+        <button onclick="openModal('helpModal')" class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">?</button>
+    </div>
+    <div class="calculator-container">
+        <div class="calculator">
+            <div id="result-container">
+                <div class="result-box fraction-result" id="fraction-result" data-i18n="exact_answer">Точный ответ: Ожидание ввода...</div>
+                <div class="result-box decimal-result" id="decimal-result" data-i18n="approx_answer">Приближенный ответ: ---</div>
+            </div>
+            <div id="render-output"></div>
+            <input type="text" id="expression" placeholder="Введите: 100%50, 200+10%, x+5=10, 3/4*2" autocomplete="off">
+            <div class="grid grid-cols-4 gap-2 mb-4">
+                <button class="btn-mem text-sm" onclick="memoryClear()">MC</button>
+                <button class="btn-mem text-sm" onclick="memoryRecall()">MR</button>
+                <button class="btn-mem text-sm" onclick="memoryAdd()">M+</button>
+                <button class="btn-mem text-sm" onclick="memorySubtract()">M-</button>
+            </div>
+            <div class="grid grid-cols-5 gap-2 mb-4">
+                <button class="btn-op text-sm" onclick="appendToExpression('sin(')">sin</button>
+                <button class="btn-op text-sm" onclick="appendToExpression('cos(')">cos</button>
+                <button class="btn-op text-sm" onclick="appendToExpression('tan(')">tan</button>
+                <button class="btn-op text-sm" onclick="appendToExpression('log(')">log</button>
+                <button class="btn-op text-sm" onclick="appendToExpression('sqrt(')">√</button>
+            </div>
+            <div class="btn-grid">
+                <button class="btn-history" onclick="toggleConverter()">🌐</button>
+                <button class="btn-history" onclick="toggleHistory()">H</button>
+                <button class="btn-clear" onclick="clearExpression()">AC</button>
+                <button class="btn-op" onclick="appendToExpression('(')">(</button>
+                <button class="btn-op" onclick="appendToExpression(')')">)</button>
+                <button class="btn-num" onclick="appendToExpression('7')">7</button>
+                <button class="btn-num" onclick="appendToExpression('8')">8</button>
+                <button class="btn-num" onclick="appendToExpression('9')">9</button>
+                <button class="btn-op" onclick="appendToExpression('/')">/</button>
+                <button class="btn-num" onclick="appendToExpression('4')">4</button>
+                <button class="btn-num" onclick="appendToExpression('5')">5</button>
+                <button class="btn-num" onclick="appendToExpression('6')">6</button>
+                <button class="btn-op" onclick="appendToExpression('*')">×</button>
+                <button class="btn-num" onclick="appendToExpression('1')">1</button>
+                <button class="btn-num" onclick="appendToExpression('2')">2</button>
+                <button class="btn-num" onclick="appendToExpression('3')">3</button>
+                <button class="btn-op" onclick="appendToExpression('-')">-</button>
+                <button class="btn-num" onclick="appendToExpression('0')">0</button>
+                <button class="btn-num" onclick="appendToExpression('.')">.</button>
+                <button class="btn-op" onclick="appendToExpression('\\pi')">π</button>
+                <button class="btn-percent" onclick="appendToExpression('%')">%</button>
+                <button class="btn-op" onclick="appendToExpression('i')">i</button>
+                <button class="btn-op" onclick="openModal('graphModal')">📈</button>
+                <button class="btn-op" onclick="appendToExpression('^')">^</button>
+                <button class="btn-op" onclick="appendToExpression('=')">=</button>
+                <button class="btn-main mt-4" onclick="handleInput()" id="calculate-btn" data-i18n="calculate">Вычислить</button>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-600 flex justify-between items-center">
+                <select id="language-select" class="language-select" onchange="changeLanguage()">
+                    <option value="ru">🇷🇺 Русский</option>
+                    <option value="en">🇺🇸 English</option>
+                </select>
+                <label class="flex items-center gap-2 text-white">
+                    <span id="scientific-label" data-i18n="scientific_label">Научная</span>
+                    <label class="switch"><input type="checkbox" id="scientific-toggle" onchange="toggleScientificNotation()"><span class="slider"></span></label>
+                </label>
+            </div>
+        </div>
+        <div class="converter-panel hidden" id="converter-panel">
+            <h3 class="text-xl font-bold mb-4 border-b border-gray-600 pb-2" data-i18n="unit_converter">🌐 Конвертер Единиц</h3>
+            <div class="mb-4">
+                <label class="block mb-2 text-sm font-medium" data-i18n="select_category">Выберите Категорию:</label>
+                <select id="unit-category" class="converter-select" onchange="renderUnitSelector()"></select>
+            </div>
+            <div class="converter-section">
+                <label class="block mb-2 text-sm font-medium" data-i18n="value">Значение:</label>
+                <input type="number" id="converter-input" class="converter-input" placeholder="Введите число" value="1" oninput="performConversion()">
+                <div class="grid grid-cols-3 gap-2 mt-4 items-center">
+                    <div><label class="block text-xs font-medium text-gray-400" data-i18n="from">ИЗ:</label><select id="unit-from" class="converter-select" onchange="performConversion()"></select></div>
+                    <div class="text-center text-lg text-yellow-400 font-bold">→</div>
+                    <div><label class="block text-xs font-medium text-gray-400" data-i18n="to">В:</label><select id="unit-to" class="converter-select" onchange="performConversion()"></select></div>
+                </div>
+            </div>
+            <div class="converter-section mt-4">
+                <label class="block mb-2 text-sm font-medium" data-i18n="precision">Точность (знаков после запятой):</label>
+                <input type="range" min="1" max="15" value="6" class="precision-slider" id="precision-slider" oninput="updatePrecision()">
+                <div class="flex justify-between text-xs text-gray-400">
+                    <span>1</span><span id="precision-value">6</span><span>15</span>
+                </div>
+            </div>
+            <div id="converter-result-output" class="result-box decimal-result mt-4" data-i18n="result">Результат:</div>
+        </div>
+        <div class="history-panel hidden" id="history-panel">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold border-b border-gray-600 pb-2" data-i18n="calculation_history">Журнал Вычислений</h3>
+                <div class="flex gap-2">
+                    <button onclick="exportHistory()" class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700" data-i18n="export">Экспорт</button>
+                    <button onclick="clearAllHistory()" class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700" data-i18n="clear_all">Удалить всё</button>
+                </div>
+            </div>
+            <div id="history-log" class="flex flex-col-reverse">
+                <p class="text-sm text-gray-500 text-center mt-4" data-i18n="history_empty">Результаты будут отображаться здесь.</p>
+            </div>
+        </div>
+    </div>
     <script>
-        // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
-        let memoryValue = 0;
-        let calculationHistory = [];
-        let currentTab = 'history';
-        let currentExpression = '';
+        const expressionInput = document.getElementById('expression');
+        const fractionResultDiv = document.getElementById('fraction-result');
+        const decimalResultDiv = document.getElementById('decimal-result');
+        const historyPanel = document.getElementById('history-panel');
+        const historyLogDiv = document.getElementById('history-log');
+        const renderOutputDiv = document.getElementById('render-output');
+        const converterPanel = document.getElementById('converter-panel');
+        const converterResultOutput = document.getElementById('converter-result-output');
+        const spinner = document.getElementById('spinner');
+        const precisionSlider = document.getElementById('precision-slider');
+        const precisionValue = document.getElementById('precision-value');
+        const languageSelect = document.getElementById('language-select');
         
-        // Настройки math.js
-        math.config({
-            number: 'BigNumber',
-            precision: 64
+        let calculationHistory = [];
+        let memoryValue = 0;
+        let precision = 6;
+        let scientificNotation = false;
+        let historyIndex = -1;
+        let originalExpression = '';
+        const Epsilon = 1e-10;
+        let currentLanguage = 'ru';
+        
+        const translations = {
+            ru: {
+                exact_answer: "Точный ответ: ",
+                approx_answer: "Приближенный ответ: ",
+                calculate: "Вычислить",
+                unit_converter: "🌐 Конвертер Единиц",
+                select_category: "Выберите Категорию:",
+                value: "Значение:",
+                from: "ИЗ:",
+                to: "В:",
+                precision: "Точность (знаков после запятой):",
+                result: "Результат: ",
+                calculation_history: "Журнал Вычислений",
+                export: "Экспорт",
+                clear_all: "Удалить всё",
+                history_empty: "Результаты будут отображаться здесь.",
+                scientific_label: "Научная",
+                expression_placeholder: "Введите: 100%50, 200+10%, x+5=10, 3/4*2",
+                conversion: "Конверсия",
+                memory_cleared: "Память очищена",
+                memory_value: "Значение памяти: ",
+                memory_add_error: "Ошибка при добавлении в память: ",
+                memory_sub_error: "Ошибка при вычитании из памяти: ",
+                confirm_clear_history: "Вы уверены, что хотите удалить всю историю?",
+                history_cleared: "История очищена",
+                history_exported: "История экспортирована",
+                no_history: "Нет истории для экспорта",
+                graph_function: "Функция (используйте x как переменную):",
+                graph_from: "От:",
+                graph_to: "До:",
+                graph_step: "Шаг:",
+                plot_graph: "Построить график",
+                Длина: "Длина",
+                Масса: "Масса",
+                Объем: "Объем",
+                Площадь: "Площадь",
+                Время: "Время",
+                Температура: "Температура",
+                Скорость: "Скорость",
+                'Энергия/Работа': "Энергия/Работа",
+                Давление: "Давление",
+                Сила: "Сила",
+                'help_title': "📚 Справка по калькулятору",
+                'graph_title': "📈 Построение графика"
+            },
+            en: {
+                exact_answer: "Exact answer: ",
+                approx_answer: "Approximate answer: ",
+                calculate: "Calculate",
+                unit_converter: "🌐 Unit Converter",
+                select_category: "Select Category:",
+                value: "Value:",
+                from: "FROM:",
+                to: "TO:",
+                precision: "Precision (decimal places):",
+                result: "Result: ",
+                calculation_history: "Calculation History",
+                export: "Export",
+                clear_all: "Clear All",
+                history_empty: "Results will appear here.",
+                scientific_label: "Scientific",
+                expression_placeholder: "Enter: 100%50, 200+10%, x+5=10, 3/4*2",
+                conversion: "Conversion",
+                memory_cleared: "Memory cleared",
+                memory_value: "Memory value: ",
+                memory_add_error: "Error adding to memory: ",
+                memory_sub_error: "Error subtracting from memory: ",
+                confirm_clear_history: "Are you sure you want to clear all history?",
+                history_cleared: "History cleared",
+                history_exported: "History exported",
+                no_history: "No history to export",
+                graph_function: "Function (use x as variable):",
+                graph_from: "From:",
+                graph_to: "To:",
+                graph_step: "Step:",
+                plot_graph: "Plot Graph",
+                Длина: "Length",
+                Масса: "Mass",
+                Объем: "Volume",
+                Площадь: "Area",
+                Время: "Time",
+                Температура: "Temperature",
+                Скорость: "Speed",
+                'Энергия/Работа': "Energy/Work",
+                Давление: "Pressure",
+                Сила: "Force",
+                'help_title': "📚 Calculator Help",
+                'graph_title': "📈 Plot Graph"
+            }
+        };
+        
+        const UNIT_CATEGORIES = {
+            'Длина': ['m', 'km', 'cm', 'mm', 'inch', 'ft', 'yd', 'mile'],
+            'Масса': ['kg', 'g', 'mg', 'lbm', 'oz', 'tonne'],
+            'Объем': ['m^3', 'L', 'mL', 'gallon', 'quart', 'pint'],
+            'Площадь': ['m^2', 'km^2', 'cm^2', 'acre', 'ha'],
+            'Время': ['s', 'min', 'hr', 'day', 'week', 'year'],
+            'Температура': ['degC', 'degF', 'K'],
+            'Скорость': ['m/s', 'km/h', 'mph', 'knot'],
+            'Энергия/Работа': ['J', 'kJ', 'cal', 'kcal', 'kWh', 'BTU'],
+            'Давление': ['Pa', 'kPa', 'bar', 'atm', 'psi'],
+            'Сила': ['N', 'kN', 'lbf'],
+        };
+        
+        const scope = { M: 0, pi: math.pi, e: math.e, i: math.i };
+        Object.defineProperty(scope, 'M', {
+            get: () => memoryValue, set: (val) => memoryValue = val, enumerable: true, configurable: true
         });
         
-        // База знаний "AI"
-        const mathKnowledgeBase = {
-            // Арифметика
-            '2+2': '2 + 2 = 4',
-            '3+3': '3 + 3 = 6',
-            '4+4': '4 + 4 = 8',
-            '5+5': '5 + 5 = 10',
-            '10+10': '10 + 10 = 20',
-            '100+100': '100 + 100 = 200',
-            '1000+1000': '1000 + 1000 = 2000',
-            '1+1': '1 + 1 = 2',
-            '10-5': '10 - 5 = 5',
-            '20-10': '20 - 10 = 10',
-            '100-50': '100 - 50 = 50',
-            '2*2': '2 × 2 = 4',
-            '3*3': '3 × 3 = 9',
-            '4*4': '4 × 4 = 16',
-            '5*5': '5 × 5 = 25',
-            '6*6': '6 × 6 = 36',
-            '7*7': '7 × 7 = 49',
-            '8*8': '8 × 8 = 64',
-            '9*9': '9 × 9 = 81',
-            '10*10': '10 × 10 = 100',
-            '10/2': '10 ÷ 2 = 5',
-            '20/4': '20 ÷ 4 = 5',
-            '100/10': '100 ÷ 10 = 10',
-            '1000/100': '1000 ÷ 100 = 10',
-            
-            // Уравнения
-            'x+5=10': 'x + 5 = 10\nx = 10 - 5\nx = 5',
-            'x-3=7': 'x - 3 = 7\nx = 7 + 3\nx = 10',
-            '2x=8': '2x = 8\nx = 8 ÷ 2\nx = 4',
-            '3x=12': '3x = 12\nx = 12 ÷ 3\nx = 4',
-            'x/2=6': 'x ÷ 2 = 6\nx = 6 × 2\nx = 12',
-            'x^2=9': 'x² = 9\nx = √9\nx = 3 или x = -3',
-            'x^2=16': 'x² = 16\nx = √16\nx = 4 или x = -4',
-            'x^2=25': 'x² = 25\nx = √25\nx = 5 или x = -5',
-            
-            // Проценты
-            '15% от 200': '15% от 200 = 200 × 0.15 = 30',
-            '10% от 100': '10% от 100 = 100 × 0.10 = 10',
-            '20% от 50': '20% от 50 = 50 × 0.20 = 10',
-            '25% от 80': '25% от 80 = 80 × 0.25 = 20',
-            '50% от 60': '50% от 60 = 60 × 0.50 = 30',
-            '75% от 40': '75% от 40 = 40 × 0.75 = 30',
-            '100% от 45': '100% от 45 = 45 × 1.00 = 45',
-            '200% от 30': '200% от 30 = 30 × 2.00 = 60',
-            
-            // Геометрия
-            'площадь круга радиусом 5': 'S = πr² = π × 5² = 25π ≈ 78.54',
-            'площадь круга r=3': 'S = πr² = π × 3² = 9π ≈ 28.27',
-            'площадь круга r=10': 'S = πr² = π × 10² = 100π ≈ 314.16',
-            'площадь квадрата стороной 4': 'S = a² = 4² = 16',
-            'площадь квадрата a=5': 'S = a² = 5² = 25',
-            'площадь квадрата a=10': 'S = a² = 10² = 100',
-            'площадь прямоугольника 6x4': 'S = a × b = 6 × 4 = 24',
-            'площадь треугольника основание 6 высота 4': 'S = ½ × основание × высота = ½ × 6 × 4 = 12',
-            'периметр квадрата стороной 5': 'P = 4a = 4 × 5 = 20',
-            'объем куба стороной 3': 'V = a³ = 3³ = 27',
-            'объем куба a=2': 'V = a³ = 2³ = 8',
-            'объем куба a=4': 'V = a³ = 4³ = 64',
-            
-            // Теоремы и формулы
-            'теорема пифагора': 'a² + b² = c²\nГде c - гипотенуза, a и b - катеты',
-            'формула квадратного уравнения': 'ax² + bx + c = 0\nD = b² - 4ac\nx₁,₂ = (-b ± √D) / 2a',
-            'формула дискриминанта': 'D = b² - 4ac',
-            'синус 30': 'sin(30°) = 1/2 = 0.5',
-            'синус 45': 'sin(45°) = √2/2 ≈ 0.7071',
-            'синус 60': 'sin(60°) = √3/2 ≈ 0.8660',
-            'синус 90': 'sin(90°) = 1',
-            'косинус 30': 'cos(30°) = √3/2 ≈ 0.8660',
-            'косинус 45': 'cos(45°) = √2/2 ≈ 0.7071',
-            'косинус 60': 'cos(60°) = 1/2 = 0.5',
-            'косинус 90': 'cos(90°) = 0',
-            'тангенс 45': 'tan(45°) = 1',
-            
-            // Константы
-            'пи': 'π ≈ 3.141592653589793',
-            'число е': 'e ≈ 2.718281828459045',
-            'золотое сечение': 'φ ≈ 1.618033988749895',
-            'градус в радианы': '1° = π/180 ≈ 0.01745 рад',
-            'радиан в градусы': '1 рад = 180/π ≈ 57.2958°',
-            
-            // Факториалы
-            'факториал 5': '5! = 5 × 4 × 3 × 2 × 1 = 120',
-            'факториал 6': '6! = 6 × 5 × 4 × 3 × 2 × 1 = 720',
-            'факториал 7': '7! = 7 × 6 × 5 × 4 × 3 × 2 × 1 = 5040',
-            'факториал 4': '4! = 4 × 3 × 2 × 1 = 24',
-            'факториал 3': '3! = 3 × 2 × 1 = 6',
-            
-            // Степени двойки
-            '2 в степени 10': '2¹⁰ = 1024',
-            '2 в степени 8': '2⁸ = 256',
-            '2 в степени 7': '2⁷ = 128',
-            '2 в степени 6': '2⁶ = 64',
-            '2 в степени 5': '2⁵ = 32',
-            '2 в степени 4': '2⁴ = 16',
-            '2 в степени 3': '2³ = 8',
-            '2 в степени 2': '2² = 4',
-            
-            // Квадратные корни
-            'корень из 4': '√4 = 2',
-            'корень из 9': '√9 = 3',
-            'корень из 16': '√16 = 4',
-            'корень из 25': '√25 = 5',
-            'корень из 36': '√36 = 6',
-            'корень из 49': '√49 = 7',
-            'корень из 64': '√64 = 8',
-            'корень из 81': '√81 = 9',
-            'корень из 100': '√100 = 10',
-            
-            // Логарифмы
-            'логарифм 100 по основанию 10': 'log₁₀(100) = 2',
-            'логарифм 1000 по основанию 10': 'log₁₀(1000) = 3',
-            'логарифм 1 по основанию 10': 'log₁₀(1) = 0',
-            'натуральный логарифм e': 'ln(e) = 1',
-            'натуральный логарифм 1': 'ln(1) = 0',
-            
-            // Шутки
-            'ответ на все вопросы': '42 (по версии "Автостопом по галактике")',
-            'лучшее число': '73 (по мнению Шелдона Купера)',
-            'самое счастливое число': '7',
-            'сколько весит слон': 'Африканский слон: 4000-7000 кг\nАзиатский слон: 3000-5000 кг',
-            
-            // Помощь
-            'как пользоваться калькулятором': '🎯 Просто введите выражение и нажмите "="!\n\nПримеры:\n• 100%50 → 50 (50% от 100)\n• 200+10% → 220 (200 + 10%)\n• x+5=10 → решит уравнение\n• 3/4*2 → дроби и умножение',
-            'что умеет калькулятор': '✅ Арифметика\n✅ Проценты\n✅ Уравнения\n✅ Дроби\n✅ Научные функции\n✅ Конвертер единиц\n✅ История вычислений\n✅ Память\n\nИ всё это БЕСПЛАТНО!',
-            'помощь': 'Нужна помощь? Просто спросите что-нибудь математическое!\nИли используйте калькулятор - он реально крутой! 😉'
-        };
+        // ===== ОСНОВНЫЕ ФУНКЦИИ =====
         
-        // Конвертер единиц
-        const unitConversions = {
-            length: {
-                m: 1,
-                km: 0.001,
-                cm: 100,
-                mm: 1000,
-                inch: 39.3701,
-                ft: 3.28084,
-                yd: 1.09361,
-                mile: 0.000621371
-            },
-            mass: {
-                kg: 1,
-                g: 1000,
-                mg: 1000000,
-                lb: 2.20462,
-                oz: 35.274,
-                tonne: 0.001
-            },
-            temperature: {
-                C: 'celsius',
-                F: 'fahrenheit',
-                K: 'kelvin'
-            },
-            area: {
-                m2: 1,
-                km2: 0.000001,
-                ha: 0.0001,
-                acre: 0.000247105,
-                ft2: 10.7639
-            },
-            volume: {
-                m3: 1,
-                L: 1000,
-                mL: 1000000,
-                gal: 264.172,
-                ft3: 35.3147
-            },
-            time: {
-                s: 1,
-                min: 1/60,
-                h: 1/3600,
-                day: 1/86400,
-                week: 1/604800,
-                year: 1/31536000
+        function formatFractionResult(num) {
+            if (typeof num !== 'number' || !isFinite(num)) {
+                if (num === Infinity) return '∞';
+                if (num === -Infinity) return '-∞';
+                return String(num);
             }
-        };
+            
+            if (Math.abs(num) < 1e-15) return '0';
+            
+            const rounded = Math.round(num);
+            if (Math.abs(num - rounded) < 1e-10) {
+                return rounded.toString();
+            }
+            
+            const commonFractions = [
+                {value: 0.5, text: '1/2'},
+                {value: 0.3333333333, text: '1/3'},
+                {value: 0.6666666667, text: '2/3'},
+                {value: 0.25, text: '1/4'},
+                {value: 0.75, text: '3/4'},
+                {value: 0.2, text: '1/5'},
+                {value: 0.4, text: '2/5'},
+                {value: 0.6, text: '3/5'},
+                {value: 0.8, text: '4/5'},
+                {value: 0.125, text: '1/8'},
+                {value: 0.375, text: '3/8'},
+                {value: 0.625, text: '5/8'},
+                {value: 0.875, text: '7/8'},
+                {value: 0.1666666667, text: '1/6'},
+                {value: 0.8333333333, text: '5/6'},
+            ];
+            
+            for (const frac of commonFractions) {
+                if (Math.abs(num - frac.value) < 1e-8) {
+                    return frac.text;
+                }
+            }
+            
+            const tolerance = 1e-7;
+            const maxDenominator = 100;
+            
+            for (let denominator = 1; denominator <= maxDenominator; denominator++) {
+                const numerator = Math.round(num * denominator);
+                const fractionValue = numerator / denominator;
+                
+                if (Math.abs(fractionValue - num) < tolerance) {
+                    try {
+                        const gcd = math.gcd(numerator, denominator);
+                        const simpNum = numerator / gcd;
+                        const simpDen = denominator / gcd;
+                        
+                        if (simpDen === 1) return simpNum.toString();
+                        if (simpDen <= 100) return `${simpNum}/${simpDen}`;
+                    } catch (e) {
+                        return `${numerator}/${denominator}`;
+                    }
+                }
+            }
+            
+            if (Math.abs(num * 2 - Math.round(num * 2)) < 1e-8) {
+                const numerator = Math.round(num * 2);
+                const gcd = math.gcd(numerator, 2);
+                const simpNum = numerator / gcd;
+                const simpDen = 2 / gcd;
+                return simpDen === 1 ? simpNum.toString() : `${simpNum}/${simpDen}`;
+            }
+            
+            const absNum = Math.abs(num);
+            let displayPrecision = 6;
+            
+            if (absNum < 0.0001 || absNum > 10000) {
+                return num.toExponential(4);
+            } else if (absNum < 1) {
+                displayPrecision = Math.max(6, Math.ceil(-Math.log10(absNum)) + 2);
+            }
+            
+            const formatted = num.toFixed(Math.min(displayPrecision, 10));
+            return formatted.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+        }
         
-        const unitNames = {
-            length: {
-                m: 'Метры',
-                km: 'Километры',
-                cm: 'Сантиметры',
-                mm: 'Миллиметры',
-                inch: 'Дюймы',
-                ft: 'Футы',
-                yd: 'Ярды',
-                mile: 'Мили'
-            },
-            mass: {
-                kg: 'Килограммы',
-                g: 'Граммы',
-                mg: 'Миллиграммы',
-                lb: 'Фунты',
-                oz: 'Унции',
-                tonne: 'Тонны'
-            },
-            temperature: {
-                C: 'Цельсий',
-                F: 'Фаренгейт',
-                K: 'Кельвин'
+        // ===== ФУНКЦИИ ДЛЯ ПРОЦЕНТОВ (КАК В SAMSUNG) =====
+        
+        function preprocessExpression(expr) {
+            // Убираем лишние пробелы
+            expr = expr.replace(/\s+/g, '');
+            
+            // 1. Обработка процентов в стиле Samsung
+            expr = processPercentages(expr);
+            
+            // 2. Стандартные замены
+            let result = expr
+                .replace(/\\frac{([^}]+)}{([^}]+)}/g, '($1)/($2)')
+                .replace(/\\pi/g, 'pi')
+                .replace(/\\cdot/g, '*')
+                .replace(/\\times/g, '*')
+                .replace(/\\div/g, '/')
+                .replace(/\\sqrt{([^}]+)}/g, 'sqrt($1)')
+                .replace(/\\sqrt\[([^\]]+)\]{\s*([^}]+)\s*}/g, 'nthRoot($2, $1)');
+            
+            // 3. Добавляем неявное умножение
+            result = addImplicitMultiplication(result);
+            
+            return result;
+        }
+        
+        function processPercentages(expr) {
+            // Логика процентов как в калькуляторе Samsung:
+            // 1. 100%50 → 100 * (50/100) = 50 (50% от 100)
+            // 2. 200+10% → 200 + (200*0.10) = 220
+            // 3. 500-20% → 500 - (500*0.20) = 400
+            // 4. 1000*15% → 1000 * 0.15 = 150
+            // 5. 80/20% → 80 / 0.20 = 400
+            
+            // Сначала обработаем случаи типа X%Y
+            expr = expr.replace(/(\d+(?:\.\d+)?)%(\d+(?:\.\d+)?)/g, function(match, p1, p2) {
+                // p1%p2 → p1 * (p2/100)
+                return `${p1}*(${p2}/100)`;
+            });
+            
+            // Обработаем случаи с операторами: X+%, X-%, X*%, X/%
+            // Регулярное выражение для поиска паттернов: число оператор число%
+            const percentPattern = /([+\-*/])(\d+(?:\.\d+)?)%/g;
+            let lastMatch;
+            
+            while ((lastMatch = percentPattern.exec(expr)) !== null) {
+                const operator = lastMatch[1];
+                const percentValue = lastMatch[2];
+                
+                // Найдем число перед оператором
+                const beforeMatch = expr.substring(0, lastMatch.index).match(/(\d+(?:\.\d+)?)(?=[+\-*/]|$)/);
+                
+                if (beforeMatch) {
+                    const baseNumber = beforeMatch[1];
+                    const startIndex = beforeMatch.index;
+                    const endIndex = lastMatch.index + lastMatch[0].length;
+                    
+                    let replacement;
+                    switch (operator) {
+                        case '+':
+                            // X + Y% → X + (X * Y/100)
+                            replacement = `${baseNumber}+(${baseNumber}*${percentValue}/100)`;
+                            break;
+                        case '-':
+                            // X - Y% → X - (X * Y/100)
+                            replacement = `${baseNumber}-(${baseNumber}*${percentValue}/100)`;
+                            break;
+                        case '*':
+                            // X * Y% → X * (Y/100)
+                            replacement = `${baseNumber}*(${percentValue}/100)`;
+                            break;
+                        case '/':
+                            // X / Y% → X / (Y/100)
+                            replacement = `${baseNumber}/(${percentValue}/100)`;
+                            break;
+                        default:
+                            replacement = match;
+                    }
+                    
+                    expr = expr.substring(0, startIndex) + replacement + expr.substring(endIndex);
+                    // Сбросим индекс регулярного выражения после изменения строки
+                    percentPattern.lastIndex = 0;
+                }
             }
-        };
+            
+            // Обработка одиночных процентов в конце выражения
+            expr = expr.replace(/(\d+(?:\.\d+)?)%$/g, function(match, p1) {
+                return `(${p1}/100)`;
+            });
+            
+            return expr;
+        }
+        
+        function addImplicitMultiplication(expr) {
+            // Защищаем существующие операторы умножения
+            expr = expr.replace(/\*/g, '~M~');
+            
+            // Паттерны для неявного умножения
+            const patterns = [
+                { regex: /(\d+(?:\.\d+)?)([a-zA-Z])/g, replace: '$1~M~$2' },
+                { regex: /([a-zA-Z])(\d+(?:\.\d+)?)/g, replace: '$1~M~$2' },
+                { regex: /([a-zA-Z])([a-zA-Z])/g, replace: '$1~M~$2' },
+                { regex: /(\d+(?:\.\d+)?)\(/g, replace: '$1~M~(' },
+                { regex: /([a-zA-Z])\(/g, replace: '$1~M~(' },
+                { regex: /\)(\d+(?:\.\d+)?)/g, replace: ')~M~$1' },
+                { regex: /\)([a-zA-Z])/g, replace: ')~M~$1' },
+                { regex: /\)\(/g, replace: ')~M~(' },
+            ];
+            
+            for (let i = 0; i < 3; i++) {
+                patterns.forEach(pattern => {
+                    expr = expr.replace(pattern.regex, pattern.replace);
+                });
+            }
+            
+            // Восстанавливаем оригинальные операторы умножения
+            expr = expr.replace(/~M~/g, '*');
+            
+            return expr;
+        }
+        
+        // ===== ФУНКЦИИ ДЛЯ УРАВНЕНИЙ =====
+        
+        function solveEquation(equationStr, variable = 'x') {
+            try {
+                equationStr = equationStr.replace(/\s+/g, '');
+                const parts = equationStr.split('=');
+                if (parts.length !== 2) return null;
+                
+                const left = parts[0];
+                const right = parts[1];
+                
+                // Простой парсер для линейных уравнений типа "x + 5 = 10"
+                if (left.includes(variable)) {
+                    // Упрощаем выражение: переносим всё в левую часть
+                    const fullExpr = `(${left})-(${right})`;
+                    
+                    try {
+                        // Пробуем использовать mathjs для упрощения
+                        const expr = math.parse(fullExpr);
+                        const simplified = math.simplify(expr);
+                        
+                        // Пробуем решить линейное уравнение
+                        const coeffMatch = simplified.toString().match(new RegExp(`([+-]?\\d*\\.?\\d*)\\*?${variable}`));
+                        const constMatch = simplified.toString().match(/([+-]\d*\.?\d+)(?!.*[a-zA-Z])/);
+                        
+                        if (coeffMatch) {
+                            let coeff = 1;
+                            if (coeffMatch[1]) {
+                                if (coeffMatch[1] === '' || coeffMatch[1] === '+') coeff = 1;
+                                else if (coeffMatch[1] === '-') coeff = -1;
+                                else coeff = parseFloat(coeffMatch[1]);
+                            }
+                            
+                            let constTerm = 0;
+                            if (constMatch) {
+                                constTerm = parseFloat(constMatch[1]);
+                            }
+                            
+                            if (Math.abs(coeff) > 1e-12) {
+                                const solution = -constTerm / coeff;
+                                return {
+                                    solutions: solution,
+                                    type: 'linear'
+                                };
+                            } else if (Math.abs(constTerm) < 1e-12) {
+                                return {
+                                    solutions: 'бесконечно много решений',
+                                    type: 'identity'
+                                };
+                            } else {
+                                return {
+                                    solutions: [],
+                                    type: 'no-solution'
+                                };
+                            }
+                        }
+                    } catch (e) {
+                        // Используем простой парсер
+                    }
+                    
+                    // Простой парсер для уравнений вида "ax + b = c"
+                    const simplePattern = new RegExp(`([+-]?\\d*\\.?\\d*)\\*?${variable}\\s*([+-]\\s*\\d*\\.?\\d*)?`);
+                    const match = left.match(simplePattern);
+                    
+                    if (match && !isNaN(parseFloat(right))) {
+                        let coeff = 1;
+                        if (match[1]) {
+                            if (match[1] === '' || match[1] === '+') coeff = 1;
+                            else if (match[1] === '-') coeff = -1;
+                            else coeff = parseFloat(match[1]);
+                        }
+                        
+                        let leftConst = 0;
+                        if (match[2]) {
+                            leftConst = parseFloat(match[2].replace(/\s+/g, ''));
+                        }
+                        
+                        const rightNum = parseFloat(right);
+                        
+                        if (Math.abs(coeff) > 1e-12) {
+                            const solution = (rightNum - leftConst) / coeff;
+                            return {
+                                solutions: solution,
+                                type: 'linear-simple'
+                            };
+                        }
+                    }
+                }
+                
+                // Обработка уравнений вида "x = число" или "число = x"
+                if (left === variable && !isNaN(parseFloat(right))) {
+                    return {
+                        solutions: parseFloat(right),
+                        type: 'direct'
+                    };
+                }
+                
+                if (right === variable && !isNaN(parseFloat(left))) {
+                    return {
+                        solutions: parseFloat(left),
+                        type: 'direct'
+                    };
+                }
+                
+                // Обработка квадратных уравнений вида "x^2 = число"
+                const squareMatchLeft = left.match(new RegExp(`${variable}\\^2`));
+                const squareMatchRight = right.match(new RegExp(`${variable}\\^2`));
+                
+                if (squareMatchLeft && !isNaN(parseFloat(right))) {
+                    const constant = parseFloat(right);
+                    if (constant >= 0) {
+                        const sqrtVal = Math.sqrt(constant);
+                        return {
+                            solutions: [sqrtVal, -sqrtVal],
+                            type: 'quadratic'
+                        };
+                    } else {
+                        const sqrtVal = Math.sqrt(-constant);
+                        return {
+                            solutions: [`${sqrtVal}i`, `-${sqrtVal}i`],
+                            type: 'complex'
+                        };
+                    }
+                }
+                
+                if (squareMatchRight && !isNaN(parseFloat(left))) {
+                    const constant = parseFloat(left);
+                    if (constant >= 0) {
+                        const sqrtVal = Math.sqrt(constant);
+                        return {
+                            solutions: [sqrtVal, -sqrtVal],
+                            type: 'quadratic'
+                        };
+                    } else {
+                        const sqrtVal = Math.sqrt(-constant);
+                        return {
+                            solutions: [`${sqrtVal}i`, `-${sqrtVal}i`],
+                            type: 'complex'
+                        };
+                    }
+                }
+                
+                return null;
+                
+            } catch (error) {
+                console.error('Ошибка в solveEquation:', error);
+                return null;
+            }
+        }
         
         // ===== ОСНОВНЫЕ ФУНКЦИИ КАЛЬКУЛЯТОРА =====
-        function appendToExpression(value) {
-            const input = document.getElementById('expressionInput');
-            const display = document.getElementById('expressionDisplay');
+        
+        function init() {
+            calculationHistory = [];
+            memoryValue = 0;
+            precision = 6;
+            scientificNotation = false;
+            currentLanguage = 'ru';
             
-            input.value += value;
-            currentExpression = input.value;
-            display.textContent = currentExpression;
-            input.focus();
+            precisionSlider.value = precision;
+            document.getElementById('scientific-toggle').checked = scientificNotation;
+            languageSelect.value = currentLanguage;
+            
+            initConverter();
+            renderExpression('');
+            updatePrecision();
+            updateLanguage();
+        }
+        
+        function changeLanguage() {
+            currentLanguage = languageSelect.value;
+            updateLanguage();
+        }
+        
+        function updateLanguage() {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[currentLanguage][key]) {
+                    if (element.tagName === 'INPUT' && element.type === 'text') {
+                        element.placeholder = translations[currentLanguage][key];
+                    } else {
+                        const currentText = element.textContent;
+                        if (element.id === 'fraction-result' && currentText.includes('Точный ответ: ')) {
+                            const value = currentText.replace('Точный ответ: ', '');
+                            element.textContent = translations[currentLanguage].exact_answer + value;
+                        } else if (element.id === 'decimal-result' && currentText.includes('Приближенный ответ: ')) {
+                            const value = currentText.replace('Приближенный ответ: ', '');
+                            element.textContent = translations[currentLanguage].approx_answer + value;
+                        } else if (element.id === 'scientific-label') {
+                            element.textContent = translations[currentLanguage].scientific_label;
+                        } else {
+                            element.textContent = translations[currentLanguage][key];
+                        }
+                    }
+                }
+            });
+            
+            // Обновляем заголовки модальных окон
+            document.getElementById('help-title').textContent = translations[currentLanguage].help_title;
+            document.getElementById('graph-title').textContent = translations[currentLanguage].graph_title;
+            document.getElementById('graph-function-label').textContent = translations[currentLanguage].graph_function;
+            document.getElementById('graph-from-label').textContent = translations[currentLanguage].graph_from;
+            document.getElementById('graph-to-label').textContent = translations[currentLanguage].graph_to;
+            document.getElementById('graph-step-label').textContent = translations[currentLanguage].graph_step;
+            document.getElementById('plot-graph-btn').textContent = translations[currentLanguage].plot_graph;
+            
+            // Обновляем категории конвертера
+            const categorySelect = document.getElementById('unit-category');
+            if (categorySelect.options.length > 0) {
+                const currentCategory = categorySelect.value;
+                categorySelect.innerHTML = '';
+                for (const category in UNIT_CATEGORIES) {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = translations[currentLanguage][category] || category;
+                    categorySelect.appendChild(option);
+                }
+                categorySelect.value = currentCategory in UNIT_CATEGORIES ? currentCategory : Object.keys(UNIT_CATEGORIES)[0];
+                renderUnitSelector();
+            }
+        }
+        
+        function renderExpression(text) {
+            // Показываем проценты как есть (без преобразования в KaTeX)
+            let displayText = text;
+            
+            // Для KaTeX преобразуем только если нет специальных символов
+            if (!text.includes('%')) {
+                let kaTeXInput = text
+                    .replace(/\*/g, '\\cdot ')
+                    .replace(/pi/g, '\\pi')
+                    .replace(/\^/g, '^{');
+                kaTeXInput = kaTeXInput.replace(/^{([^{}]+)(?![}])/g, '^{$1}');
+                
+                try {
+                    katex.render(kaTeXInput, renderOutputDiv, {
+                        throwOnError: false,
+                        displayMode: true,
+                    });
+                    return;
+                } catch (e) {
+                    // Если KaTeX не сработал, показываем обычный текст
+                }
+            }
+            
+            renderOutputDiv.textContent = displayText;
+        }
+        
+        function checkSyntax(expr) {
+            let hasError = false;
+            if (expr) {
+                let stack = [];
+                for (let char of expr) {
+                    if (char === '(') stack.push('(');
+                    else if (char === ')') {
+                        if (stack.length === 0) {
+                            hasError = true;
+                            break;
+                        }
+                        stack.pop();
+                    }
+                }
+                if (stack.length > 0) hasError = true;
+            }
+            
+            if (hasError) {
+                expressionInput.classList.add('error');
+            } else {
+                expressionInput.classList.remove('error');
+            }
+            return !hasError;
+        }
+        
+        expressionInput.addEventListener('input', function(e) {
+            renderExpression(expressionInput.value);
+        });
+        
+        expressionInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleInput();
+            }
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F1') {
+                e.preventDefault();
+                openModal('helpModal');
+            }
+            if (e.key === 'Escape') {
+                clearExpression();
+            }
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                navigateHistory(-1);
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                navigateHistory(1);
+            }
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                handleInput();
+            }
+        });
+        
+        function navigateHistory(direction) {
+            if (calculationHistory.length === 0) return;
+            if (historyIndex === -1 && direction === -1) {
+                historyIndex = calculationHistory.length - 1;
+                originalExpression = expressionInput.value;
+            } else {
+                historyIndex += direction;
+                if (historyIndex < 0) {
+                    historyIndex = 0;
+                } else if (historyIndex >= calculationHistory.length) {
+                    historyIndex = calculationHistory.length - 1;
+                }
+            }
+            if (historyIndex >= 0 && historyIndex < calculationHistory.length) {
+                const historyItem = calculationHistory[historyIndex];
+                if (historyItem.type === 'calc') {
+                    expressionInput.value = historyItem.expression;
+                    renderExpression(historyItem.expression);
+                }
+            }
+            if (historyIndex >= calculationHistory.length - 1 && direction === 1) {
+                historyIndex = -1;
+                expressionInput.value = originalExpression;
+                renderExpression(originalExpression);
+            }
+        }
+        
+        function appendToExpression(value) {
+            expressionInput.value += value;
+            renderExpression(expressionInput.value);
         }
         
         function clearExpression() {
-            document.getElementById('expressionInput').value = '';
-            document.getElementById('expressionDisplay').textContent = '';
-            document.getElementById('resultDisplay').textContent = '0';
-            currentExpression = '';
+            expressionInput.value = '';
+            showResults(
+                'Ожидание ввода...',
+                '---',
+                'fraction-result',
+                'decimal-result'
+            );
+            renderOutputDiv.innerHTML = '';
+            expressionInput.classList.remove('error');
+            historyIndex = -1;
         }
         
-        function calculate() {
-            const input = document.getElementById('expressionInput');
-            const display = document.getElementById('expressionDisplay');
-            const resultDisplay = document.getElementById('resultDisplay');
-            
-            let expr = input.value.trim();
-            currentExpression = expr;
-            
-            if (!expr) {
-                showNotification('Введите выражение!', 'warning');
-                return;
-            }
-            
-            try {
-                // Обработка процентов Samsung-style
-                expr = expr.replace(/(\d+)%/g, '($1/100)');
-                expr = expr.replace(/(\d+)\+(\d+)%/g, (match, num, percent) => {
-                    return `${num}+${num}*${percent}/100`;
-                });
-                expr = expr.replace(/(\d+)-(\d+)%/g, (match, num, percent) => {
-                    return `${num}-${num}*${percent}/100`;
-                });
-                
-                // Обработка факториала
-                expr = expr.replace(/(\d+)!/g, (match, num) => {
-                    let fact = 1;
-                    for (let i = 2; i <= parseInt(num); i++) {
-                        fact *= i;
-                    }
-                    return fact.toString();
-                });
-                
-                // Обработка уравнений
-                if (expr.includes('=')) {
-                    const parts = expr.split('=');
-                    if (parts.length === 2 && expr.includes('x')) {
-                        const left = parts[0].trim();
-                        const right = parts[1].trim();
-                        
-                        // Простой линейный случай: x + a = b
-                        if (left === 'x' || left === 'x ') {
-                            const result = math.evaluate(right);
-                            resultDisplay.textContent = result;
-                            addToHistory(expr, result);
-                            return;
-                        }
-                        
-                        // Коэффициент при x
-                        const coeffMatch = left.match(/(\d*\.?\d*)x/);
-                        if (coeffMatch) {
-                            const coeff = coeffMatch[1] ? parseFloat(coeffMatch[1]) : 1;
-                            const constValue = math.evaluate(right);
-                            const result = constValue / coeff;
-                            resultDisplay.textContent = result;
-                            addToHistory(expr, result);
-                            return;
-                        }
-                    }
-                }
-                
-                // Вычисление обычного выражения
-                const result = math.evaluate(expr);
-                resultDisplay.textContent = formatNumber(result);
-                
-                // Добавление в историю
-                addToHistory(expr, result);
-                
-                // Очистка поля ввода
-                input.value = '';
-                display.textContent = '';
-                currentExpression = '';
-                
-            } catch (error) {
-                resultDisplay.textContent = 'Ошибка';
-                showNotification('Ошибка вычисления. Проверьте выражение.', 'error');
-                console.error('Calculation error:', error);
-            }
+        function showResults(fractionText, decimalText, fractionClass, decimalClass) {
+            fractionResultDiv.textContent = translations[currentLanguage].exact_answer + fractionText;
+            decimalResultDiv.textContent = translations[currentLanguage].approx_answer + decimalText;
+            fractionResultDiv.className = `result-box ${fractionClass}`;
+            decimalResultDiv.className = `result-box ${decimalClass}`;
         }
         
         function formatNumber(num) {
-            if (typeof num === 'number') {
-                // Для очень больших или очень маленьких чисел
-                if (Math.abs(num) > 1e10 || (Math.abs(num) < 1e-6 && num !== 0)) {
-                    return num.toExponential(6);
-                }
-                
-                // Для чисел с длинной дробной частью
-                const str = num.toString();
-                if (str.includes('.') && str.split('.')[1].length > 8) {
-                    return num.toFixed(8);
-                }
-                
-                return num.toString();
+            if (typeof num !== 'number' || isNaN(num) || !isFinite(num)) {
+                return String(num);
             }
-            return num.toString();
+            if (scientificNotation) {
+                return num.toExponential(precision);
+            } else {
+                const formatted = num.toFixed(precision);
+                return formatted.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+            }
         }
         
-        // ===== ПАМЯТЬ =====
+        async function handleInput() {
+            const expr = expressionInput.value.trim();
+            if (!expr) return;
+            
+            showSpinner(true);
+            try {
+                if (expr.includes('=')) {
+                    // === РЕШЕНИЕ УРАВНЕНИЙ ===
+                    const parts = expr.split('=');
+                    if (parts.length !== 2) {
+                        throw new Error('Уравнение должно содержать один знак "="');
+                    }
+                    
+                    // Предобработка обеих частей уравнения
+                    const leftProcessed = preprocessExpression(parts[0].trim());
+                    const rightProcessed = preprocessExpression(parts[1].trim());
+                    
+                    let variable = 'x';
+                    const varMatch = expr.match(/([a-zA-Z])(?=\s*[=+\-*/^]|$)/);
+                    if (varMatch) {
+                        variable = varMatch[1];
+                    }
+                    
+                    const solution = solveEquation(`${leftProcessed}=${rightProcessed}`, variable);
+                    
+                    if (!solution) {
+                        throw new Error('Не удалось решить уравнение. Пример: 2x + 3 = 7');
+                    }
+                    
+                    let fractionText, decimalText;
+                    
+                    if (solution.type === 'identity') {
+                        fractionText = `${variable}: ${solution.solutions}`;
+                        decimalText = '---';
+                    } else if (solution.type === 'no-solution') {
+                        fractionText = `${variable}: нет решения`;
+                        decimalText = '---';
+                    } else if (solution.type === 'complex') {
+                        fractionText = `${variable} = ${solution.solutions.join(', ')}`;
+                        decimalText = fractionText;
+                    } else if (Array.isArray(solution.solutions)) {
+                        fractionText = `${variable} = ${solution.solutions.map(s => formatFractionResult(s)).join(', ')}`;
+                        decimalText = `${variable} ≈ ${solution.solutions.map(s => formatNumber(s)).join(', ')}`;
+                    } else {
+                        fractionText = `${variable} = ${formatFractionResult(solution.solutions)}`;
+                        decimalText = `${variable} ≈ ${formatNumber(solution.solutions)}`;
+                    }
+                    
+                    showResults(fractionText, decimalText, 'text-purple-400', 'decimal-result');
+                    recordHistory(expr, fractionText);
+                    
+                } else {
+                    // === ОБЫЧНЫЕ ВЫРАЖЕНИЯ ===
+                    // Предобработка выражения с поддержкой процентов и неявного умножения
+                    const mathExpr = preprocessExpression(expr);
+                    
+                    if (!checkSyntax(mathExpr)) {
+                        showResults('Ошибка синтаксиса:', 'Проверьте выражение', 'error', 'error');
+                        return;
+                    }
+                    
+                    try {
+                        const parsed = math.parse(mathExpr, scope);
+                        const simplified = math.simplify(parsed);
+                        const numericResult = parsed.evaluate(scope);
+                        
+                        if (math.typeOf(numericResult) === 'Complex') {
+                            const real = numericResult.re;
+                            const imag = numericResult.im;
+                            let fractionText, decimalText;
+                            
+                            if (Math.abs(imag) < Epsilon) {
+                                fractionText = formatFractionResult(real);
+                                decimalText = formatNumber(real);
+                            } else {
+                                const realPart = formatFractionResult(real);
+                                const imagPart = formatFractionResult(Math.abs(imag));
+                                const sign = imag >= 0 ? ' + ' : ' - ';
+                                fractionText = realPart + sign + imagPart + 'i';
+                                decimalText = formatNumber(real) + sign + formatNumber(Math.abs(imag)) + 'i';
+                            }
+                            showResults(fractionText, decimalText, 'text-purple-400', 'decimal-result');
+                            recordHistory(expr, fractionText + ' (≈ ' + decimalText + ')');
+                        } else {
+                            let fractionText = formatFractionResult(numericResult);
+                            const decimalText = formatNumber(numericResult);
+                            
+                            // Для процентных вычислений показываем специальный стиль
+                            if (expr.includes('%')) {
+                                showResults(fractionText, decimalText, 'text-orange-400', 'decimal-result');
+                            } else {
+                                showResults(fractionText, decimalText, 'fraction-result', 'decimal-result');
+                            }
+                            recordHistory(expr, `${fractionText} (≈ ${decimalText})`);
+                        }
+                    } catch (parseError) {
+                        // Если не удалось распарсить, попробуем альтернативный подход
+                        const alternativeResult = evaluateSimpleExpression(expr);
+                        if (alternativeResult !== null) {
+                            let fractionText = formatFractionResult(alternativeResult);
+                            const decimalText = formatNumber(alternativeResult);
+                            
+                            if (expr.includes('%')) {
+                                showResults(fractionText, decimalText, 'text-orange-400', 'decimal-result');
+                            } else {
+                                showResults(fractionText, decimalText, 'fraction-result', 'decimal-result');
+                            }
+                            recordHistory(expr, `${fractionText} (≈ ${decimalText})`);
+                        } else {
+                            throw parseError;
+                        }
+                    }
+                }
+            } catch (error) {
+                showResults('Ошибка:', error.message, 'error', 'error');
+            } finally {
+                showSpinner(false);
+            }
+        }
+        
+        function evaluateSimpleExpression(expr) {
+            try {
+                // Упрощенный парсер для выражений без сложных функций
+                expr = expr.replace(/\s+/g, '');
+                
+                // Поддержка неявного умножения
+                expr = expr.replace(/(\d+)([a-zA-Z])/g, '$1*$2');
+                expr = expr.replace(/([a-zA-Z])(\d+)/g, '$1*$2');
+                expr = expr.replace(/(\d+)\(/g, '$1*(');
+                expr = expr.replace(/\)(\d+)/g, ')*$1');
+                expr = expr.replace(/\)\(/g, ')*(');
+                
+                // Заменяем константы
+                expr = expr.replace(/pi/g, Math.PI.toString());
+                expr = expr.replace(/e/g, Math.E.toString());
+                
+                // Безопасное вычисление
+                return math.evaluate(expr);
+            } catch (e) {
+                return null;
+            }
+        }
+        
+        // ===== ДОПОЛНИТЕЛЬНЫЕ ФУНКЦИИ =====
+        
+        function toggleConverter() {
+            converterPanel.classList.toggle('hidden');
+            if (!converterPanel.classList.contains('hidden')) {
+                initConverter();
+            }
+        }
+        
+        function initConverter() {
+            const categorySelect = document.getElementById('unit-category');
+            if (categorySelect.options.length > 0) {
+                performConversion();
+                return;
+            }
+            for (const category in UNIT_CATEGORIES) {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = translations[currentLanguage][category] || category;
+                categorySelect.appendChild(option);
+            }
+            renderUnitSelector();
+        }
+        
+        function renderUnitSelector() {
+            const category = document.getElementById('unit-category').value;
+            const units = UNIT_CATEGORIES[category] || [];
+            const unitFromSelect = document.getElementById('unit-from');
+            const unitToSelect = document.getElementById('unit-to');
+            unitFromSelect.innerHTML = '';
+            unitToSelect.innerHTML = '';
+            units.forEach((unit, index) => {
+                const optionFrom = document.createElement('option');
+                optionFrom.value = unit;
+                optionFrom.textContent = unit;
+                unitFromSelect.appendChild(optionFrom);
+                
+                const optionTo = document.createElement('option');
+                optionTo.value = unit;
+                optionTo.textContent = unit;
+                unitToSelect.appendChild(optionTo);
+                
+                // Выбираем разные единицы по умолчанию
+                if (index === 0) {
+                    optionFrom.selected = true;
+                }
+                if (index === 1 || units.length === 1) {
+                    optionTo.selected = true;
+                }
+            });
+            performConversion();
+        }
+        
+        function updatePrecision() {
+            precision = parseInt(precisionSlider.value);
+            precisionValue.textContent = precision;
+            performConversion();
+        }
+        
+        function performConversion() {
+            const value = parseFloat(document.getElementById('converter-input').value);
+            const unitFrom = document.getElementById('unit-from').value;
+            const unitTo = document.getElementById('unit-to').value;
+            if (isNaN(value) || !unitFrom || !unitTo) {
+                converterResultOutput.textContent = translations[currentLanguage].result + 'Введите число и выберите единицы.';
+                converterResultOutput.className = 'result-box error mt-4';
+                return;
+            }
+            try {
+                if (unitFrom.includes('deg') || unitTo.includes('deg')) {
+                    let result;
+                    if (unitFrom === 'degC' && unitTo === 'degF') {
+                        result = (value * 9/5) + 32;
+                    } else if (unitFrom === 'degF' && unitTo === 'degC') {
+                        result = (value - 32) * 5/9;
+                    } else if (unitFrom === 'degC' && unitTo === 'K') {
+                        result = value + 273.15;
+                    } else if (unitFrom === 'K' && unitTo === 'degC') {
+                        result = value - 273.15;
+                    } else if (unitFrom === 'degF' && unitTo === 'K') {
+                        result = (value - 32) * 5/9 + 273.15;
+                    } else if (unitFrom === 'K' && unitTo === 'degF') {
+                        result = (value - 273.15) * 9/5 + 32;
+                    } else {
+                        const unit = math.unit(value, unitFrom);
+                        const converted = unit.to(unitTo);
+                        result = converted.toNumber();
+                    }
+                    let formattedResult;
+                    if (scientificNotation) {
+                        formattedResult = result.toExponential(precision);
+                    } else {
+                        formattedResult = result.toFixed(precision).replace(/\.?0+$/, '');
+                    }
+                    converterResultOutput.textContent = `${translations[currentLanguage].result}${formattedResult} ${unitTo}`;
+                } else {
+                    const unit = math.unit(value, unitFrom);
+                    const converted = unit.to(unitTo);
+                    let formattedResult;
+                    if (scientificNotation) {
+                        formattedResult = converted.toNumber().toExponential(precision);
+                    } else {
+                        formattedResult = converted.toNumber().toFixed(precision).replace(/\.?0+$/, '');
+                    }
+                    converterResultOutput.textContent = `${translations[currentLanguage].result}${formattedResult} ${unitTo}`;
+                }
+                converterResultOutput.className = 'result-box text-yellow-400 mt-4';
+                const historyExpression = `${value} ${unitFrom} to ${unitTo}`;
+                const historyResult = `${translations[currentLanguage].conversion}: ${converterResultOutput.textContent}`;
+                recordHistory(historyExpression, historyResult, 'conversion');
+            } catch (error) {
+                converterResultOutput.textContent = `Ошибка: ${error.message}`;
+                converterResultOutput.className = 'result-box error mt-4';
+            }
+        }
+        
+        function toggleHistory() {
+            historyPanel.classList.toggle('hidden');
+            if (!historyPanel.classList.contains('hidden')) {
+                updateHistoryDisplay();
+            }
+        }
+        
+        function recordHistory(expression, result, type = 'calc') {
+            const historyItem = {
+                id: Date.now(),
+                expression,
+                result,
+                type,
+                timestamp: new Date().toISOString()
+            };
+            calculationHistory.push(historyItem);
+            updateHistoryDisplay();
+        }
+        
+        function updateHistoryDisplay() {
+            historyLogDiv.innerHTML = '';
+            if (calculationHistory.length === 0) {
+                const emptyMsg = document.createElement('p');
+                emptyMsg.className = 'text-sm text-gray-500 text-center mt-4';
+                emptyMsg.textContent = translations[currentLanguage].history_empty;
+                historyLogDiv.appendChild(emptyMsg);
+                return;
+            }
+            const recentHistory = calculationHistory.slice().reverse();
+            recentHistory.forEach(entry => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div class="history-content">
+                        <div class="history-expression">${entry.expression}</div>
+                        <div class="history-result">${entry.result}</div>
+                    </div>
+                    <div class="history-actions">
+                        <button class="history-action-btn" onclick="editHistoryItem(${entry.id})" title="Редактировать">✏️</button>
+                        <button class="history-action-btn" onclick="deleteHistoryItem(${entry.id})" title="Удалить">🗑️</button>
+                    </div>
+                `;
+                historyItem.addEventListener('click', (e) => {
+                    if (!e.target.closest('.history-actions')) {
+                        if (entry.type === 'calc') {
+                            expressionInput.value = entry.expression;
+                            renderExpression(entry.expression);
+                        }
+                    }
+                });
+                historyLogDiv.appendChild(historyItem);
+            });
+        }
+        
+        function editHistoryItem(id) {
+            const item = calculationHistory.find(h => h.id === id);
+            if (item && item.type === 'calc') {
+                expressionInput.value = item.expression;
+                renderExpression(item.expression);
+            }
+        }
+        
+        function deleteHistoryItem(id) {
+            calculationHistory = calculationHistory.filter(h => h.id !== id);
+            updateHistoryDisplay();
+        }
+        
+        function clearAllHistory() {
+            if (confirm(translations[currentLanguage].confirm_clear_history)) {
+                calculationHistory = [];
+                updateHistoryDisplay();
+                alert(translations[currentLanguage].history_cleared);
+            }
+        }
+        
+        function exportHistory() {
+            if (calculationHistory.length === 0) {
+                alert(translations[currentLanguage].no_history);
+                return;
+            }
+            const dataStr = JSON.stringify(calculationHistory, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = `calculator-history-${new Date().toISOString().split('T')[0]}.json`;
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            alert(translations[currentLanguage].history_exported);
+        }
+        
+        function toggleScientificNotation() {
+            scientificNotation = document.getElementById('scientific-toggle').checked;
+        }
+        
         function memoryClear() {
             memoryValue = 0;
-            showNotification('Память очищена', 'success');
+            alert(translations[currentLanguage].memory_cleared);
         }
         
         function memoryRecall() {
-            const input = document.getElementById('expressionInput');
-            input.value += memoryValue.toString();
-            currentExpression = input.value;
-            document.getElementById('expressionDisplay').textContent = currentExpression;
+            expressionInput.value += 'M';
+            renderExpression(expressionInput.value);
         }
         
         function memoryAdd() {
             try {
-                const current = parseFloat(document.getElementById('resultDisplay').textContent) || 0;
-                memoryValue += current;
-                showNotification(`Добавлено в память: ${memoryValue}`, 'success');
+                const currentValue = math.evaluate(expressionInput.value || '0', scope);
+                memoryValue += currentValue;
+                alert(translations[currentLanguage].memory_value + memoryValue);
             } catch (e) {
-                showNotification('Ошибка при добавлении в память', 'error');
+                alert(translations[currentLanguage].memory_add_error + e.message);
             }
         }
         
         function memorySubtract() {
             try {
-                const current = parseFloat(document.getElementById('resultDisplay').textContent) || 0;
-                memoryValue -= current;
-                showNotification(`Вычтено из памяти: ${memoryValue}`, 'success');
+                const currentValue = math.evaluate(expressionInput.value || '0', scope);
+                memoryValue -= currentValue;
+                alert(translations[currentLanguage].memory_value + memoryValue);
             } catch (e) {
-                showNotification('Ошибка при вычитании из памяти', 'error');
-            }
-        }
-        
-        // ===== ИСТОРИЯ =====
-        function addToHistory(expression, result) {
-            calculationHistory.push({
-                expression: expression,
-                result: result,
-                timestamp: new Date().toLocaleTimeString()
-            });
-            
-            // Ограничиваем историю 50 записями
-            if (calculationHistory.length > 50) {
-                calculationHistory.shift();
-            }
-            
-            updateHistoryDisplay();
-        }
-        
-        function updateHistoryDisplay() {
-            const historyList = document.getElementById('historyList');
-            historyList.innerHTML = '';
-            
-            if (calculationHistory.length === 0) {
-                historyList.innerHTML = '<div style="text-align: center; padding: 30px; color: #94a3b8;">История пуста</div>';
-                return;
-            }
-            
-            // Показываем последние 10 записей
-            calculationHistory.slice().reverse().forEach((item, index) => {
-                if (index >= 10) return;
-                
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                div.innerHTML = `
-                    <div class="history-expr">${item.expression}</div>
-                    <div class="history-result">${formatNumber(item.result)}</div>
-                    <div style="font-size: 0.8rem; color: #64748b; margin-top: 5px;">${item.timestamp}</div>
-                `;
-                
-                div.onclick = function() {
-                    document.getElementById('expressionInput').value = item.expression;
-                    document.getElementById('expressionDisplay').textContent = item.expression;
-                    currentExpression = item.expression;
-                    showNotification('Выражение загружено из истории', 'success');
-                };
-                
-                historyList.appendChild(div);
-            });
-        }
-        
-        function toggleHistory() {
-            if (currentTab !== 'history') {
-                showTab('history');
-            } else {
-                const historySection = document.getElementById('historySection');
-                historySection.style.display = historySection.style.display === 'none' ? 'block' : 'none';
-            }
-        }
-        
-        function clearAllHistory() {
-            if (calculationHistory.length === 0) return;
-            
-            if (confirm('Очистить всю историю вычислений?')) {
-                calculationHistory = [];
-                updateHistoryDisplay();
-                showNotification('История очищена', 'success');
-            }
-        }
-        
-        // ===== КОНВЕРТЕР =====
-        function toggleConverter() {
-            if (currentTab !== 'converter') {
-                showTab('converter');
-            } else {
-                const converterSection = document.getElementById('converterSection');
-                converterSection.style.display = converterSection.style.display === 'none' ? 'block' : 'none';
-            }
-        }
-        
-        function updateConverterUnits() {
-            const category = document.getElementById('converterCategory').value;
-            const fromSelect = document.getElementById('converterFrom');
-            const toSelect = document.getElementById('converterTo');
-            
-            fromSelect.innerHTML = '';
-            toSelect.innerHTML = '';
-            
-            let units = [];
-            
-            switch(category) {
-                case 'length':
-                    units = Object.keys(unitConversions.length);
-                    break;
-                case 'mass':
-                    units = Object.keys(unitConversions.mass);
-                    break;
-                case 'temperature':
-                    units = Object.keys(unitConversions.temperature);
-                    break;
-                case 'area':
-                    units = Object.keys(unitConversions.area);
-                    break;
-                case 'volume':
-                    units = Object.keys(unitConversions.volume);
-                    break;
-                case 'time':
-                    units = Object.keys(unitConversions.time);
-                    break;
-            }
-            
-            units.forEach(unit => {
-                const option1 = document.createElement('option');
-                const option2 = document.createElement('option');
-                
-                option1.value = unit;
-                option2.value = unit;
-                
-                // Используем русские названия если есть
-                if (unitNames[category] && unitNames[category][unit]) {
-                    option1.textContent = unitNames[category][unit];
-                    option2.textContent = unitNames[category][unit];
-                } else {
-                    option1.textContent = unit;
-                    option2.textContent = unit;
-                }
-                
-                fromSelect.appendChild(option1);
-                toSelect.appendChild(option2);
-            });
-            
-            // Устанавливаем разные единицы по умолчанию
-            if (units.length > 1) {
-                fromSelect.value = units[0];
-                toSelect.value = units[1];
-            }
-            
-            convertUnits();
-        }
-        
-        function convertUnits() {
-            const category = document.getElementById('converterCategory').value;
-            const value = parseFloat(document.getElementById('converterValue').value) || 0;
-            const fromUnit = document.getElementById('converterFrom').value;
-            const toUnit = document.getElementById('converterTo').value;
-            const resultDiv = document.getElementById('converterResult');
-            
-            if (fromUnit === toUnit) {
-                resultDiv.textContent = `${value} ${fromUnit} = ${value} ${toUnit}`;
-                return;
-            }
-            
-            let result;
-            
-            // Особый случай для температуры
-            if (category === 'temperature') {
-                result = convertTemperature(value, fromUnit, toUnit);
-            } else {
-                // Обычные единицы измерения
-                const conversions = unitConversions[category];
-                if (!conversions) {
-                    resultDiv.textContent = 'Ошибка конвертации';
-                    return;
-                }
-                
-                const valueInBase = value / conversions[fromUnit];
-                result = valueInBase * conversions[toUnit];
-            }
-            
-            resultDiv.textContent = `${value} ${fromUnit} = ${result.toFixed(6)} ${toUnit}`;
-        }
-        
-        function convertTemperature(value, fromUnit, toUnit) {
-            let celsius;
-            
-            // Конвертируем в Цельсий
-            switch(fromUnit) {
-                case 'C':
-                    celsius = value;
-                    break;
-                case 'F':
-                    celsius = (value - 32) * 5/9;
-                    break;
-                case 'K':
-                    celsius = value - 273.15;
-                    break;
-                default:
-                    celsius = value;
-            }
-            
-            // Конвертируем из Цельсий
-            switch(toUnit) {
-                case 'C':
-                    return celsius;
-                case 'F':
-                    return (celsius * 9/5) + 32;
-                case 'K':
-                    return celsius + 273.15;
-                default:
-                    return celsius;
-            }
-        }
-        
-        // ===== "AI" ПОМОЩНИК =====
-        function askAI() {
-            const prompt = document.getElementById('aiPrompt').value.trim().toLowerCase();
-            const responseDiv = document.getElementById('aiResponse');
-            
-            if (!prompt) {
-                responseDiv.innerHTML = '<div style="color: #f87171; padding: 20px; text-align: center;">Введите вопрос!</div>';
-                return;
-            }
-            
-            // Анимация "думания"
-            responseDiv.innerHTML = `
-                <div style="text-align: center; padding: 40px;">
-                    <div style="font-size: 2rem; margin-bottom: 15px;">🤔</div>
-                    <p>"Думаю"...</p>
-                    <div style="margin-top: 20px;">
-                        <div style="width: 100%; height: 4px; background: #334155; border-radius: 2px; overflow: hidden;">
-                            <div id="aiProgress" style="height: 100%; background: #8b5cf6; width: 0%; transition: width 0.3s;"></div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Прогресс бар
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += 10;
-                const progressBar = document.getElementById('aiProgress');
-                if (progressBar) progressBar.style.width = `${progress}%`;
-                if (progress >= 100) clearInterval(progressInterval);
-            }, 100);
-            
-            // Имитация "мышления" ИИ
-            setTimeout(() => {
-                let response = '';
-                
-                // Проверка точного совпадения
-                if (mathKnowledgeBase[prompt]) {
-                    response = mathKnowledgeBase[prompt];
-                } 
-                // Поиск по ключевым словам
-                else {
-                    const words = prompt.split(' ');
-                    let found = false;
-                    
-                    for (const [key, value] of Object.entries(mathKnowledgeBase)) {
-                        const keyLower = key.toLowerCase();
-                        // Проверяем, содержит ли ключ хотя бы одно слово из запроса
-                        if (words.some(word => word.length > 2 && keyLower.includes(word))) {
-                            response = `🔍 Похожий вопрос: <strong>"${key}"</strong>\n\n${value}`;
-                            found = true;
-                            break;
-                        }
-                    }
-                    
-                    // Если не нашли, пытаемся вычислить как математическое выражение
-                    if (!found && /[\d\+\-\*\/\^\(\)\.]/.test(prompt)) {
-                        try {
-                            const cleanedExpr = prompt.replace(/[^\d\+\-\*\/\^\(\)\.\s]/g, '');
-                            if (cleanedExpr.trim().length >= 3) {
-                                const result = math.evaluate(cleanedExpr);
-                                response = `🧮 Вычисляю: <strong>${cleanedExpr}</strong>\n\nРезультат: ${formatNumber(result)}`;
-                                found = true;
-                            }
-                        } catch (e) {
-                            // Не удалось вычислить
-                        }
-                    }
-                    
-                    // Если всё ещё не нашли
-                    if (!found) {
-                        response = `🤷‍♂️ <strong>"${prompt}"</strong>\n\nК сожалению, я не знаю ответ на этот вопрос.\n\n💡 Совет: Попробуйте ввести выражение в калькулятор - он мощный и решит почти всё!\n\n🎭 P.S. Это не настоящий ИИ, а база знаний. Но работает быстрее и надёжнее!`;
-                    }
-                }
-                
-                // Форматируем ответ
-                const formattedResponse = response.replace(/\n/g, '<br>');
-                
-                responseDiv.innerHTML = `
-                    <div style="color: #10b981; font-weight: bold; margin-bottom: 10px;">
-                        ✅ Ответ найден в базе знаний!
-                    </div>
-                    <div style="font-size: 1.1rem; line-height: 1.6;">
-                        ${formattedResponse}
-                    </div>
-                    <div style="margin-top: 20px; padding: 10px; background: rgba(139, 92, 246, 0.1); border-radius: 8px; font-size: 0.9rem; color: #94a3b8;">
-                        ⚡ Ответ за 1 сек • 🚫 Без API • 💰 Бесплатно
-                    </div>
-                `;
-                
-            }, 1000 + Math.random() * 500); // Случайная задержка
-        }
-        
-        function copyAIResponse() {
-            const responseDiv = document.getElementById('aiResponse');
-            const text = responseDiv.innerText;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                showNotification('Ответ скопирован в буфер обмена', 'success');
-            }).catch(err => {
-                showNotification('Не удалось скопировать', 'error');
-            });
-        }
-        
-        function insertAIResult() {
-            const responseDiv = document.getElementById('aiResponse');
-            const text = responseDiv.innerText;
-            
-            // Ищем числа в ответе
-            const numberMatch = text.match(/(?:=|равно|→|is|Результат:)\s*([0-9.]+)/i) || 
-                               text.match(/(\d+(?:\.\d+)?)(?=\s|$)/);
-            
-            if (numberMatch && numberMatch[1]) {
-                const number = numberMatch[1];
-                document.getElementById('expressionInput').value = number;
-                document.getElementById('expressionDisplay').textContent = number;
-                currentExpression = number;
-                closeModal('aiModal');
-                showNotification(`Число ${number} вставлено в калькулятор`, 'success');
-            } else {
-                showNotification('Не нашёл числа для вставки', 'warning');
-            }
-        }
-        
-        function clearAIResponse() {
-            document.getElementById('aiPrompt').value = '';
-            document.getElementById('aiResponse').innerHTML = `
-                <div style="text-align: center; padding: 40px;">
-                    <div style="font-size: 3rem; margin-bottom: 15px;">🤔</div>
-                    <p>"AI" помощник в режиме "Честный наёб"</p>
-                    <p style="margin-top: 10px; color: #94a3b8;">Задайте вопрос - получите мгновенный ответ из базы знаний!</p>
-                </div>
-            `;
-        }
-        
-        // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
-        function showTab(tabName) {
-            currentTab = tabName;
-            
-            // Обновляем активную вкладку
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.textContent.includes(tabName === 'history' ? 'История' : 'Конвертер')) {
-                    tab.classList.add('active');
-                }
-            });
-            
-            // Показываем нужную секцию
-            document.getElementById('historySection').style.display = tabName === 'history' ? 'block' : 'none';
-            document.getElementById('converterSection').style.display = tabName === 'converter' ? 'block' : 'none';
-            
-            if (tabName === 'converter') {
-                updateConverterUnits();
-            } else if (tabName === 'history') {
-                updateHistoryDisplay();
+                alert(translations[currentLanguage].memory_sub_error + e.message);
             }
         }
         
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
-            document.getElementById('aiPrompt').focus();
         }
         
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
         }
         
-        function showNotification(message, type = 'info') {
-            const notification = document.getElementById('notification');
-            
-            // Цвета для разных типов уведомлений
-            const colors = {
-                success: '#10b981',
-                error: '#ef4444',
-                warning: '#f59e0b',
-                info: '#3b82f6'
-            };
-            
-            notification.textContent = message;
-            notification.style.background = colors[type] || colors.info;
-            notification.style.display = 'block';
-            
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
-        }
-        
-        function handleKeyDown(event) {
-            const input = document.getElementById('expressionInput');
-            
-            // Enter для вычисления
-            if (event.key === 'Enter') {
-                calculate();
-                event.preventDefault();
+        function plotGraph() {
+            const funcStr = document.getElementById('graph-function').value;
+            const from = parseFloat(document.getElementById('graph-from').value);
+            const to = parseFloat(document.getElementById('graph-to').value);
+            const step = parseFloat(document.getElementById('graph-step').value);
+            if (!funcStr || isNaN(from) || isNaN(to) || isNaN(step)) {
+                alert('Пожалуйста, заполните все поля');
+                return;
             }
-            // Escape для очистки
-            else if (event.key === 'Escape') {
-                clearExpression();
-                event.preventDefault();
+            if (from >= to) {
+                alert('"От" должно быть меньше "До"');
+                return;
             }
-            // Ctrl+H для истории
-            else if (event.ctrlKey && event.key === 'h') {
-                toggleHistory();
-                event.preventDefault();
+            if (step <= 0) {
+                alert('Шаг должен быть положительным числом');
+                return;
             }
-            // Ctrl+C для конвертера
-            else if (event.ctrlKey && event.key === 'c') {
-                toggleConverter();
-                event.preventDefault();
-            }
-            // Ctrl+I для AI
-            else if (event.ctrlKey && event.key === 'i') {
-                openModal('aiModal');
-                event.preventDefault();
-            }
-            
-            // Обновляем display при вводе
-            setTimeout(() => {
-                currentExpression = input.value;
-                document.getElementById('expressionDisplay').textContent = currentExpression;
-            }, 10);
-        }
-        
-        // ===== ИНИЦИАЛИЗАЦИЯ =====
-        window.onload = function() {
-            // Инициализация конвертера
-            updateConverterUnits();
-            
-            // Показываем историю по умолчанию
-            showTab('history');
-            
-            // Фокус на поле ввода
-            document.getElementById('expressionInput').focus();
-            
-            // Закрытие модалки по клику вне её
-            window.onclick = function(event) {
-                if (event.target.classList.contains('modal')) {
-                    event.target.style.display = 'none';
+            showSpinner(true);
+            try {
+                const func = math.parse(funcStr);
+                const compiled = func.compile();
+                const xValues = [];
+                const yValues = [];
+                for (let x = from; x <= to; x += step) {
+                    try {
+                        const y = compiled.evaluate({x: x});
+                        xValues.push(x);
+                        yValues.push(y);
+                    } catch (e) {
+                        console.log(`Функция не определена при x = ${x}`);
+                    }
                 }
-            };
-            
-            showNotification('Калькулятор готов к работе! 🚀', 'success');
-        };
+                
+                if (xValues.length === 0) {
+                    alert('Не удалось вычислить функцию. Проверьте выражение.');
+                    showSpinner(false);
+                    return;
+                }
+                
+                const ctx = document.getElementById('graphCanvas').getContext('2d');
+                if (window.currentChart) {
+                    window.currentChart.destroy();
+                }
+                window.currentChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: xValues,
+                        datasets: [{
+                            label: `f(x) = ${funcStr}`,
+                            data: yValues,
+                            borderColor: 'rgb(59, 130, 246)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#d1d5db' }
+                            },
+                            y: {
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#d1d5db' }
+                            }
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#d1d5db' } }
+                        }
+                    }
+                });
+                closeModal('graphModal');
+            } catch (error) {
+                alert('Ошибка при построении графика: ' + error.message);
+            } finally {
+                showSpinner(false);
+            }
+        }
+        
+        function showSpinner(show) {
+            spinner.style.display = show ? 'block' : 'none';
+        }
+        
+        window.onload = init;
     </script>
 </body>
-    </html>
+                                                  </html>
