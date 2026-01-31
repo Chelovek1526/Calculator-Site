@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Продвинутый Калькулятор с AI</title>
+    <title>Калькулятор с "AI"<title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <style>
-        /* Все предыдущие стили остаются без изменений */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body {
             font-family: 'Inter', sans-serif;
@@ -306,7 +305,6 @@
             cursor: pointer;
             border-radius: 50%;
         }
-        
         /* AI Response стили */
         #ai-response {
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
@@ -400,24 +398,21 @@
             padding: 8px 12px;
             font-size: 0.9rem;
         }
-        .api-key-status {
-            font-size: 0.8rem;
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: #ef4444;
-            color: white;
-            margin-left: 10px;
-        }
-        .api-key-status.active {
-            background: #10b981;
-        }
-        .offline-badge {
+        .honest-badge {
             font-size: 0.7rem;
             padding: 2px 6px;
             border-radius: 4px;
-            background: #6b7280;
-            color: white;
+            background: #f59e0b;
+            color: #1f2937;
+            font-weight: bold;
             margin-left: 5px;
+        }
+        .truth-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
         }
     </style>
 </head>
@@ -426,129 +421,80 @@
         <div class="spinner-circle"></div>
     </div>
     
-    <!-- Модалка помощи (без изменений) -->
-    <div class="modal" id="helpModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="text-2xl font-bold" id="help-title">📚 Справка по калькулятору</h2>
-                <button class="close-btn" onclick="closeModal('helpModal')">×</button>
-            </div>
-            <div class="space-y-4">
-                <div><h3 class="text-lg font-bold text-blue-300 mb-2">Проценты (как в Samsung)</h3>
-                    <ul class="list-disc pl-5 space-y-1">
-                        <li><code>100%50</code> → 50 (50% от 100)</li>
-                        <li><code>200+10%</code> → 220 (200 + 10% от 200)</li>
-                        <li><code>500-20%</code> → 400 (500 - 20% от 500)</li>
-                        <li><code>1000*15%</code> → 150 (15% от 1000)</li>
-                        <li><code>80/20%</code> → 400 (80 ÷ 20%)</li>
-                    </ul>
-                </div>
-                <!-- ... остальная справка ... -->
-            </div>
-        </div>
-    </div>
-    
-    <!-- Модалка графиков (без изменений) -->
-    <div class="modal" id="graphModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="text-2xl font-bold" id="graph-title">📈 Построение графика</h2>
-                <button class="close-btn" onclick="closeModal('graphModal')">×</button>
-            </div>
-            <div class="mb-4">
-                <label class="block mb-2" id="graph-function-label">Функция (используйте x как переменную):</label>
-                <input type="text" id="graph-function" class="w-full p-2 rounded bg-gray-800 text-white" value="x^2" placeholder="sin(x), x^2, log(x)">
-            </div>
-            <!-- ... остальное ... -->
-        </div>
-    </div>
-    
-    <!-- ОБНОВЛЕННАЯ AI МОДАЛКА - ТЕПЕРЬ ОФФЛАЙН -->
+    <!-- AI Модалка с "честным" дизайном -->
     <div class="modal" id="aiModal">
         <div class="modal-content" style="max-width: 600px;">
             <div class="modal-header">
-                <h2 class="text-2xl font-bold" id="ai-title">🧠 Математический Помощник <span class="offline-badge">ОФФЛАЙН</span></h2>
+                <h2 class="text-2xl font-bold" id="ai-title">🧠 "AI" Помощник <span class="honest-badge">НАЁБ 9000</span></h2>
                 <button class="close-btn" onclick="closeModal('aiModal')">×</button>
             </div>
-            <div class="mb-4">
-                <label class="block mb-2" for="ai-prompt">Задайте математическую задачу:</label>
-                <textarea id="ai-prompt" class="w-full p-3 rounded bg-gray-800 text-white h-32" 
-                          placeholder="Примеры:
-• 2+2
-• x+5=10
-• 15% от 200
-• площадь круга радиусом 5
-• производная от x^2"></textarea>
+            
+            <div class="truth-box">
+                <p class="text-sm text-yellow-300">🎭 <strong>Честно говоря:</strong> Это не настоящий ИИ, а база готовых решений.</p>
+                <p class="text-xs text-yellow-400 mt-1">✅ Работает мгновенно • 🔒 Без интернета • 💰 Бесплатно • 🎯 Для 80% задач</p>
             </div>
             
-            <div class="mb-4 p-3 bg-blue-900/30 rounded border border-blue-700">
-                <p class="text-sm text-blue-300">💡 <strong>Оффлайн помощник</strong> - решает основные задачи без интернета!</p>
-                <p class="text-xs text-blue-400 mt-1">Поддерживает: арифметику, уравнения, проценты, геометрию</p>
+            <div class="mb-4">
+                <label class="block mb-2" for="ai-prompt">Спросите что-нибудь математическое:</label>
+                <textarea id="ai-prompt" class="w-full p-3 rounded bg-gray-800 text-white h-32" 
+                          placeholder="Примеры (это реально работает!):
+• 2+2
+• x+5=10  
+• 15% от 200
+• площадь круга радиусом 5
+• теорема Пифагора"></textarea>
             </div>
             
             <div class="mb-4 flex items-center gap-4">
-                <select id="ai-model" class="ai-model-select" disabled>
-                    <option>🔒 Оффлайн режим</option>
+                <select id="ai-model" class="ai-model-select">
+                    <option>🤖 Режим: "Очень умный"</option>
                 </select>
                 <button onclick="askAI()" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 flex items-center gap-2" id="ai-ask-btn">
-                    <span id="ai-btn-text">Решить задачу</span>
+                    <span id="ai-btn-text">Получить ответ</span>
                     <span id="ai-loading" class="hidden">⏳</span>
                 </button>
-                <span id="api-status" class="api-key-status">🚫 API не нужен</span>
-            </div>
-            
-            <div class="mb-4">
-                <label class="block mb-2 text-sm text-gray-400">Контекст калькулятора:</label>
-                <div class="p-3 bg-gray-900 rounded text-sm">
-                    <div class="flex justify-between mb-2">
-                        <span>Текущее выражение: <code id="current-expression-context">нет</code></span>
-                        <button onclick="useCurrentExpression()" class="text-xs text-blue-400 hover:text-blue-300">Использовать</button>
-                    </div>
-                    <div>Последний результат: <code id="last-result-context">нет</code></div>
-                </div>
             </div>
             
             <div id="ai-response" class="p-4 bg-gray-900 rounded min-h-48">
                 <div class="ai-thinking">
-                    <div class="text-2xl mb-2">🧮</div>
-                    <p>Оффлайн математический помощник</p>
-                    <p class="text-sm text-gray-400 mt-2">Решает задачи без интернета и API ключей!</p>
+                    <div class="text-2xl mb-2">🤔</div>
+                    <p>"AI" помощник в режиме "Честный наёб"</p>
+                    <p class="text-sm text-gray-400 mt-2">Задайте вопрос - получите мгновенный ответ из базы знаний!</p>
                 </div>
             </div>
             
             <div class="ai-actions mt-4">
                 <button onclick="copyAIResponse()" class="ai-action-btn copy" id="ai-copy-btn">📋 Копировать</button>
-                <button onclick="insertAIResult()" class="ai-action-btn insert" id="ai-insert-btn">➡️ Вставить в калькулятор</button>
+                <button onclick="insertAIResult()" class="ai-action-btn insert" id="ai-insert-btn">➡️ Вставить число</button>
                 <button onclick="clearAIResponse()" class="ai-action-btn clear" id="ai-clear-btn">🗑️ Очистить</button>
             </div>
             
             <div class="mt-4 text-xs text-gray-400">
-                <p>💡 <strong>Совет:</strong> Введите математическую задачу простыми словами.</p>
-                <p class="mt-1">✅ <strong>Работает оффлайн</strong> - не требует API ключей и интернета</p>
+                <p>💡 <strong>Секрет:</strong> База содержит 50+ готовых решений. Новые задачи решайте через калькулятор!</p>
+                <p class="mt-1">🎯 <strong>Фишка:</strong> Работает даже в самолёте без интернета!</p>
             </div>
         </div>
     </div>
     
-    <!-- Header с кнопкой AI -->
+    <!-- Хедер -->
     <div class="header-controls">
-        <h1 class="text-3xl font-extrabold text-white">🧮 Продвинутый Калькулятор</h1>
+        <h1 class="text-3xl font-extrabold text-white">🧮 Калькулятор "Честный"</h1>
         <div class="flex gap-2">
             <button onclick="openModal('aiModal')" class="px-3 py-1 bg-purple-700 text-white rounded hover:bg-purple-600 flex items-center gap-1">
-                🧠 Помощник
+                🧠 "AI"
             </button>
-            <button onclick="openModal('helpModal')" class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">?</button>
         </div>
     </div>
     
-    <!-- Основной калькулятор (без изменений) -->
+    <!-- Основной калькулятор -->
     <div class="calculator-container">
         <div class="calculator">
             <div id="result-container">
-                <div class="result-box fraction-result" id="fraction-result" data-i18n="exact_answer">Точный ответ: Ожидание ввода...</div>
-                <div class="result-box decimal-result" id="decimal-result" data-i18n="approx_answer">Приближенный ответ: ---</div>
+                <div class="result-box fraction-result" id="fraction-result">Точный ответ: Ожидание ввода...</div>
+                <div class="result-box decimal-result" id="decimal-result">Приближенный ответ: ---</div>
             </div>
             <div id="render-output"></div>
-            <input type="text" id="expression" placeholder="Введите: 100%50, 200+10%, x+5=10, 3/4*2" autocomplete="off">
+            <input type="text" id="expression" placeholder="Введите выражение: 100%50, x+5=10, 3/4*2" autocomplete="off">
             
             <!-- Кнопки памяти -->
             <div class="grid grid-cols-4 gap-2 mb-4">
@@ -590,36 +536,43 @@
                 <button class="btn-num" onclick="appendToExpression('.')">.</button>
                 <button class="btn-op" onclick="appendToExpression('\\pi')">π</button>
                 <button class="btn-percent" onclick="appendToExpression('%')">%</button>
-                <button class="btn-op" onclick="appendToExpression('i')">i</button>
-                <button class="btn-op" onclick="openModal('graphModal')">📈</button>
                 <button class="btn-op" onclick="appendToExpression('^')">^</button>
                 <button class="btn-op" onclick="appendToExpression('=')">=</button>
-                <button class="btn-main mt-4" onclick="handleInput()" id="calculate-btn" data-i18n="calculate">Вычислить</button>
-            </div>
-            
-            <!-- Настройки -->
-            <div class="mt-4 pt-4 border-t border-gray-600 flex justify-between items-center">
-                <select id="language-select" class="language-select" onchange="changeLanguage()">
-                    <option value="ru">🇷🇺 Русский</option>
-                    <option value="en">🇺🇸 English</option>
-                </select>
-                <label class="flex items-center gap-2 text-white">
-                    <span id="scientific-label" data-i18n="scientific_label">Научная</span>
-                    <label class="switch"><input type="checkbox" id="scientific-toggle" onchange="toggleScientificNotation()"><span class="slider"></span></label>
-                </label>
+                <button class="btn-main mt-4" onclick="handleInput()" id="calculate-btn">Вычислить</button>
             </div>
         </div>
         
-        <!-- Конвертер и история (без изменений) -->
+        <!-- Конвертер -->
         <div class="converter-panel hidden" id="converter-panel">
-            <h3 class="text-xl font-bold mb-4 border-b border-gray-600 pb-2" data-i18n="unit_converter">🌐 Конвертер Единиц</h3>
-            <!-- ... конвертер ... -->
+            <h3 class="text-xl font-bold mb-4 border-b border-gray-600 pb-2">🌐 Конвертер Единиц</h3>
+            <div class="mb-4">
+                <label class="block mb-2 text-sm font-medium">Выберите Категорию:</label>
+                <select id="unit-category" class="converter-select" onchange="renderUnitSelector()">
+                    <option value="Длина">Длина</option>
+                    <option value="Масса">Масса</option>
+                    <option value="Температура">Температура</option>
+                </select>
+            </div>
+            <div class="converter-section">
+                <label class="block mb-2 text-sm font-medium">Значение:</label>
+                <input type="number" id="converter-input" class="converter-input" placeholder="Введите число" value="1" oninput="performConversion()">
+                <div class="grid grid-cols-3 gap-2 mt-4 items-center">
+                    <div><label class="block text-xs font-medium text-gray-400">ИЗ:</label><select id="unit-from" class="converter-select" onchange="performConversion()"></select></div>
+                    <div class="text-center text-lg text-yellow-400 font-bold">→</div>
+                    <div><label class="block text-xs font-medium text-gray-400">В:</label><select id="unit-to" class="converter-select" onchange="performConversion()"></select></div>
+                </div>
+            </div>
+            <div id="converter-result-output" class="result-box decimal-result mt-4">Результат:</div>
         </div>
         
+        <!-- История -->
         <div class="history-panel hidden" id="history-panel">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold border-b border-gray-600 pb-2" data-i18n="calculation_history">Журнал Вычислений</h3>
-                <!-- ... история ... -->
+                <h3 class="text-xl font-bold border-b border-gray-600 pb-2">История Вычислений</h3>
+                <button onclick="clearAllHistory()" class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">🗑️ Очистить</button>
+            </div>
+            <div id="history-log">
+                <p class="text-sm text-gray-500 text-center mt-4">Здесь появятся ваши вычисления</p>
             </div>
         </div>
     </div>
@@ -634,25 +587,12 @@
         const renderOutputDiv = document.getElementById('render-output');
         const converterPanel = document.getElementById('converter-panel');
         const converterResultOutput = document.getElementById('converter-result-output');
-        const spinner = document.getElementById('spinner');
-        const precisionSlider = document.getElementById('precision-slider');
-        const precisionValue = document.getElementById('precision-value');
-        const languageSelect = document.getElementById('language-select');
         
         let calculationHistory = [];
         let memoryValue = 0;
         let precision = 6;
-        let scientificNotation = false;
-        let historyIndex = -1;
-        let originalExpression = '';
-        const Epsilon = 1e-10;
-        let currentLanguage = 'ru';
         
-        // БОЛЬШЕ НЕТ API КЛЮЧА!
-        let aiRequestsCount = 0;
-        let aiHistory = [];
-        
-        // ===== МАТЕМАТИЧЕСКАЯ БАЗА ЗНАНИЙ ДЛЯ ОФФЛАЙН AI =====
+        // ===== БАЗА ЗНАНИЙ "AI" (самый честный наёб) =====
         const mathKnowledgeBase = {
             // Арифметика
             '2+2': '2 + 2 = 4',
@@ -660,194 +600,223 @@
             '4+4': '4 + 4 = 8',
             '5+5': '5 + 5 = 10',
             '10+10': '10 + 10 = 20',
+            '100+100': '100 + 100 = 200',
+            '1000+1000': '1000 + 1000 = 2000',
+            '1+1': '1 + 1 = 2',
+            
+            // Вычитание
+            '10-5': '10 - 5 = 5',
+            '20-10': '20 - 10 = 10',
+            '100-50': '100 - 50 = 50',
+            
+            // Умножение
+            '2*2': '2 × 2 = 4',
+            '3*3': '3 × 3 = 9',
+            '4*4': '4 × 4 = 16',
+            '5*5': '5 × 5 = 25',
+            '6*6': '6 × 6 = 36',
+            '7*7': '7 × 7 = 49',
+            '8*8': '8 × 8 = 64',
+            '9*9': '9 × 9 = 81',
+            '10*10': '10 × 10 = 100',
+            
+            // Деление
+            '10/2': '10 ÷ 2 = 5',
+            '20/4': '20 ÷ 4 = 5',
+            '100/10': '100 ÷ 10 = 10',
+            '1000/100': '1000 ÷ 100 = 10',
             
             // Уравнения
             'x+5=10': 'x + 5 = 10\nx = 10 - 5\nx = 5',
             'x-3=7': 'x - 3 = 7\nx = 7 + 3\nx = 10',
             '2x=8': '2x = 8\nx = 8 ÷ 2\nx = 4',
+            '3x=12': '3x = 12\nx = 12 ÷ 3\nx = 4',
             'x/2=6': 'x ÷ 2 = 6\nx = 6 × 2\nx = 12',
             'x^2=9': 'x² = 9\nx = √9\nx = 3 или x = -3',
+            'x^2=16': 'x² = 16\nx = √16\nx = 4 или x = -4',
+            'x^2=25': 'x² = 25\nx = √25\nx = 5 или x = -5',
             
             // Проценты
             '15% от 200': '15% от 200 = 200 × 0.15 = 30',
             '10% от 100': '10% от 100 = 100 × 0.10 = 10',
+            '20% от 50': '20% от 50 = 50 × 0.20 = 10',
             '25% от 80': '25% от 80 = 80 × 0.25 = 20',
             '50% от 60': '50% от 60 = 60 × 0.50 = 30',
+            '75% от 40': '75% от 40 = 40 × 0.75 = 30',
             '100% от 45': '100% от 45 = 45 × 1.00 = 45',
+            '200% от 30': '200% от 30 = 30 × 2.00 = 60',
             
             // Геометрия
             'площадь круга радиусом 5': 'S = πr² = π × 5² = 25π ≈ 78.54',
+            'площадь круга r=3': 'S = πr² = π × 3² = 9π ≈ 28.27',
+            'площадь круга r=10': 'S = πr² = π × 10² = 100π ≈ 314.16',
             'площадь квадрата стороной 4': 'S = a² = 4² = 16',
+            'площадь квадрата a=5': 'S = a² = 5² = 25',
+            'площадь квадрата a=10': 'S = a² = 10² = 100',
+            'площадь прямоугольника 6x4': 'S = a × b = 6 × 4 = 24',
             'площадь треугольника основание 6 высота 4': 'S = ½ × основание × высота = ½ × 6 × 4 = 12',
             'периметр квадрата стороной 5': 'P = 4a = 4 × 5 = 20',
             'объем куба стороной 3': 'V = a³ = 3³ = 27',
+            'объем куба a=2': 'V = a³ = 2³ = 8',
+            'объем куба a=4': 'V = a³ = 4³ = 64',
             
-            // Алгебра
+            // Теоремы и формулы
+            'теорема Пифагора': 'a² + b² = c²\nГде c - гипотенуза, a и b - катеты',
+            'формула квадратного уравнения': 'ax² + bx + c = 0\nD = b² - 4ac\nx₁,₂ = (-b ± √D) / 2a',
+            'формула дискриминанта': 'D = b² - 4ac',
+            'синус 30': 'sin(30°) = 1/2 = 0.5',
+            'синус 45': 'sin(45°) = √2/2 ≈ 0.7071',
+            'синус 60': 'sin(60°) = √3/2 ≈ 0.8660',
+            'синус 90': 'sin(90°) = 1',
+            'косинус 30': 'cos(30°) = √3/2 ≈ 0.8660',
+            'косинус 45': 'cos(45°) = √2/2 ≈ 0.7071',
+            'косинус 60': 'cos(60°) = 1/2 = 0.5',
+            'косинус 90': 'cos(90°) = 0',
+            'тангенс 45': 'tan(45°) = 1',
+            
+            // Константы
+            'пи': 'π ≈ 3.141592653589793',
+            'число е': 'e ≈ 2.718281828459045',
+            'золотое сечение': 'φ ≈ 1.618033988749895',
+            'градус в радианы': '1° = π/180 ≈ 0.01745 рад',
+            'радиан в градусы': '1 рад = 180/π ≈ 57.2958°',
+            'скорость света': 'c ≈ 299,792,458 м/с',
+            'гравитационная постоянная': 'G ≈ 6.67430 × 10⁻¹¹ Н·м²/кг²',
+            'число Авогадро': 'Nₐ ≈ 6.02214076 × 10²³ моль⁻¹',
+            
+            // Факториалы
+            'факториал 5': '5! = 5 × 4 × 3 × 2 × 1 = 120',
+            'факториал 6': '6! = 6 × 5 × 4 × 3 × 2 × 1 = 720',
+            'факториал 7': '7! = 7 × 6 × 5 × 4 × 3 × 2 × 1 = 5040',
+            'факториал 4': '4! = 4 × 3 × 2 × 1 = 24',
+            'факториал 3': '3! = 3 × 2 × 1 = 6',
+            
+            // Степени двойки
+            '2 в степени 10': '2¹⁰ = 1024',
+            '2 в степени 8': '2⁸ = 256',
+            '2 в степени 7': '2⁷ = 128',
+            '2 в степени 6': '2⁶ = 64',
+            '2 в степени 5': '2⁵ = 32',
+            '2 в степени 4': '2⁴ = 16',
+            '2 в степени 3': '2³ = 8',
+            '2 в степени 2': '2² = 4',
+            
+            // Квадратные корни
+            'корень из 4': '√4 = 2',
+            'корень из 9': '√9 = 3',
+            'корень из 16': '√16 = 4',
+            'корень из 25': '√25 = 5',
+            'корень из 36': '√36 = 6',
+            'корень из 49': '√49 = 7',
+            'корень из 64': '√64 = 8',
+            'корень из 81': '√81 = 9',
+            'корень из 100': '√100 = 10',
+            
+            // Логарифмы
+            'логарифм 100 по основанию 10': 'log₁₀(100) = 2',
+            'логарифм 1000 по основанию 10': 'log₁₀(1000) = 3',
+            'логарифм 1 по основанию 10': 'log₁₀(1) = 0',
+            'натуральный логарифм e': 'ln(e) = 1',
+            'натуральный логарифм 1': 'ln(1) = 0',
+            
+            // Производные
             'производная от x^2': 'f(x) = x²\nf\'(x) = 2x',
             'производная от x^3': 'f(x) = x³\nf\'(x) = 3x²',
+            'производная от x': 'f(x) = x\nf\'(x) = 1',
+            'производная от константы': 'f(x) = C\nf\'(x) = 0',
             'производная от sin(x)': 'f(x) = sin(x)\nf\'(x) = cos(x)',
             'производная от cos(x)': 'f(x) = cos(x)\nf\'(x) = -sin(x)',
+            'производная от e^x': 'f(x) = eˣ\nf\'(x) = eˣ',
+            'производная от ln(x)': 'f(x) = ln(x)\nf\'(x) = 1/x',
+            
+            // Интегралы
             'интеграл от x': '∫x dx = ½x² + C',
+            'интеграл от x^2': '∫x² dx = ⅓x³ + C',
+            'интеграл от константы': '∫C dx = Cx + C₁',
+            'интеграл от sin(x)': '∫sin(x) dx = -cos(x) + C',
+            'интеграл от cos(x)': '∫cos(x) dx = sin(x) + C',
+            'интеграл от e^x': '∫eˣ dx = eˣ + C',
+            'интеграл от 1/x': '∫(1/x) dx = ln|x| + C',
+            
+            // Вероятность
+            'вероятность выпадения орла': 'P(орёл) = 1/2 = 0.5 = 50%',
+            'вероятность выпадения решки': 'P(решка) = 1/2 = 0.5 = 50%',
+            'вероятность выпадения 6 на кубике': 'P(6) = 1/6 ≈ 0.1667 = 16.67%',
+            'вероятность выпадения четного числа': 'P(чётное) = 3/6 = 1/2 = 0.5 = 50%',
             
             // Физика
             'скорость расстояние 100 время 20': 'v = s/t = 100 ÷ 20 = 5 м/с',
+            'скорость s=50 t=10': 'v = s/t = 50 ÷ 10 = 5 м/с',
             'сила масса 10 ускорение 2': 'F = m × a = 10 × 2 = 20 Н',
+            'сила m=5 a=3': 'F = m × a = 5 × 3 = 15 Н',
             'работа сила 5 расстояние 3': 'A = F × s = 5 × 3 = 15 Дж',
+            'работа F=10 s=2': 'A = F × s = 10 × 2 = 20 Дж',
+            'мощность работа 100 время 5': 'P = A/t = 100 ÷ 5 = 20 Вт',
+            'давление сила 50 площадь 2': 'p = F/S = 50 ÷ 2 = 25 Па',
             'плотность масса 30 объем 6': 'ρ = m/V = 30 ÷ 6 = 5 г/см³',
+            'плотность m=12 v=3': 'ρ = m/V = 12 ÷ 3 = 4 г/см³',
             
-            // Общие математические факты
-            'пи': 'π ≈ 3.141592653589793',
-            'е': 'e ≈ 2.718281828459045',
-            'градус в радианы': '1° = π/180 ≈ 0.01745 рад',
-            'радиан в градусы': '1 рад = 180/π ≈ 57.2958°',
-            'факториал 5': '5! = 5 × 4 × 3 × 2 × 1 = 120'
-        };
-        
-        const translations = {
-            ru: {
-                exact_answer: "Точный ответ: ",
-                approx_answer: "Приближенный ответ: ",
-                calculate: "Вычислить",
-                unit_converter: "🌐 Конвертер Единиц",
-                select_category: "Выберите Категорию:",
-                value: "Значение:",
-                from: "ИЗ:",
-                to: "В:",
-                precision: "Точность (знаков после запятой):",
-                result: "Результат: ",
-                calculation_history: "Журнал Вычислений",
-                export: "Экспорт",
-                clear_all: "Удалить всё",
-                history_empty: "Результаты будут отображаться здесь.",
-                scientific_label: "Научная",
-                expression_placeholder: "Введите: 100%50, 200+10%, x+5=10, 3/4*2",
-                conversion: "Конверсия",
-                memory_cleared: "Память очищена",
-                memory_value: "Значение памяти: ",
-                memory_add_error: "Ошибка при добавлении в память: ",
-                memory_sub_error: "Ошибка при вычитании из памяти: ",
-                confirm_clear_history: "Вы уверены, что хотите удалить всю историю?",
-                history_cleared: "История очищена",
-                history_exported: "История экспортирована",
-                no_history: "Нет истории для экспорта",
-                graph_function: "Функция (используйте x как переменную):",
-                graph_from: "От:",
-                graph_to: "До:",
-                graph_step: "Шаг:",
-                plot_graph: "Построить график",
-                Длина: "Длина",
-                Масса: "Масса",
-                Объем: "Объем",
-                Площадь: "Площадь",
-                Время: "Время",
-                Температура: "Температура",
-                Скорость: "Скорость",
-                'Энергия/Работа': "Энергия/Работа",
-                Давление: "Давление",
-                Сила: "Сила",
-                'help_title': "📚 Справка по калькулятору",
-                'graph_title': "📈 Построение графика",
-                'ai_title': "🧠 Математический Помощник",
-                'ai_ask_btn': "Решить задачу",
-                'ai_processing': "Решение...",
-                'ai_copy_btn': "📋 Копировать",
-                'ai_insert_btn': "➡️ Вставить в калькулятор",
-                'ai_clear_btn': "🗑️ Очистить"
-            },
-            en: {
-                exact_answer: "Exact answer: ",
-                approx_answer: "Approximate answer: ",
-                calculate: "Calculate",
-                unit_converter: "🌐 Unit Converter",
-                select_category: "Select Category:",
-                value: "Value:",
-                from: "FROM:",
-                to: "TO:",
-                precision: "Precision (decimal places):",
-                result: "Result: ",
-                calculation_history: "Calculation History",
-                export: "Export",
-                clear_all: "Clear All",
-                history_empty: "Results will appear here.",
-                scientific_label: "Scientific",
-                expression_placeholder: "Enter: 100%50, 200+10%, x+5=10, 3/4*2",
-                conversion: "Conversion",
-                memory_cleared: "Memory cleared",
-                memory_value: "Memory value: ",
-                memory_add_error: "Error adding to memory: ",
-                memory_sub_error: "Error subtracting from memory: ",
-                confirm_clear_history: "Are you sure you want to clear all history?",
-                history_cleared: "History cleared",
-                history_exported: "History exported",
-                no_history: "No history to export",
-                graph_function: "Function (use x as variable):",
-                graph_from: "From:",
-                graph_to: "To:",
-                graph_step: "Step:",
-                plot_graph: "Plot Graph",
-                Длина: "Length",
-                Масса: "Mass",
-                Объем: "Volume",
-                Площадь: "Area",
-                Время: "Time",
-                Температура: "Temperature",
-                Скорость: "Speed",
-                'Энергия/Работа': "Energy/Work",
-                Давление: "Pressure",
-                Сила: "Force",
-                'help_title': "📚 Calculator Help",
-                'graph_title': "📈 Plot Graph",
-                'ai_title': "🧠 Math Assistant",
-                'ai_ask_btn': "Solve Problem",
-                'ai_processing': "Solving...",
-                'ai_copy_btn': "📋 Copy",
-                'ai_insert_btn': "➡️ Insert to Calculator",
-                'ai_clear_btn': "🗑️ Clear"
-            }
+            // Химия
+            'молекулярная масса воды': 'H₂O: 2×1 + 16 = 18 г/моль',
+            'молекулярная масса углекислого газа': 'CO₂: 12 + 2×16 = 44 г/моль',
+            'молекулярная масса метана': 'CH₄: 12 + 4×1 = 16 г/моль',
+            'число молей масса 36 вещество вода': 'n = m/M = 36 ÷ 18 = 2 моль',
+            
+            // Финансы
+            'простой процент сумма 1000 ставка 5 время 3': 'I = P × r × t = 1000 × 0.05 × 3 = 150',
+            'сложный процент сумма 1000 ставка 5 время 3': 'A = P(1 + r)ᵗ = 1000(1.05)³ ≈ 1157.63',
+            'скидка 20% на товар 500': 'Скидка = 500 × 0.20 = 100\nЦена со скидкой = 500 - 100 = 400',
+            'налоги 13% от зарплаты 100000': 'Налог = 100000 × 0.13 = 13000\nНа руки = 100000 - 13000 = 87000',
+            
+            // Единицы измерения
+            '1 км в метрах': '1 км = 1000 м',
+            '1 метр в сантиметрах': '1 м = 100 см',
+            '1 сантиметр в миллиметрах': '1 см = 10 мм',
+            '1 килограмм в граммах': '1 кг = 1000 г',
+            '1 литр в миллилитрах': '1 л = 1000 мл',
+            '1 час в минутах': '1 ч = 60 мин',
+            '1 минута в секундах': '1 мин = 60 с',
+            '1 день в часах': '1 день = 24 ч',
+            '1 неделя в днях': '1 неделя = 7 дней',
+            '1 год в днях': '1 год ≈ 365 дней',
+            
+            // Температура
+            '0 цельсия в фаренгейт': '0°C = 32°F',
+            '100 цельсия в фаренгейт': '100°C = 212°F',
+            '32 фаренгейт в цельсий': '32°F = 0°C',
+            '212 фаренгейт в цельсий': '212°F = 100°C',
+            'формула цельсий в фаренгейт': '°F = °C × 9/5 + 32',
+            'формула фаренгейт в цельсий': '°C = (°F - 32) × 5/9',
+            'абсолютный ноль': '-273.15°C = -459.67°F = 0 K',
+            
+            // Шутки и пасхалки
+            'ответ на все вопросы': '42 (по версии "Автостопом по галактике")',
+            'лучшее число': '73 (по мнению Шелдона Купера)',
+            'самое счастливое число': '7',
+            'сколько весит слон': 'Африканский слон: 4000-7000 кг\nАзиатский слон: 3000-5000 кг',
+            'скорость звука': 'В воздухе при 20°C: ≈ 343 м/с',
+            'скорость света в вакууме': '299,792,458 м/с',
+            'расстояние до луны': 'Среднее: 384,400 км',
+            'расстояние до солнца': 'Среднее: 149,600,000 км (1 а.е.)',
+            
+            // Последнее - совет как пользоваться калькулятором
+            'как пользоваться калькулятором': '🎯 Просто введите выражение в поле и нажмите "Вычислить"!\n\nПримеры:\n• 100%50 → 50 (50% от 100)\n• 200+10% → 220 (200 + 10%)\n• x+5=10 → решит уравнение\n• 3/4*2 → дроби и умножение\n\nКалькулятор умеет ВСЁ что нужно!',
+            'что умеет калькулятор': '✅ Арифметика\n✅ Проценты (как в Samsung)\n✅ Уравнения\n✅ Дроби\n✅ Научные функции\n✅ Графики (скоро)\n✅ Конвертер единиц\n✅ История вычислений\n✅ Память (MC, MR, M+, M-)\n\nИ всё это БЕСПЛАТНО!',
+            'помощь': 'Нужна помощь? Просто спросите что-нибудь математическое!\nИли используйте калькулятор - он реально крутой! 😉'
         };
         
         const UNIT_CATEGORIES = {
             'Длина': ['m', 'km', 'cm', 'mm', 'inch', 'ft', 'yd', 'mile'],
             'Масса': ['kg', 'g', 'mg', 'lbm', 'oz', 'tonne'],
-            'Объем': ['m^3', 'L', 'mL', 'gallon', 'quart', 'pint'],
-            'Площадь': ['m^2', 'km^2', 'cm^2', 'acre', 'ha'],
-            'Время': ['s', 'min', 'hr', 'day', 'week', 'year'],
-            'Температура': ['degC', 'degF', 'K'],
-            'Скорость': ['m/s', 'km/h', 'mph', 'knot'],
-            'Энергия/Работа': ['J', 'kJ', 'cal', 'kcal', 'kWh', 'BTU'],
-            'Давление': ['Pa', 'kPa', 'bar', 'atm', 'psi'],
-            'Сила': ['N', 'kN', 'lbf'],
+            'Температура': ['degC', 'degF', 'K']
         };
         
-        const scope = { M: 0, pi: math.pi, e: math.e, i: math.i };
-        Object.defineProperty(scope, 'M', {
-            get: () => memoryValue, set: (val) => memoryValue = val, enumerable: true, configurable: true
-        });
-        
-        // ===== ИНИЦИАЛИЗАЦИЯ =====
-        function init() {
-            calculationHistory = [];
-            memoryValue = 0;
-            precision = 6;
-            scientificNotation = false;
-            currentLanguage = 'ru';
-            
-            precisionSlider.value = precision;
-            document.getElementById('scientific-toggle').checked = scientificNotation;
-            languageSelect.value = currentLanguage;
-            
-            initConverter();
-            renderExpression('');
-            updatePrecision();
-            updateLanguage();
-        }
-        
-        // ===== ОФФЛАЙН AI ПОМОЩНИК =====
+        // ===== "AI" ПОМОЩНИК =====
         function askAI() {
             const prompt = document.getElementById('ai-prompt').value.trim().toLowerCase();
             
             if (!prompt) {
-                alert('Введите математическую задачу или вопрос');
+                alert('Введите вопрос! Например: "2+2" или "площадь круга радиусом 5"');
                 return;
             }
             
@@ -858,117 +827,88 @@
             
             askBtn.disabled = true;
             loading.classList.remove('hidden');
-            btnText.textContent = translations[currentLanguage].ai_processing;
+            btnText.textContent = "Думаю...";
             
-            responseDiv.innerHTML = '<div class="ai-thinking">🤔 Решаю задачу...</div>';
+            responseDiv.innerHTML = '<div class="ai-thinking">🤔 "Думаю"... (на самом деле ищу в базе)</div>';
             
-            // Имитируем загрузку для реалистичности
+            // Искусственная задержка для "реалистичности" 🤣
             setTimeout(() => {
                 try {
-                    const solution = solveMathProblem(prompt);
-                    displayAIResponse(solution);
-                    aiRequestsCount++;
+                    let response = findInKnowledgeBase(prompt);
+                    displayAIResponse(response);
                     
                 } catch (error) {
                     responseDiv.innerHTML = `
                         <div class="error p-4">
-                            <strong>❌ Ошибка:</strong> Не удалось решить задачу<br><br>
-                            <small>Попробуйте сформулировать иначе или используйте калькулятор напрямую.</small>
+                            <strong>🤷‍♂️ Не знаю ответ на это!</strong><br><br>
+                            <small>Но вы можете решить это через калькулятор!<br>
+                            Просто введите выражение в поле выше. Калькулятор реально мощный! 💪</small>
                         </div>
                     `;
                 } finally {
                     askBtn.disabled = false;
                     loading.classList.add('hidden');
-                    btnText.textContent = translations[currentLanguage].ai_ask_btn;
+                    btnText.textContent = "Получить ответ";
                 }
-            }, 800); // Небольшая задержка для реалистичности
+            }, 800 + Math.random() * 400); // Случайная задержка 800-1200ms
         }
         
-        function solveMathProblem(prompt) {
-            const lowerPrompt = prompt.toLowerCase();
+        function findInKnowledgeBase(prompt) {
+            // 1. Точное совпадение
+            if (mathKnowledgeBase[prompt]) {
+                return `🎯 <strong>Точный ответ:</strong><br><br>${mathKnowledgeBase[prompt]}`;
+            }
             
-            // 1. Проверяем базу знаний
-            for (const [key, solution] of Object.entries(mathKnowledgeBase)) {
-                if (lowerPrompt.includes(key.toLowerCase())) {
-                    return `✅ Решение для "${key}":\n\n${solution}`;
+            // 2. Поиск по ключевым словам
+            const words = prompt.split(' ');
+            for (const [key, value] of Object.entries(mathKnowledgeBase)) {
+                // Проверяем, содержатся ли слова запроса в ключе
+                const keyWords = key.toLowerCase().split(' ');
+                const hasMatch = words.some(word => 
+                    word.length > 2 && keyWords.some(kw => kw.includes(word) || word.includes(kw))
+                );
+                
+                if (hasMatch) {
+                    return `🔍 <strong>Похожий вопрос "${key}":</strong><br><br>${value}`;
                 }
             }
             
-            // 2. Пытаемся распознать тип задачи
-            if (lowerPrompt.includes('+') || lowerPrompt.includes('-') || 
-                lowerPrompt.includes('*') || lowerPrompt.includes('/') ||
-                lowerPrompt.includes('разделить') || lowerPrompt.includes('умнож') ||
-                lowerPrompt.includes('слож') || lowerPrompt.includes('выч')) {
-                
+            // 3. Если есть числа и операторы - пытаемся вычислить
+            const mathExpr = prompt.replace(/[^0-9+\-*/.()=x^√π]/g, '');
+            if (mathExpr.length >= 3) {
                 try {
-                    // Пробуем вычислить выражение
-                    const result = math.evaluate(prompt.replace(/[^0-9+\-*/.()]/g, ''));
-                    return `✅ Арифметическое выражение:\n\n${prompt} = ${result}`;
+                    const result = math.evaluate(mathExpr.replace(/[^0-9+\-*/.()]/g, ''));
+                    return `🧮 <strong>Вычисляю "${mathExpr}":</strong><br><br>${mathExpr} = ${result}`;
                 } catch (e) {
                     // Не удалось вычислить
                 }
             }
             
-            // 3. Проверяем уравнения
-            if (lowerPrompt.includes('=') && (lowerPrompt.includes('x') || lowerPrompt.includes('у'))) {
-                const equation = prompt.replace(/[^0-9x=+\-*/]/g, '');
-                if (equation.includes('x')) {
-                    return `✅ Уравнение:\n\n${equation}\n\nИспользуйте калькулятор для решения (введите выражение в поле калькулятора).`;
-                }
-            }
-            
-            // 4. Проценты
-            if (lowerPrompt.includes('%') || lowerPrompt.includes('процент')) {
-                const match = prompt.match(/(\d+)\s*%\s*(?:от|of)\s*(\d+)/i);
-                if (match) {
-                    const percent = parseInt(match[1]);
-                    const number = parseInt(match[2]);
-                    const result = (number * percent) / 100;
-                    return `✅ ${percent}% от ${number}:\n\n${percent}% × ${number} = ${percent/100} × ${number} = ${result}`;
-                }
-            }
-            
-            // 5. Геометрия
-            if (lowerPrompt.includes('площадь') || lowerPrompt.includes('area') ||
-                lowerPrompt.includes('объем') || lowerPrompt.includes('volume') ||
-                lowerPrompt.includes('периметр') || lowerPrompt.includes('perimeter')) {
-                
-                if (lowerPrompt.includes('круг') || lowerPrompt.includes('circle')) {
-                    const radiusMatch = prompt.match(/(\d+)/);
-                    if (radiusMatch) {
-                        const r = parseInt(radiusMatch[1]);
-                        const area = Math.PI * r * r;
-                        return `✅ Площадь круга радиусом ${r}:\n\nS = πr² = π × ${r}² = ${area.toFixed(2)}`;
-                    }
-                } else if (lowerPrompt.includes('квадрат') || lowerPrompt.includes('square')) {
-                    const sideMatch = prompt.match(/(\d+)/);
-                    if (sideMatch) {
-                        const a = parseInt(sideMatch[1]);
-                        const area = a * a;
-                        const perimeter = 4 * a;
-                        return `✅ Квадрат со стороной ${a}:\n\nПлощадь = a² = ${a}² = ${area}\nПериметр = 4a = 4 × ${a} = ${perimeter}`;
-                    }
-                }
-            }
-            
-            // 6. Общий ответ, если не распознали
-            return `🤔 Задача: "${prompt}"\n\n💡 Совет:\n1. Введите выражение в калькулятор напрямую\n2. Используйте кнопки для операций\n3. Для уравнений используйте формат: x+5=10\n\n🔧 Калькулятор умеет:\n- Арифметические операции\n- Проценты (стиль Samsung)\n- Уравнения\n- Дроби\n- Научные функции`;
+            // 4. Общий совет
+            return `🤔 <strong>"${prompt}"</strong><br><br>
+            💡 <strong>Совет:</strong> Используйте калькулятор для решения!<br><br>
+            Калькулятор умеет:<br>
+            ✅ Арифметические операции<br>
+            ✅ Проценты (200+10% → 220)<br>
+            ✅ Уравнения (x+5=10)<br>
+            ✅ Дроби (3/4*2)<br>
+            ✅ Научные функции (sin, cos, √)<br><br>
+            <small>🎭 P.S. Это не настоящий ИИ, а база знаний с 150+ готовыми ответами.<br>
+            Но работает быстрее и надежнее любого API! 😉</small>`;
         }
         
         function displayAIResponse(response) {
             const responseDiv = document.getElementById('ai-response');
             const formattedResponse = response.replace(/\n/g, '<br>');
             
-            const timestamp = new Date().toLocaleTimeString();
-            const finalHTML = `
-                <div class="mb-4 text-sm text-gray-400 border-b border-gray-700 pb-2">
-                    ✅ Решено в ${timestamp} | Оффлайн режим
+            responseDiv.innerHTML = `
+                <div class="success p-4">
+                    ${formattedResponse}
+                    <div class="mt-4 text-xs text-gray-400">
+                        ⚡ Ответ за 1 сек • 🚫 Без API • 💰 Бесплатно • 🎯 Точно в цель
+                    </div>
                 </div>
-                <div class="ai-content">${formattedResponse}</div>
             `;
-            
-            responseDiv.innerHTML = finalHTML;
-            responseDiv.scrollTop = 0;
         }
         
         function copyAIResponse() {
@@ -980,7 +920,7 @@
                 const original = btn.textContent;
                 btn.textContent = '✅ Скопировано!';
                 setTimeout(() => {
-                    btn.textContent = translations[currentLanguage].ai_copy_btn;
+                    btn.textContent = '📋 Копировать';
                 }, 2000);
             });
         }
@@ -989,48 +929,302 @@
             const responseDiv = document.getElementById('ai-response');
             const text = responseDiv.innerText;
             
-            // Ищем числовой ответ в тексте
-            const matches = text.match(/(?:=|равно|равняется)\s*([0-9.]+)/i) || 
-                          text.match(/(\d+(?:\.\d+)?)$/m);
+            // Ищем числа в ответе
+            const numberMatch = text.match(/(?:=|равно|→|is)\s*([0-9.]+)/i) || 
+                              text.match(/(\d+(?:\.\d+)?)(?=\s|$)/);
             
-            if (matches && matches[1]) {
-                expressionInput.value = matches[1];
-                renderExpression(matches[1]);
+            if (numberMatch && numberMatch[1]) {
+                expressionInput.value = numberMatch[1];
+                renderExpression(numberMatch[1]);
                 closeModal('aiModal');
-                alert(`✅ Число вставлено: ${matches[1]}`);
+                showNotification(`✅ Число ${numberMatch[1]} вставлено в калькулятор!`);
             } else {
-                alert('Не удалось найти числовой ответ. Скопируйте выражение вручную.');
+                showNotification('🔍 Не нашёл числа для вставки. Скопируйте вручную.');
             }
         }
         
         function clearAIResponse() {
             document.getElementById('ai-response').innerHTML = 
-                '<div class="ai-thinking"><div class="text-2xl mb-2">🧮</div><p>Оффлайн математический помощник</p></div>';
+                '<div class="ai-thinking"><div class="text-2xl mb-2">🤔</div><p>Задайте вопрос - получите мгновенный ответ!</p></div>';
             document.getElementById('ai-prompt').value = '';
         }
         
-        function updateAIContext() {
-            const currentExpr = expressionInput.value || 'нет';
-            const lastResult = calculationHistory.length > 0 
-                ? calculationHistory[calculationHistory.length - 1].result
-                : 'нет';
-            
-            document.getElementById('current-expression-context').textContent = currentExpr;
-            document.getElementById('last-result-context').textContent = lastResult;
+        // ===== ОСНОВНЫЕ ФУНКЦИИ КАЛЬКУЛЯТОРА =====
+        function init() {
+            renderUnitSelector();
         }
         
-        function useCurrentExpression() {
-            const currentExpr = expressionInput.value;
-            if (currentExpr) {
-                document.getElementById('ai-prompt').value = `Реши: ${currentExpr}`;
+        function appendToExpression(value) {
+            expressionInput.value += value;
+            renderExpression(expressionInput.value);
+        }
+        
+        function clearExpression() {
+            expressionInput.value = '';
+            fractionResultDiv.textContent = 'Точный ответ: Ожидание ввода...';
+            decimalResultDiv.textContent = 'Приближенный ответ: ---';
+            renderOutputDiv.innerHTML = '';
+        }
+        
+        function renderExpression(text) {
+            renderOutputDiv.textContent = text;
+        }
+        
+        async function handleInput() {
+            const expr = expressionInput.value.trim();
+            if (!expr) return;
+            
+            try {
+                // Уравнения
+                if (expr.includes('=')) {
+                    const parts = expr.split('=');
+                    if (parts.length === 2) {
+                        const left = math.evaluate(parts[0].trim());
+                        const right = math.evaluate(parts[1].trim());
+                        
+                        if (expr.includes('x')) {
+                            const solution = right - left;
+                            showResults(`x = ${solution}`, `${solution}`);
+                            recordHistory(expr, solution);
+                        } else {
+                            const result = left === right ? 'Верно' : 'Неверно';
+                            showResults(result, result);
+                            recordHistory(expr, result);
+                        }
+                        return;
+                    }
+                }
+                
+                // Проценты Samsung-style
+                let processedExpr = expr;
+                if (expr.includes('%')) {
+                    processedExpr = expr.replace(/(\d+)%(\d+)/g, '($1/100)*$2');
+                    processedExpr = processedExpr.replace(/(\d+)[\+\-](\d+)%/g, (match, num, percent) => {
+                        const op = match.includes('+') ? '+' : '-';
+                        return `${num}${op}(${num}*${percent}/100)`;
+                    });
+                }
+                
+                const result = math.evaluate(processedExpr);
+                showResults(result.toString(), result.toFixed(6));
+                recordHistory(expr, result);
+                
+            } catch (error) {
+                showResults('Ошибка', 'Проверьте выражение', true);
             }
         }
         
-        // ===== ВСЕ ОСТАЛЬНЫЕ ФУНКЦИИ КАЛЬКУЛЯТОРА ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ =====
-        // (предобработка выражений, решение уравнений, конвертер, история, графики и т.д.)
-        // ... [ВСТАВЬТЕ СЮДА ВЕСЬ ОСТАВШИЙСЯ КОД ИЗ ПРЕДЫДУЩЕЙ ВЕРСИИ] ...
+        function showResults(exact, approx, isError = false) {
+            fractionResultDiv.textContent = `Точный ответ: ${exact}`;
+            decimalResultDiv.textContent = `Приближенный ответ: ${approx}`;
+            
+            if (isError) {
+                fractionResultDiv.className = 'result-box error';
+                decimalResultDiv.className = 'result-box error';
+            } else {
+                fractionResultDiv.className = 'result-box fraction-result';
+                decimalResultDiv.className = 'result-box decimal-result';
+            }
+        }
         
-        // Инициализация при загрузке
+        // ===== КОНВЕРТЕР =====
+        function toggleConverter() {
+            converterPanel.classList.toggle('hidden');
+        }
+        
+        function renderUnitSelector() {
+            const category = document.getElementById('unit-category').value;
+            const units = UNIT_CATEGORIES[category] || [];
+            
+            const unitFrom = document.getElementById('unit-from');
+            const unitTo = document.getElementById('unit-to');
+            
+            unitFrom.innerHTML = '';
+            unitTo.innerHTML = '';
+            
+            units.forEach(unit => {
+                const option1 = document.createElement('option');
+                option1.value = unit;
+                option1.textContent = unit;
+                unitFrom.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = unit;
+                option2.textContent = unit;
+                unitTo.appendChild(option2);
+                
+                if (units.length > 1) {
+                    unitFrom.options[0].selected = true;
+                    unitTo.options[1].selected = true;
+                }
+            });
+            
+            performConversion();
+        }
+        
+        function performConversion() {
+            const value = parseFloat(document.getElementById('converter-input').value) || 1;
+            const from = document.getElementById('unit-from').value;
+            const to = document.getElementById('unit-to').value;
+            const category = document.getElementById('unit-category').value;
+            
+            let result = value;
+            
+            if (category === 'Длина') {
+                const conversions = {
+                    'm': 1,
+                    'km': 0.001,
+                    'cm': 100,
+                    'mm': 1000,
+                    'inch': 39.3701,
+                    'ft': 3.28084,
+                    'yd': 1.09361,
+                    'mile': 0.000621371
+                };
+                result = value * (conversions[to] / conversions[from]);
+            }
+            else if (category === 'Масса') {
+                const conversions = {
+                    'kg': 1,
+                    'g': 1000,
+                    'mg': 1e6,
+                    'lbm': 2.20462,
+                    'oz': 35.274,
+                    'tonne': 0.001
+                };
+                result = value * (conversions[to] / conversions[from]);
+            }
+            else if (category === 'Температура') {
+                let tempInC;
+                if (from === 'degC') tempInC = value;
+                else if (from === 'degF') tempInC = (value - 32) * 5/9;
+                else if (from === 'K') tempInC = value - 273.15;
+                
+                if (to === 'degC') result = tempInC;
+                else if (to === 'degF') result = (tempInC * 9/5) + 32;
+                else if (to === 'K') result = tempInC + 273.15;
+            }
+            
+            converterResultOutput.textContent = `Результат: ${result.toFixed(4)} ${to}`;
+        }
+        
+        // ===== ИСТОРИЯ =====
+        function toggleHistory() {
+            historyPanel.classList.toggle('hidden');
+            if (!historyPanel.classList.contains('hidden')) {
+                updateHistoryDisplay();
+            }
+        }
+        
+        function recordHistory(expression, result) {
+            calculationHistory.push({
+                expression,
+                result,
+                timestamp: new Date().toLocaleTimeString()
+            });
+            
+            if (calculationHistory.length > 50) {
+                calculationHistory.shift();
+            }
+            
+            updateHistoryDisplay();
+        }
+        
+        function updateHistoryDisplay() {
+            historyLogDiv.innerHTML = '';
+            
+            if (calculationHistory.length === 0) {
+                historyLogDiv.innerHTML = '<p class="text-sm text-gray-500 text-center mt-4">Здесь появятся ваши вычисления</p>';
+                return;
+            }
+            
+            calculationHistory.slice().reverse().forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <div class="history-content">
+                        <div class="history-expression">${item.expression}</div>
+                        <div class="history-result">${item.result}</div>
+                    </div>
+                `;
+                div.onclick = () => {
+                    expressionInput.value = item.expression;
+                    renderExpression(item.expression);
+                };
+                historyLogDiv.appendChild(div);
+            });
+        }
+        
+        function clearAllHistory() {
+            if (confirm('Очистить всю историю вычислений?')) {
+                calculationHistory = [];
+                updateHistoryDisplay();
+                showNotification('✅ История очищена');
+            }
+        }
+        
+        // ===== ПАМЯТЬ =====
+        function memoryClear() {
+            memoryValue = 0;
+            showNotification('🧠 Память очищена');
+        }
+        
+        function memoryRecall() {
+            expressionInput.value += memoryValue;
+            renderExpression(expressionInput.value);
+        }
+        
+        function memoryAdd() {
+            try {
+                const current = math.evaluate(expressionInput.value || '0');
+                memoryValue += current;
+                showNotification(`🧠 Добавлено в память. Текущее значение: ${memoryValue}`);
+            } catch (e) {
+                showNotification('❌ Не удалось добавить в память');
+            }
+        }
+        
+        function memorySubtract() {
+            try {
+                const current = math.evaluate(expressionInput.value || '0');
+                memoryValue -= current;
+                showNotification(`🧠 Вычтено из памяти. Текущее значение: ${memoryValue}`);
+            } catch (e) {
+                showNotification('❌ Не удалось вычесть из памяти');
+            }
+        }
+        
+        // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // Горячие клавиши
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleInput();
+            if (e.key === 'Escape') clearExpression();
+            if (e.ctrlKey && e.key === 'i') {
+                e.preventDefault();
+                openModal('aiModal');
+            }
+        });
+        
+        // Инициализация
         window.onload = init;
     </script>
 </body>
