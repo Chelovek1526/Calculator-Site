@@ -398,27 +398,277 @@
             padding: 8px 12px;
             font-size: 0.9rem;
         }
-        .honest-badge {
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            background: #f59e0b;
-            color: #1f2937;
-            font-weight: bold;
-            margin-left: 5px;
-        }
-        .truth-box {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid #f59e0b;
-            border-radius: 8px;
-            padding: 10px;
-            margin: 10px 0;
-        }
     </style>
 </head>
 <body>
     <div class="spinner" id="spinner">
         <div class="spinner-circle"></div>
+    </div>
+    
+    <!-- Модалка справки (содержит все подсказки + помощь с AI) -->
+    <div class="modal" id="helpModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl font-bold">📚 Полная справка по калькулятору</h2>
+                <button class="close-btn" onclick="closeModal('helpModal')">×</button>
+            </div>
+            <div class="space-y-6">
+                <!-- Раздел: Быстрый старт -->
+                <div>
+                    <h3 class="text-lg font-bold text-blue-300 mb-3">🚀 Быстрый старт</h3>
+                    <p class="text-gray-300 mb-2">Введите выражение в поле и нажмите <kbd class="bg-gray-700 px-2 py-1 rounded">Вычислить</kbd> или <kbd class="bg-gray-700 px-2 py-1 rounded">Enter</kbd></p>
+                </div>
+                
+                <!-- Раздел: Проценты Samsung-style -->
+                <div>
+                    <h3 class="text-lg font-bold text-green-300 mb-2">💯 Проценты (как в Samsung)</h3>
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Формат</div>
+                                <code class="text-white">100%50</code>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Результат</div>
+                                <div class="text-green-400">50 (50% от 100)</div>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Формат</div>
+                                <code class="text-white">200+10%</code>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Результат</div>
+                                <div class="text-green-400">220 (200 + 10% от 200)</div>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Формат</div>
+                                <code class="text-white">500-20%</code>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Результат</div>
+                                <div class="text-green-400">400 (500 - 20% от 500)</div>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Формат</div>
+                                <code class="text-white">1000*15%</code>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Результат</div>
+                                <div class="text-green-400">150 (15% от 1000)</div>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Формат</div>
+                                <code class="text-white">80/20%</code>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Результат</div>
+                                <div class="text-green-400">400 (80 ÷ 20%)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Раздел: Уравнения -->
+                <div>
+                    <h3 class="text-lg font-bold text-purple-300 mb-2">⚖️ Решение уравнений</h3>
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Уравнение</div>
+                                <code class="text-white">x + 5 = 10</code>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Ответ</div>
+                                <div class="text-purple-400">x = 5</div>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Уравнение</div>
+                                <code class="text-white">2x = 8</code>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Ответ</div>
+                                <div class="text-purple-400">x = 4</div>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Уравнение</div>
+                                <code class="text-white">x/2 = 6</code>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Ответ</div>
+                                <div class="text-purple-400">x = 12</div>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Уравнение</div>
+                                <code class="text-white">x^2 = 9</code>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-sm text-gray-400">Ответ</div>
+                                <div class="text-purple-400">x = 3 или x = -3</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Раздел: AI Помощник -->
+                <div>
+                    <h3 class="text-lg font-bold text-yellow-300 mb-2">🧠 AI Помощник</h3>
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <div class="mb-3">
+                            <h4 class="font-bold text-yellow-200 mb-2">Что можно спросить у AI:</h4>
+                            <ul class="list-disc pl-5 space-y-2 text-gray-300">
+                                <li><span class="text-white font-semibold">Математические вопросы:</span> "площадь круга радиусом 5", "теорема Пифагора", "синус 30 градусов"</li>
+                                <li><span class="text-white font-semibold">Расчеты:</span> "15% от 200", "факториал 5", "2 в степени 10"</li>
+                                <li><span class="text-white font-semibold">Формулы:</span> "формула дискриминанта", "формула квадратного уравнения"</li>
+                                <li><span class="text-white font-semibold">Константы:</span> "число пи", "золотое сечение", "число e"</li>
+                            </ul>
+                        </div>
+                        <div class="mb-3">
+                            <h4 class="font-bold text-yellow-200 mb-2">Как использовать:</h4>
+                            <ol class="list-decimal pl-5 space-y-2 text-gray-300">
+                                <li>Нажмите кнопку <span class="text-purple-300 font-semibold">🧠 AI</span> в правом верхнем углу</li>
+                                <li>Введите вопрос в текстовое поле</li>
+                                <li>Нажмите <span class="text-green-300 font-semibold">"Получить ответ"</span></li>
+                                <li>Используйте кнопки для копирования ответа или вставки числа в калькулятор</li>
+                            </ol>
+                        </div>
+                        <div class="p-3 bg-yellow-900/30 rounded-lg border border-yellow-700">
+                            <p class="text-yellow-200 text-sm font-semibold">💡 Советы по использованию AI:</p>
+                            <ul class="mt-2 space-y-1 text-sm text-yellow-100">
+                                <li>• Задавайте вопросы на русском или английском</li>
+                                <li>• AI понимает математические термины и формулы</li>
+                                <li>• Используйте кнопку <span class="bg-gray-700 px-2 py-1 rounded text-xs">➡️ Вставить в калькулятор</span> для быстрых расчетов</li>
+                                <li>• AI работает офлайн и мгновенно выдает ответы</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Раздел: Горячие клавиши -->
+                <div>
+                    <h3 class="text-lg font-bold text-red-300 mb-2">⌨️ Горячие клавиши</h3>
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <kbd class="bg-gray-700 px-2 py-1 rounded text-sm">Enter</kbd>
+                                    <span class="text-gray-300">Вычислить</span>
+                                </div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <kbd class="bg-gray-700 px-2 py-1 rounded text-sm">Esc</kbd>
+                                    <span class="text-gray-300">Очистить поле</span>
+                                </div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <kbd class="bg-gray-700 px-2 py-1 rounded text-sm">F1</kbd>
+                                    <span class="text-gray-300">Открыть справку</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <kbd class="bg-gray-700 px-2 py-1 rounded text-sm">Ctrl</kbd>
+                                    <span class="text-gray-300">+</span>
+                                    <kbd class="bg-gray-700 px-2 py-1 rounded text-sm">I</kbd>
+                                    <span class="text-gray-300">Открыть AI помощник</span>
+                                </div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <kbd class="bg-gray-700 px-2 py-1 rounded text-sm">↑</kbd>
+                                    <kbd class="bg-gray-700 px-2 py-1 rounded text-sm">↓</kbd>
+                                    <span class="text-gray-300">Навигация по истории</span>
+                                </div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <kbd class="bg-gray-700 px-2 py-1 rounded text-sm">Ctrl</kbd>
+                                    <span class="text-gray-300">+</span>
+                                    <kbd class="bg-gray-700 px-2 py-1 rounded text-sm">Enter</kbd>
+                                    <span class="text-gray-300">Вычислить</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Раздел: Научные функции -->
+                <div>
+                    <h3 class="text-lg font-bold text-cyan-300 mb-2">🔬 Научные функции</h3>
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="text-center">
+                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
+                                <div class="text-cyan-400 font-bold">sin</div>
+                                <div class="text-xs text-gray-400">Синус угла</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
+                                <div class="text-cyan-400 font-bold">cos</div>
+                                <div class="text-xs text-gray-400">Косинус угла</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
+                                <div class="text-cyan-400 font-bold">tan</div>
+                                <div class="text-xs text-gray-400">Тангенс угла</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
+                                <div class="text-cyan-400 font-bold">log</div>
+                                <div class="text-xs text-gray-400">Логарифм</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
+                                <div class="text-cyan-400 font-bold">√</div>
+                                <div class="text-xs text-gray-400">Квадратный корень</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
+                                <div class="text-cyan-400 font-bold">^</div>
+                                <div class="text-xs text-gray-400">Возведение в степень</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
+                                <div class="text-cyan-400 font-bold">π</div>
+                                <div class="text-xs text-gray-400">Число Пи (3.1415...)</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
+                                <div class="text-cyan-400 font-bold">=</div>
+                                <div class="text-xs text-gray-400">Знак равенства</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
+                                <div class="text-cyan-400 font-bold">( )</div>
+                                <div class="text-xs text-gray-400">Скобки</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Раздел: Конвертер единиц -->
+                <div>
+                    <h3 class="text-lg font-bold text-pink-300 mb-2">🌐 Конвертер единиц</h3>
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <p class="text-gray-300 mb-3">Нажмите кнопку <span class="text-yellow-300">🌐</span> для открытия конвертера.</p>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="text-center p-3 bg-gray-900 rounded-lg">
+                                <div class="font-bold text-pink-400">Длина</div>
+                                <div class="text-xs text-gray-400 mt-1">м, км, см, мм, дюймы, футы, мили</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-900 rounded-lg">
+                                <div class="font-bold text-pink-400">Масса</div>
+                                <div class="text-xs text-gray-400 mt-1">кг, г, мг, фунты, унции, тонны</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-900 rounded-lg">
+                                <div class="font-bold text-pink-400">Температура</div>
+                                <div class="text-xs text-gray-400 mt-1">°C, °F, K</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Кнопка закрытия -->
+            <div class="mt-6 pt-4 border-t border-gray-600 text-center">
+                <button onclick="closeModal('helpModal')" class="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600">
+                    Закрыть справку
+                </button>
+            </div>
+        </div>
     </div>
     
     <!-- AI Модалка -->
@@ -463,6 +713,10 @@
                 <button onclick="insertAIResult()" class="ai-action-btn insert" id="ai-insert-btn">➡️ Вставить в калькулятор</button>
                 <button onclick="clearAIResponse()" class="ai-action-btn clear" id="ai-clear-btn">🗑️ Очистить</button>
             </div>
+            
+            <div class="mt-4 text-xs text-gray-400 text-center">
+                <p>💡 Нужна помощь по использованию AI? Откройте справку (<kbd class="bg-gray-700 px-1 py-0.5 rounded">F1</kbd>)</p>
+            </div>
         </div>
     </div>
     
@@ -470,6 +724,9 @@
     <div class="header-controls">
         <h1 class="text-3xl font-extrabold text-white">🧮 Продвинутый калькулятор</h1>
         <div class="flex gap-2">
+            <button onclick="openModal('helpModal')" class="px-3 py-1 bg-blue-700 text-white rounded hover:bg-blue-600 flex items-center gap-1">
+                📚
+            </button>
             <button onclick="openModal('aiModal')" class="px-3 py-1 bg-purple-700 text-white rounded hover:bg-purple-600 flex items-center gap-1">
                 🧠 AI
             </button>
@@ -595,6 +852,67 @@
         function init() {
             renderUnitSelector();
             loadHistory();
+            setupKeyboardShortcuts();
+        }
+        
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                // F1 для открытия справки
+                if (e.key === 'F1') {
+                    e.preventDefault();
+                    openModal('helpModal');
+                }
+                // Ctrl+I для открытия AI
+                else if (e.ctrlKey && e.key === 'i') {
+                    e.preventDefault();
+                    openModal('aiModal');
+                }
+                // Enter для вычисления
+                else if (e.key === 'Enter') {
+                    calculate();
+                }
+                // Escape для очистки
+                else if (e.key === 'Escape') {
+                    clearExpression();
+                }
+                // Ctrl+Enter для вычисления
+                else if (e.ctrlKey && e.key === 'Enter') {
+                    calculate();
+                }
+                // Стрелки для навигации по истории
+                else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    navigateHistory(e.key === 'ArrowUp' ? -1 : 1);
+                }
+            });
+        }
+        
+        let historyIndex = -1;
+        let originalExpression = '';
+        
+        function navigateHistory(direction) {
+            if (calculationHistory.length === 0) return;
+            
+            if (historyIndex === -1 && direction === -1) {
+                historyIndex = calculationHistory.length - 1;
+                originalExpression = expressionInput.value;
+            } else {
+                historyIndex += direction;
+                if (historyIndex < 0) historyIndex = 0;
+                if (historyIndex >= calculationHistory.length) historyIndex = calculationHistory.length - 1;
+            }
+            
+            if (historyIndex >= 0 && historyIndex < calculationHistory.length) {
+                const historyItem = calculationHistory[historyIndex];
+                expressionInput.value = historyItem.expression;
+                renderExpression(historyItem.expression);
+            }
+            
+            if (historyIndex >= calculationHistory.length - 1 && direction === 1) {
+                historyIndex = -1;
+                expressionInput.value = originalExpression;
+                renderExpression(originalExpression);
+            }
         }
         
         function appendToExpression(value) {
@@ -607,6 +925,7 @@
             fractionResultDiv.textContent = 'Точный ответ: Ожидание ввода...';
             decimalResultDiv.textContent = 'Приближенный ответ: ---';
             renderOutputDiv.innerHTML = '';
+            historyIndex = -1;
         }
         
         function renderExpression(text) {
@@ -984,15 +1303,13 @@
             }, 3000);
         }
         
-        // Горячие клавиши
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') calculate();
-            if (e.key === 'Escape') clearExpression();
-            if (e.ctrlKey && e.key === 'i') {
-                e.preventDefault();
-                openModal('aiModal');
-            }
-        });
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
         
         // ============ ВТОРАЯ ЧАСТЬ: AI ПОМОЩНИК ============
         
@@ -1116,7 +1433,9 @@
             // Помощь
             'как пользоваться калькулятором': '🎯 Просто введите выражение и нажмите "Вычислить"!\n\nПримеры:\n• 100%50 → 50 (50% от 100)\n• 200+10% → 220 (200 + 10%)\n• x+5=10 → решит уравнение\n• 3/4*2 → дроби и умножение',
             'что умеет калькулятор': '✅ Арифметика\n✅ Проценты\n✅ Уравнения\n✅ Дроби\n✅ Научные функции\n✅ Конвертер единиц\n✅ История вычислений\n✅ Память\n\nИ всё это бесплатно!',
-            'помощь': 'Нужна помощь? Просто спросите что-нибудь математическое!\nИли используйте калькулятор - он мощный! 😉'
+            'помощь': 'Нужна помощь? Просто спросите что-нибудь математическое!\nИли используйте калькулятор - он мощный! 😉',
+            'как использовать ai': '1. Нажмите кнопку 🧠 AI\n2. Введите вопрос\n3. Нажмите "Получить ответ"\n4. Используйте кнопки для копирования или вставки в калькулятор',
+            'примеры вопросов для ai': '• "площадь круга радиусом 5"\n• "теорема Пифагора"\n• "синус 30 градусов"\n• "15% от 200"\n• "факториал 5"\n• "формула квадратного уравнения"'
         };
         
         // ===== ФУНКЦИИ AI =====
@@ -1255,16 +1574,8 @@
             document.getElementById('ai-prompt').value = '';
         }
         
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
-        
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-        
         // Инициализация калькулятора
         window.onload = init;
     </script>
 </body>
-    </html>
+                                    </html>
