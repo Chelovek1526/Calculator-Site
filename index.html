@@ -405,7 +405,7 @@
         <div class="spinner-circle"></div>
     </div>
     
-    <!-- Модалка справки (содержит все подсказки + помощь с AI) -->
+    <!-- Модалка справки -->
     <div class="modal" id="helpModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -424,46 +424,11 @@
                     <h3 class="text-lg font-bold text-green-300 mb-2">💯 Проценты (как в Samsung)</h3>
                     <div class="bg-gray-800 rounded-lg p-4">
                         <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Формат</div>
-                                <code class="text-white">100%50</code>
-                            </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Результат</div>
-                                <div class="text-green-400">50 (50% от 100)</div>
-                            </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Формат</div>
-                                <code class="text-white">200+10%</code>
-                            </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Результат</div>
-                                <div class="text-green-400">220 (200 + 10% от 200)</div>
-                            </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Формат</div>
-                                <code class="text-white">500-20%</code>
-                            </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Результат</div>
-                                <div class="text-green-400">400 (500 - 20% от 500)</div>
-                            </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Формат</div>
-                                <code class="text-white">1000*15%</code>
-                            </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Результат</div>
-                                <div class="text-green-400">150 (15% от 1000)</div>
-                            </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Формат</div>
-                                <code class="text-white">80/20%</code>
-                            </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Результат</div>
-                                <div class="text-green-400">400 (80 ÷ 20%)</div>
-                            </div>
+                            <div><code class="text-white">100%50</code></div><div class="text-green-400">50 (50% от 100)</div>
+                            <div><code class="text-white">200+10%</code></div><div class="text-green-400">220 (200 + 10% от 200)</div>
+                            <div><code class="text-white">500-20%</code></div><div class="text-green-400">400 (500 - 20% от 500)</div>
+                            <div><code class="text-white">1000*15%</code></div><div class="text-green-400">150 (15% от 1000)</div>
+                            <div><code class="text-white">80/20%</code></div><div class="text-green-400">400 (80 ÷ 20%)</div>
                         </div>
                     </div>
                 </div>
@@ -473,37 +438,48 @@
                     <h3 class="text-lg font-bold text-purple-300 mb-2">⚖️ Решение уравнений</h3>
                     <div class="bg-gray-800 rounded-lg p-4">
                         <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Уравнение</div>
-                                <code class="text-white">x + 5 = 10</code>
+                            <div><code class="text-white">x + 5 = 10</code></div><div class="text-purple-400">x = 5</div>
+                            <div><code class="text-white">2x = 8</code></div><div class="text-purple-400">x = 4</div>
+                            <div><code class="text-white">x/2 = 6</code></div><div class="text-purple-400">x = 12</div>
+                            <div><code class="text-white">x^2 = 9</code></div><div class="text-purple-400">x = 3 или x = -3</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Раздел: Степени и корни -->
+                <div>
+                    <h3 class="text-lg font-bold text-yellow-300 mb-2">🔢 Степени и корни</h3>
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div><code class="text-white">2^3</code></div><div class="text-yellow-400">8 (2 в степени 3)</div>
+                            <div><code class="text-white">sqrt(16)</code></div><div class="text-yellow-400">4 (квадратный корень)</div>
+                            <div><code class="text-white">(2+3)^2</code></div><div class="text-yellow-400">25 (5 в квадрате)</div>
+                            <div><code class="text-white">∛27</code></div><div class="text-yellow-400">3 (кубический корень)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Раздел: KaTeX формулы -->
+                <div>
+                    <h3 class="text-lg font-bold text-cyan-300 mb-2">📐 KaTeX формулы</h3>
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <p class="text-gray-300 mb-3">Калькулятор поддерживает форматирование формул с помощью KaTeX:</p>
+                        <div class="space-y-2">
+                            <div class="p-3 bg-gray-900 rounded">
+                                <div class="text-sm text-gray-400 mb-1">Введите:</div>
+                                <code class="text-white">\frac{1}{2} + \frac{1}{3}</code>
                             </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Ответ</div>
-                                <div class="text-purple-400">x = 5</div>
+                            <div class="p-3 bg-gray-900 rounded">
+                                <div class="text-sm text-gray-400 mb-1">Результат:</div>
+                                <div class="text-cyan-400">½ + ⅓ = 5/6</div>
                             </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Уравнение</div>
-                                <code class="text-white">2x = 8</code>
+                            <div class="p-3 bg-gray-900 rounded">
+                                <div class="text-sm text-gray-400 mb-1">Введите:</div>
+                                <code class="text-white">\sqrt{x^2 + y^2}</code>
                             </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Ответ</div>
-                                <div class="text-purple-400">x = 4</div>
-                            </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Уравнение</div>
-                                <code class="text-white">x/2 = 6</code>
-                            </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Ответ</div>
-                                <div class="text-purple-400">x = 12</div>
-                            </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Уравнение</div>
-                                <code class="text-white">x^2 = 9</code>
-                            </div>
-                            <div>
-                                <div class="font-semibold text-sm text-gray-400">Ответ</div>
-                                <div class="text-purple-400">x = 3 или x = -3</div>
+                            <div class="p-3 bg-gray-900 rounded">
+                                <div class="text-sm text-gray-400 mb-1">Результат:</div>
+                                <div class="text-cyan-400">√(x² + y²)</div>
                             </div>
                         </div>
                     </div>
@@ -511,33 +487,17 @@
                 
                 <!-- Раздел: AI Помощник -->
                 <div>
-                    <h3 class="text-lg font-bold text-yellow-300 mb-2">🧠 AI Помощник</h3>
+                    <h3 class="text-lg font-bold text-pink-300 mb-2">🧠 AI Помощник</h3>
                     <div class="bg-gray-800 rounded-lg p-4">
-                        <div class="mb-3">
-                            <h4 class="font-bold text-yellow-200 mb-2">Что можно спросить у AI:</h4>
-                            <ul class="list-disc pl-5 space-y-2 text-gray-300">
-                                <li><span class="text-white font-semibold">Математические вопросы:</span> "площадь круга радиусом 5", "теорема Пифагора", "синус 30 градусов"</li>
-                                <li><span class="text-white font-semibold">Расчеты:</span> "15% от 200", "факториал 5", "2 в степени 10"</li>
-                                <li><span class="text-white font-semibold">Формулы:</span> "формула дискриминанта", "формула квадратного уравнения"</li>
-                                <li><span class="text-white font-semibold">Константы:</span> "число пи", "золотое сечение", "число e"</li>
-                            </ul>
-                        </div>
-                        <div class="mb-3">
-                            <h4 class="font-bold text-yellow-200 mb-2">Как использовать:</h4>
-                            <ol class="list-decimal pl-5 space-y-2 text-gray-300">
-                                <li>Нажмите кнопку <span class="text-purple-300 font-semibold">🧠 AI</span> в правом верхнем углу</li>
-                                <li>Введите вопрос в текстовое поле</li>
-                                <li>Нажмите <span class="text-green-300 font-semibold">"Получить ответ"</span></li>
-                                <li>Используйте кнопки для копирования ответа или вставки числа в калькулятор</li>
-                            </ol>
-                        </div>
-                        <div class="p-3 bg-yellow-900/30 rounded-lg border border-yellow-700">
-                            <p class="text-yellow-200 text-sm font-semibold">💡 Советы по использованию AI:</p>
-                            <ul class="mt-2 space-y-1 text-sm text-yellow-100">
-                                <li>• Задавайте вопросы на русском или английском</li>
-                                <li>• AI понимает математические термины и формулы</li>
-                                <li>• Используйте кнопку <span class="bg-gray-700 px-2 py-1 rounded text-xs">➡️ Вставить в калькулятор</span> для быстрых расчетов</li>
-                                <li>• AI работает офлайн и мгновенно выдает ответы</li>
+                        <p class="text-gray-300 mb-3">Нажмите кнопку 🧠 AI для получения помощи по математическим вопросам.</p>
+                        <div class="p-3 bg-gray-900 rounded-lg">
+                            <p class="text-pink-200 text-sm font-semibold">Примеры вопросов для AI:</p>
+                            <ul class="mt-2 space-y-1 text-sm text-gray-300">
+                                <li>• "площадь круга радиусом 5"</li>
+                                <li>• "теорема Пифагора"</li>
+                                <li>• "синус 30 градусов"</li>
+                                <li>• "15% от 200"</li>
+                                <li>• "формула квадратного уравнения"</li>
                             </ul>
                         </div>
                     </div>
@@ -575,94 +535,15 @@
                                     <span class="text-gray-300">Навигация по истории</span>
                                 </div>
                                 <div class="flex items-center gap-2 mb-2">
-                                    <kbd class="bg-gray-700 px-2 py-1 rounded text-sm">Ctrl</kbd>
-                                    <span class="text-gray-300">+</span>
-                                    <kbd class="bg-gray-700 px-2 py-1 rounded text-sm">Enter</kbd>
-                                    <span class="text-gray-300">Вычислить</span>
+                                    <kbd class="bg-gray-700 px-2 py-1 rounded text-sm">^</kbd>
+                                    <span class="text-gray-300">Вставить степень</span>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Раздел: Научные функции -->
-                <div>
-                    <h3 class="text-lg font-bold text-cyan-300 mb-2">🔬 Научные функции</h3>
-                    <div class="bg-gray-800 rounded-lg p-4">
-                        <div class="grid grid-cols-3 gap-3">
-                            <div class="text-center">
-                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
-                                <div class="text-cyan-400 font-bold">sin</div>
-                                <div class="text-xs text-gray-400">Синус угла</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
-                                <div class="text-cyan-400 font-bold">cos</div>
-                                <div class="text-xs text-gray-400">Косинус угла</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
-                                <div class="text-cyan-400 font-bold">tan</div>
-                                <div class="text-xs text-gray-400">Тангенс угла</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
-                                <div class="text-cyan-400 font-bold">log</div>
-                                <div class="text-xs text-gray-400">Логарифм</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
-                                <div class="text-cyan-400 font-bold">√</div>
-                                <div class="text-xs text-gray-400">Квадратный корень</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
-                                <div class="text-cyan-400 font-bold">^</div>
-                                <div class="text-xs text-gray-400">Возведение в степень</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
-                                <div class="text-cyan-400 font-bold">π</div>
-                                <div class="text-xs text-gray-400">Число Пи (3.1415...)</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
-                                <div class="text-cyan-400 font-bold">=</div>
-                                <div class="text-xs text-gray-400">Знак равенства</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="font-semibold text-sm text-gray-400">Кнопка</div>
-                                <div class="text-cyan-400 font-bold">( )</div>
-                                <div class="text-xs text-gray-400">Скобки</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Раздел: Конвертер единиц -->
-                <div>
-                    <h3 class="text-lg font-bold text-pink-300 mb-2">🌐 Конвертер единиц</h3>
-                    <div class="bg-gray-800 rounded-lg p-4">
-                        <p class="text-gray-300 mb-3">Нажмите кнопку <span class="text-yellow-300">🌐</span> для открытия конвертера.</p>
-                        <div class="grid grid-cols-3 gap-3">
-                            <div class="text-center p-3 bg-gray-900 rounded-lg">
-                                <div class="font-bold text-pink-400">Длина</div>
-                                <div class="text-xs text-gray-400 mt-1">м, км, см, мм, дюймы, футы, мили</div>
-                            </div>
-                            <div class="text-center p-3 bg-gray-900 rounded-lg">
-                                <div class="font-bold text-pink-400">Масса</div>
-                                <div class="text-xs text-gray-400 mt-1">кг, г, мг, фунты, унции, тонны</div>
-                            </div>
-                            <div class="text-center p-3 bg-gray-900 rounded-lg">
-                                <div class="font-bold text-pink-400">Температура</div>
-                                <div class="text-xs text-gray-400 mt-1">°C, °F, K</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Кнопка закрытия -->
             <div class="mt-6 pt-4 border-t border-gray-600 text-center">
                 <button onclick="closeModal('helpModal')" class="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600">
                     Закрыть справку
@@ -713,10 +594,6 @@
                 <button onclick="insertAIResult()" class="ai-action-btn insert" id="ai-insert-btn">➡️ Вставить в калькулятор</button>
                 <button onclick="clearAIResponse()" class="ai-action-btn clear" id="ai-clear-btn">🗑️ Очистить</button>
             </div>
-            
-            <div class="mt-4 text-xs text-gray-400 text-center">
-                <p>💡 Нужна помощь по использованию AI? Откройте справку (<kbd class="bg-gray-700 px-1 py-0.5 rounded">F1</kbd>)</p>
-            </div>
         </div>
     </div>
     
@@ -741,7 +618,7 @@
                 <div class="result-box decimal-result" id="decimal-result">Приближенный ответ: ---</div>
             </div>
             <div id="render-output"></div>
-            <input type="text" id="expression" placeholder="Введите выражение: 100%50, x+5=10, 3/4*2" autocomplete="off">
+            <input type="text" id="expression" placeholder="Введите: 2^3, sqrt(9), \frac{1}{2}, x+5=10, 100%50" autocomplete="off">
             
             <!-- Кнопки памяти -->
             <div class="grid grid-cols-4 gap-2 mb-4">
@@ -847,42 +724,93 @@
             'Температура': ['degC', 'degF', 'K']
         };
         
-        // ===== ОСНОВНЫЕ ФУНКЦИИ КАЛЬКУЛЯТОРА =====
+        // ===== КАЧЕСТВЕННЫЙ KaTeX РЕНДЕРИНГ =====
+        function renderExpression(text) {
+            renderOutputDiv.innerHTML = '';
+            
+            if (!text) return;
+            
+            try {
+                // Преобразуем выражение для KaTeX
+                let katexExpr = text
+                    .replace(/\\pi/g, '\\pi')
+                    .replace(/\^/g, '^{')  // ^ -> ^{ для KaTeX
+                    .replace(/sqrt\(/g, '\\sqrt{')
+                    .replace(/frac\{([^}]+)\}\{([^}]+)\}/g, '\\frac{$1}{$2}')
+                    .replace(/%/g, '\\%');
+                
+                // Закрываем степени
+                katexExpr = katexExpr.replace(/\^\{([^{}]+)(?![}])/g, '^{$1}');
+                // Закрываем sqrt
+                katexExpr = katexExpr.replace(/\\sqrt\{([^{}]+)(?![}])/g, '\\sqrt{$1}');
+                
+                // Заменяем обратно закрывающие скобки для sqrt
+                katexExpr = katexExpr.replace(/\\sqrt\{([^}]+)\}/g, '\\sqrt{$1}');
+                
+                // Заменяем обычные функции на LaTeX
+                katexExpr = katexExpr.replace(/sin\(/g, '\\sin(');
+                katexExpr = katexExpr.replace(/cos\(/g, '\\cos(');
+                katexExpr = katexExpr.replace(/tan\(/g, '\\tan(');
+                katexExpr = katexExpr.replace(/log\(/g, '\\log(');
+                
+                // Добавляем \cdot для умножения если нужно
+                katexExpr = katexExpr.replace(/(\d)([a-zA-Z(])/g, '$1\\cdot $2');
+                katexExpr = katexExpr.replace(/([a-zA-Z)])(\d)/g, '$1\\cdot $2');
+                
+                katex.render(katexExpr, renderOutputDiv, {
+                    throwOnError: false,
+                    displayMode: true,
+                    fleqn: false
+                });
+            } catch (e) {
+                // Если KaTeX не сработал, показываем обычный текст
+                renderOutputDiv.textContent = text;
+                console.log('KaTeX error:', e);
+            }
+        }
         
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
         function init() {
             renderUnitSelector();
             loadHistory();
             setupKeyboardShortcuts();
+            
+            // Добавляем обработчик ввода для KaTeX
+            expressionInput.addEventListener('input', function() {
+                renderExpression(expressionInput.value);
+            });
+            
+            // Начальный рендеринг
+            renderExpression('');
         }
         
         function setupKeyboardShortcuts() {
             document.addEventListener('keydown', (e) => {
-                // F1 для открытия справки
                 if (e.key === 'F1') {
                     e.preventDefault();
                     openModal('helpModal');
                 }
-                // Ctrl+I для открытия AI
                 else if (e.ctrlKey && e.key === 'i') {
                     e.preventDefault();
                     openModal('aiModal');
                 }
-                // Enter для вычисления
                 else if (e.key === 'Enter') {
                     calculate();
                 }
-                // Escape для очистки
                 else if (e.key === 'Escape') {
                     clearExpression();
                 }
-                // Ctrl+Enter для вычисления
                 else if (e.ctrlKey && e.key === 'Enter') {
                     calculate();
                 }
-                // Стрелки для навигации по истории
                 else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
                     e.preventDefault();
                     navigateHistory(e.key === 'ArrowUp' ? -1 : 1);
+                }
+                // Обработка вставки степеней через ^
+                else if (e.key === '^') {
+                    e.preventDefault();
+                    appendToExpression('^');
                 }
             });
         }
@@ -928,27 +856,28 @@
             historyIndex = -1;
         }
         
-        function renderExpression(text) {
-            renderOutputDiv.textContent = text;
-        }
-        
-        // ===== КОРРЕКТНАЯ ОБРАБОТКА ПРОЦЕНТОВ =====
+        // ===== ОБРАБОТКА СТЕПЕНЕЙ И KaTeX =====
         function preprocessExpression(expr) {
             expr = expr.replace(/\s+/g, '');
             
-            // 1. Обработка процентов Samsung-style
+            // 1. Обработка KaTeX синтаксиса
+            expr = expr.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)');
+            expr = expr.replace(/\\sqrt\{([^}]+)\}/g, 'sqrt($1)');
+            expr = expr.replace(/\\pi/g, 'pi');
+            
+            // 2. Обработка процентов Samsung-style
             expr = processPercentages(expr);
             
-            // 2. Замены для корректной работы с math.js
-            expr = expr.replace(/pi/g, 'pi');
+            // 3. Обработка степеней (^ -> ** для math.js)
             expr = expr.replace(/\^/g, '**');
             
-            // 3. Добавление неявного умножения
+            // 4. Добавление неявного умножения
             expr = addImplicitMultiplication(expr);
             
             return expr;
         }
         
+        // ===== КОРРЕКТНАЯ ОБРАБОТКА ПРОЦЕНТОВ =====
         function processPercentages(expr) {
             let result = expr;
             
@@ -1082,7 +1011,46 @@
                 const processedExpr = preprocessExpression(expr);
                 const result = math.evaluate(processedExpr);
                 
-                showResults(result.toString(), result.toFixed(6), false);
+                // Форматируем результат для отображения
+                let exactResult = result.toString();
+                
+                // Для дробей пытаемся показать красиво
+                if (Number.isFinite(result) && !Number.isInteger(result)) {
+                    const tolerance = 1e-6;
+                    
+                    // Проверяем простые дроби
+                    const fractions = [
+                        {value: 0.5, text: '1/2'},
+                        {value: 0.3333333333, text: '1/3'},
+                        {value: 0.6666666667, text: '2/3'},
+                        {value: 0.25, text: '1/4'},
+                        {value: 0.75, text: '3/4'},
+                        {value: 0.2, text: '1/5'},
+                        {value: 0.4, text: '2/5'},
+                        {value: 0.6, text: '3/5'},
+                        {value: 0.8, text: '4/5'},
+                        {value: 0.125, text: '1/8'},
+                        {value: 0.375, text: '3/8'},
+                        {value: 0.625, text: '5/8'},
+                        {value: 0.875, text: '7/8'},
+                        {value: 0.1666666667, text: '1/6'},
+                        {value: 0.8333333333, text: '5/6'}
+                    ];
+                    
+                    for (const frac of fractions) {
+                        if (Math.abs(result - frac.value) < tolerance) {
+                            exactResult = frac.text;
+                            break;
+                        }
+                    }
+                }
+                
+                // Если результат очень большой или маленький
+                if (Math.abs(result) > 1e10 || (Math.abs(result) < 1e-6 && result !== 0)) {
+                    exactResult = result.toExponential(4);
+                }
+                
+                showResults(exactResult, result.toFixed(6), false);
                 recordHistory(expr, result);
                 
             } catch (error) {
@@ -1133,7 +1101,6 @@
                 unitTo.appendChild(option2);
             });
             
-            // Устанавливаем разные значения по умолчанию
             if (units.length > 1) {
                 unitFrom.selectedIndex = 0;
                 unitTo.selectedIndex = 1;
@@ -1347,6 +1314,21 @@
             '100/10': '100 ÷ 10 = 10',
             '1000/100': '1000 ÷ 100 = 10',
             
+            // Степени
+            '2^3': '2³ = 8',
+            '3^2': '3² = 9',
+            '4^2': '4² = 16',
+            '5^2': '5² = 25',
+            '10^2': '10² = 100',
+            '2^10': '2¹⁰ = 1024',
+            
+            // Корни
+            'sqrt(4)': '√4 = 2',
+            'sqrt(9)': '√9 = 3',
+            'sqrt(16)': '√16 = 4',
+            'sqrt(25)': '√25 = 5',
+            'sqrt(100)': '√100 = 10',
+            
             // Уравнения
             'x+5=10': 'x + 5 = 10\nx = 10 - 5\nx = 5',
             'x-3=7': 'x - 3 = 7\nx = 7 + 3\nx = 10',
@@ -1419,23 +1401,17 @@
             '2 в степени 3': '2³ = 8',
             '2 в степени 2': '2² = 4',
             
-            // Квадратные корни
-            'корень из 4': '√4 = 2',
-            'корень из 9': '√9 = 3',
-            'корень из 16': '√16 = 4',
-            'корень из 25': '√25 = 5',
-            'корень из 36': '√36 = 6',
-            'корень из 49': '√49 = 7',
-            'корень из 64': '√64 = 8',
-            'корень из 81': '√81 = 9',
-            'корень из 100': '√100 = 10',
+            // KaTeX примеры
+            'дробь 1/2': '\\frac{1}{2} = 0.5',
+            'квадратный корень из 16': '\\sqrt{16} = 4',
+            'формула квадрата суммы': '(a + b)² = a² + 2ab + b²',
+            'формула разности квадратов': 'a² - b² = (a - b)(a + b)',
             
             // Помощь
-            'как пользоваться калькулятором': '🎯 Просто введите выражение и нажмите "Вычислить"!\n\nПримеры:\n• 100%50 → 50 (50% от 100)\n• 200+10% → 220 (200 + 10%)\n• x+5=10 → решит уравнение\n• 3/4*2 → дроби и умножение',
-            'что умеет калькулятор': '✅ Арифметика\n✅ Проценты\n✅ Уравнения\n✅ Дроби\n✅ Научные функции\n✅ Конвертер единиц\n✅ История вычислений\n✅ Память\n\nИ всё это бесплатно!',
-            'помощь': 'Нужна помощь? Просто спросите что-нибудь математическое!\nИли используйте калькулятор - он мощный! 😉',
-            'как использовать ai': '1. Нажмите кнопку 🧠 AI\n2. Введите вопрос\n3. Нажмите "Получить ответ"\n4. Используйте кнопки для копирования или вставки в калькулятор',
-            'примеры вопросов для ai': '• "площадь круга радиусом 5"\n• "теорема Пифагора"\n• "синус 30 градусов"\n• "15% от 200"\n• "факториал 5"\n• "формула квадратного уравнения"'
+            'как пользоваться калькулятором': '🎯 Просто введите выражение и нажмите "Вычислить"!\n\nПримеры:\n• 100%50 → 50 (50% от 100)\n• 200+10% → 220 (200 + 10%)\n• x+5=10 → решит уравнение\n• 3/4*2 → дроби и умножение\n• 2^3 → 8 (степень)\n• sqrt(9) → 3 (квадратный корень)',
+            'как использовать степени': 'Используйте символ ^ для степеней:\n• 2^3 → 8\n• 3^2 → 9\n• (2+3)^2 → 25\n• x^2 → x в квадрате',
+            'как использовать katex': 'Поддерживается LaTeX синтаксис:\n• \\frac{1}{2} → дробь ½\n• \\sqrt{16} → √16\n• \\pi → число π\n• x^{2} → x²',
+            'примеры для ai': '• "площадь круга радиусом 5"\n• "теорема Пифагора"\n• "синус 30 градусов"\n• "15% от 200"\n• "факториал 5"\n• "формула квадратного уравнения"\n• "2 в степени 10"\n• "квадратный корень из 25"'
         };
         
         // ===== ФУНКЦИИ AI =====
@@ -1458,7 +1434,6 @@
             
             responseDiv.innerHTML = '<div class="ai-thinking">🤔 Думаю...</div>';
             
-            // Искусственная задержка
             setTimeout(() => {
                 try {
                     let response = findInKnowledgeBase(prompt);
@@ -1500,10 +1475,10 @@
             }
             
             // 3. Попытка вычислить
-            const mathExpr = prompt.replace(/[^0-9+\-*/.()=x^√π]/g, '');
+            const mathExpr = prompt.replace(/[^0-9+\-*/.()=x^√π\\]/g, '');
             if (mathExpr.length >= 3) {
                 try {
-                    const processed = preprocessExpression(mathExpr.replace(/[^0-9+\-*/.()=x]/g, ''));
+                    const processed = preprocessExpression(mathExpr);
                     const result = math.evaluate(processed);
                     return `🧮 <strong>Вычисляю "${mathExpr}":</strong><br><br>${mathExpr} = ${result}`;
                 } catch (e) {
@@ -1515,11 +1490,11 @@
             return `🤔 <strong>"${prompt}"</strong><br><br>
             💡 <strong>Совет:</strong> Используйте калькулятор для решения!<br><br>
             Калькулятор умеет:<br>
-            ✅ Арифметические операции<br>
+            ✅ Степени (2^3 → 8)<br>
+            ✅ Корни (sqrt(9) → 3)<br>
+            ✅ KaTeX формулы (\\frac{1}{2} → ½)<br>
             ✅ Проценты (200+10% → 220)<br>
-            ✅ Уравнения (x+5=10)<br>
-            ✅ Дроби (3/4*2)<br>
-            ✅ Научные функции (sin, cos, √)<br>`;
+            ✅ Уравнения (x+5=10)<br>`;
         }
         
         function displayAIResponse(response) {
@@ -1554,7 +1529,6 @@
             const responseDiv = document.getElementById('ai-response');
             const text = responseDiv.innerText;
             
-            // Ищем числа в ответе
             const numberMatch = text.match(/(?:=|равно|→|is)\s*([0-9.]+)/i) || 
                               text.match(/(\d+(?:\.\d+)?)(?=\s|$)/);
             
@@ -1578,4 +1552,4 @@
         window.onload = init;
     </script>
 </body>
-                                    </html>
+            </html>
