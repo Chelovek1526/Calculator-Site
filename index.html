@@ -734,17 +734,13 @@
                 // Преобразуем выражение для KaTeX
                 let katexExpr = text
                     .replace(/\\pi/g, '\\pi')
-                    .replace(/\^/g, '^{')  // ^ -> ^{ для KaTeX
+                    .replace(/\^(\d+)/g, '^{$1}')  // ^2 -> ^{2} для KaTeX
+                    .replace(/\^\(([^)]+)\)/g, '^{$1}') // ^(x+1) -> ^{x+1}
                     .replace(/sqrt\(/g, '\\sqrt{')
                     .replace(/frac\{([^}]+)\}\{([^}]+)\}/g, '\\frac{$1}{$2}')
                     .replace(/%/g, '\\%');
                 
-                // Закрываем степени
-                katexExpr = katexExpr.replace(/\^\{([^{}]+)(?![}])/g, '^{$1}');
                 // Закрываем sqrt
-                katexExpr = katexExpr.replace(/\\sqrt\{([^{}]+)(?![}])/g, '\\sqrt{$1}');
-                
-                // Заменяем обратно закрывающие скобки для sqrt
                 katexExpr = katexExpr.replace(/\\sqrt\{([^}]+)\}/g, '\\sqrt{$1}');
                 
                 // Заменяем обычные функции на LaTeX
@@ -756,6 +752,9 @@
                 // Добавляем \cdot для умножения если нужно
                 katexExpr = katexExpr.replace(/(\d)([a-zA-Z(])/g, '$1\\cdot $2');
                 katexExpr = katexExpr.replace(/([a-zA-Z)])(\d)/g, '$1\\cdot $2');
+                
+                // Обрабатываем сложные степени
+                katexExpr = katexExpr.replace(/([a-zA-Z0-9)])\^([a-zA-Z0-9(])/g, '$1^{$2');
                 
                 katex.render(katexExpr, renderOutputDiv, {
                     throwOnError: false,
@@ -869,7 +868,10 @@
             expr = processPercentages(expr);
             
             // 3. Обработка степеней (^ -> ** для math.js)
-            expr = expr.replace(/\^/g, '**');
+            // Важно: заменяем только если после ^ есть число или выражение в скобках
+            expr = expr.replace(/\^(\d+(?:\.\d+)?)/g, '**$1');
+            expr = expr.replace(/\^\(([^)]+)\)/g, '**($1)');
+            expr = expr.replace(/\^([a-zA-Z])/g, '**$1');
             
             // 4. Добавление неявного умножения
             expr = addImplicitMultiplication(expr);
@@ -939,7 +941,7 @@
                 // x + 5 = 10
                 if (left === 'x') {
                     try {
-                        const rightVal = math.evaluate(right);
+                        const rightVal = math.evaluate(preprocessExpression(right));
                         return rightVal;
                     } catch (e) {
                         return null;
@@ -951,7 +953,7 @@
                 if (match) {
                     try {
                         const coeff = match[1] === '' ? 1 : parseFloat(match[1]);
-                        const rightVal = math.evaluate(right);
+                        const rightVal = math.evaluate(preprocessExpression(right));
                         return rightVal / coeff;
                     } catch (e) {
                         return null;
@@ -963,7 +965,7 @@
                 if (divMatch) {
                     try {
                         const divisor = parseFloat(divMatch[1]);
-                        const rightVal = math.evaluate(right);
+                        const rightVal = math.evaluate(preprocessExpression(right));
                         return rightVal * divisor;
                     } catch (e) {
                         return null;
@@ -982,6 +984,7 @@
             return null;
         }
         
+        // ===== ГЛАВНАЯ ФУНКЦИЯ ВЫЧИСЛЕНИЯ =====
         function calculate() {
             const expr = expressionInput.value.trim();
             if (!expr) return;
@@ -1007,8 +1010,22 @@
                     }
                 }
                 
-                // Обычное вычисление
-                const processedExpr = preprocessExpression(expr);
+                // Обработка степеней перед вычислением
+                let processedExpr = expr;
+                
+                // Убедимся, что степени обрабатываются правильно
+                processedExpr = processedExpr.replace(/\^/g, '**');
+                
+                // Если вводят просто 2^3, без скобок
+                if (processedExpr.includes('**') && !processedExpr.includes('**(')) {
+                    // Добавляем скобки вокруг степени для сложных выражений
+                    processedExpr = processedExpr.replace(/(\d+(?:\.\d+)?)\*\*(\d+(?:\.\d+)?)/g, '($1)**($2)');
+                }
+                
+                // Затем обрабатываем остальное
+                processedExpr = preprocessExpression(processedExpr);
+                
+                console.log('Вычисляем:', processedExpr); // Для отладки
                 const result = math.evaluate(processedExpr);
                 
                 // Форматируем результат для отображения
@@ -1054,6 +1071,7 @@
                 recordHistory(expr, result);
                 
             } catch (error) {
+                console.error('Calculation error:', error);
                 showResults('Ошибка', 'Проверьте выражение', true);
             }
         }
@@ -1239,7 +1257,8 @@
         function memoryAdd() {
             try {
                 const expr = expressionInput.value.trim();
-                const current = expr ? math.evaluate(preprocessExpression(expr)) : 0;
+                const processed = preprocessExpression(expr.replace(/\^/g, '**'));
+                const current = expr ? math.evaluate(processed) : 0;
                 memoryValue += current;
                 showNotification(`🧠 Добавлено в память. Текущее значение: ${memoryValue.toFixed(6)}`);
             } catch (e) {
@@ -1250,7 +1269,8 @@
         function memorySubtract() {
             try {
                 const expr = expressionInput.value.trim();
-                const current = expr ? math.evaluate(preprocessExpression(expr)) : 0;
+                const processed = preprocessExpression(expr.replace(/\^/g, '**'));
+                const current = expr ? math.evaluate(processed) : 0;
                 memoryValue -= current;
                 showNotification(`🧠 Вычтено из памяти. Текущее значение: ${memoryValue.toFixed(6)}`);
             } catch (e) {
@@ -1478,7 +1498,7 @@
             const mathExpr = prompt.replace(/[^0-9+\-*/.()=x^√π\\]/g, '');
             if (mathExpr.length >= 3) {
                 try {
-                    const processed = preprocessExpression(mathExpr);
+                    const processed = preprocessExpression(mathExpr.replace(/\^/g, '**'));
                     const result = math.evaluate(processed);
                     return `🧮 <strong>Вычисляю "${mathExpr}":</strong><br><br>${mathExpr} = ${result}`;
                 } catch (e) {
@@ -1548,8 +1568,37 @@
             document.getElementById('ai-prompt').value = '';
         }
         
-        // Инициализация калькулятора
-        window.onload = init;
+        // ===== ТЕСТИРОВАНИЕ СТЕПЕНЕЙ =====
+        function testPowerCalculation() {
+            // Тестируем степени
+            const testCases = [
+                '2^3',
+                '3^2',
+                '(2+3)^2',
+                '2^(2+1)',
+                'sqrt(4)^2'
+            ];
+            
+            console.log('Тестирование степеней:');
+            testCases.forEach(test => {
+                try {
+                    const processed = preprocessExpression(test.replace(/\^/g, '**'));
+                    const result = math.evaluate(processed);
+                    console.log(`${test} = ${result} (обработано как: ${processed})`);
+                } catch (e) {
+                    console.log(`${test} - Ошибка: ${e.message}`);
+                }
+            });
+        }
+        
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        function initializeCalculator() {
+            init();
+            testPowerCalculation();
+        }
+        
+        // Запуск калькулятора при загрузке страницы
+        window.onload = initializeCalculator;
     </script>
 </body>
-            </html>
+                                     </html>
